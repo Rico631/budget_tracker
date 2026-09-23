@@ -1,5 +1,5 @@
 import 'package:budget_tracker/main.dart';
-import 'package:budget_tracker/src/data/app_database.dart';
+import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
