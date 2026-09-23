@@ -1,0 +1,8 @@
+{
+  "@@locale": "en",
+  "appTitle": "Budget Tracker",
+  "welcomeMessage": "Welcome to the expense management app",
+  "@welcomeMessage": {
+    "description": "Home screen welcome copy"
+  }
+}
