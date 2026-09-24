@@ -83,26 +83,27 @@ class Transactions extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  AppDatabase.forTesting() : super(NativeDatabase.memory());
+  AppDatabase.forTesting([QueryExecutor? executor])
+    : super(executor ?? NativeDatabase.memory());
 
   @override
   int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-        },
-        onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.createTable(books);
-            await m.createTable(banks);
-            await m.createTable(accounts);
-            await m.createTable(categories);
-            await m.createTable(transactions);
-          }
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(books);
+        await m.createTable(banks);
+        await m.createTable(accounts);
+        await m.createTable(categories);
+        await m.createTable(transactions);
+      }
+    },
+  );
 }
 
 QueryExecutor _openConnection() {

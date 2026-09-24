@@ -1,14 +1,7 @@
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:drift/drift.dart' as drift;
+import 'package:budget_tracker/presentation/features/home/budget_tracker_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final appDatabaseProvider = Provider<AppDatabase>((ref) {
-  final database = AppDatabase();
-  ref.onDispose(database.close);
-  return database;
-});
 
 Locale resolveSupportedLocale(
   Locale? locale,
@@ -28,7 +21,6 @@ Locale resolveSupportedLocale(
 }
 
 void main() {
-  drift.driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   runApp(const ProviderScope(child: BudgetTrackerApp()));
 }
 
@@ -51,30 +43,6 @@ class BudgetTrackerApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const BudgetTrackerHomePage(),
-    );
-  }
-}
-
-class BudgetTrackerHomePage extends ConsumerWidget {
-  const BudgetTrackerHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final database = ref.watch(appDatabaseProvider);
-    final localizations = AppLocalizations.of(context);
-
-    return Scaffold(
-      appBar: AppBar(title: Text(localizations.appTitle)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(localizations.welcomeMessage),
-            const SizedBox(height: 16),
-            Text('Database ready: ${database.schemaVersion}'),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -20,12 +20,7 @@ void main() {
     'app provides the root provider scope and renders the app shell',
     (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            appDatabaseProvider.overrideWithValue(AppDatabase.forTesting()),
-          ],
-          child: const BudgetTrackerApp(locale: Locale('ru')),
-        ),
+        ProviderScope(child: const BudgetTrackerApp(locale: Locale('ru'))),
       );
 
       expect(find.byType(Scaffold), findsOneWidget);
