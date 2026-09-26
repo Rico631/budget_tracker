@@ -1,0 +1,68 @@
+# Tasks
+
+## 1. Домен: правило расчёта остатка и агрегация по книге
+
+- [x] 1.1 Создать `lib/domain/services/account_balance_rule.dart` с чистой функцией `accountBalanceMinor(FinanceAccount account, Iterable<FinanceTransaction> transactions)`: начальный остаток плюс доход, минус расход, минус перевод со счета, плюс перевод на целевой счет; проверить unit-тестом `test/unit/services/account_balance_rule_test.dart` на сценарии «счет без операций», «доход и расход по счету», «перевод между счетами одной книги» и «нулевой и отрицательный остаток» из `specs/accounts-overview/spec.md`.
+- [x] 1.2 Перевести `FinanceTransactionUseCases.calculateAccountBalance` в `lib/domain/usecases/finance_transaction_usecases.dart` на вызов `accountBalanceMinor`, не меняя наблюдаемое поведение; проверить, что `flutter test test/unit/usecases/finance_transaction_usecases_test.dart` проходит без правок существующих тестов.
+- [x] 1.3 Добавить в `lib/domain/models/finance_models.dart` модели `AccountBalance` (счет и остаток в минорных единицах), `AccountBalanceGroup` (код валюты, позиция справочника валют или `null`, счета группы, итог группы) и `AccountsOverview` (группы, признак отсутствия активных счетов); проверить компиляцию командой `flutter analyze`.
+- [x] 1.4 Расширить `AccountsRepository` в `lib/domain/repositories/finance_repositories.dart` методом `hasTransactions(String accountId)`, реализовать его в `lib/data/repositories/accounts_repository.dart` одним запросом существования по таблице `transactions` с индексом `idx_transactions_account_id`; проверить тестом в `test/unit/repositories/accounts_repository_test.dart`: счет без операций дает `false`, счет с операцией — `true`.
+- [x] 1.5 Создать `lib/domain/usecases/account_usecases.dart` с `AccountUseCases.loadOverview(String bookId)`: счета через `AccountsRepository.listByBook`, операции через `TransactionsRepository.listByBook`, расчёт остатков через `accountBalanceMinor`, группировка по `currencyCode`, итог внутри группы, архивные счета исключены; проверить unit-тестом `test/unit/usecases/account_usecases_test.dart` на сценарии «счета в одной валюте», «счета в разных валютах», «архивный счет не влияет на список и итог» и «в книге нет активных счетов».
+- [x] 1.6 Покрыть в `test/unit/usecases/account_usecases_test.dart` проверку единственного чтения таблиц: подменить репозитории на шпионы с подсчетом вызовов `listByBook` и убедиться, что при нескольких счетах каждая выборка выполняется один раз; проверить командой `flutter test test/unit/usecases/account_usecases_test.dart`.
+
+## 2. Домен: ввод и жизненный цикл счета
+
+- [x] 2.1 Создать `lib/domain/commands/finance_account_input.dart` с `FinanceAccountInput.tryCreate` по образцу `FinanceTransactionInput`: тримминг строк, обязательное название, код валюты из трех букв, целый начальный остаток в минорных единицах, необязательный `bankId`; проверить unit-тестом на пустое название и код валюты длиной не 3 символа, а также на допустимость отрицательного остатка.
+- [x] 2.2 Реализовать `AccountUseCases.create(input)`: валидация через `FinanceAccountInput.tryCreate`, создание через `AccountsRepository.create`, возврат `ValidationResult`; проверить тестами на сценарии «успешное создание счета» и «незаполненное название».
+- [x] 2.3 Реализовать `AccountUseCases.update(existing, input)`: сохранение названия, банка и начального остатка; смена кода валюты разрешена только при `hasTransactions == false`, иначе `ValidationResult.invalid` без записи в базу; проверить тестами на сценарии «изменение названия и начального остатка», «изменение валюты счета без операций» и «попытка изменить валюту счета с историей».
+- [x] 2.4 Реализовать `AccountUseCases.deleteOrArchive(String accountId)`: при наличии операций вернуть результат, требующий архивирования, и не удалять счет; при отсутствии операций удалить счет; проверить тестами на сценарии «попытка удалить счет с операциями», «архивирование счета» и «удаление счета без операций».
+- [x] 2.5 Реализовать `AccountUseCases.defaultCurrencyCodeFor(String languageCode)`: `ru` возвращает `RUB`, любая другая локаль — `USD`; проверить unit-тестом для `ru`, `en` и неподдерживаемой локали.
+- [x] 2.6 Покрыть тестом сценарий «банк не выбран»: счет создается с пустым `bankId` и доступен в списке наравне со счетами с банком; проверить командой `flutter test test/unit/usecases/account_usecases_test.dart`.
+
+## 3. Core: тема и семантические цвета
+
+- [x] 3.1 Создать `lib/core/theme/app_semantic_colors.dart` с `AppSemanticColors extends ThemeExtension<AppSemanticColors>` (поля `income`, `expense`, `transfer`, методы `copyWith` и `lerp`) и функцией сопоставления `TransactionKind` с цветом; проверить компиляцию командой `flutter analyze`.
+- [x] 3.2 Создать `lib/core/theme/app_theme.dart` с `AppTheme.light`: `ColorScheme.fromSeed` на бирюзовом seed-цвете, `useMaterial3: true` и подключенный `AppSemanticColors`; заменить инлайновый `ThemeData` в `lib/main.dart` на `AppTheme.light`; проверить, что семантические цвета доступны через `AppTheme.light.extension<AppSemanticColors>()`.
+- [x] 3.3 Добавить widget-тест `test/widget/app_theme_test.dart`: приложение использует тему из `AppTheme.light`, а `Theme.of(context).extension<AppSemanticColors>()` содержит три цвета типов операций; проверить командой `flutter test test/widget/app_theme_test.dart`.
+
+## 4. Форматирование и разбор сумм
+
+- [x] 4.1 Создать `lib/presentation/shared/utils/money_formatter.dart`: форматирование минорных единиц с локалью из `Localizations.localeOf`, двумя десятичными знаками, разделителями групп разрядов и валютной единицей из `FinanceCurrency` (символ, при отсутствии — код); проверить unit-тестом `test/unit/utils/money_formatter_test.dart` на локаль `ru` (пробел как разделитель групп, запятая как десятичный разделитель) и на валюту без символа (в строке отображается код).
+- [x] 4.2 Создать `lib/presentation/shared/utils/money_input_parser.dart`: разбор введенного текста в минорные единицы с поддержкой запятой и точки как десятичного разделителя и игнорированием разделителей групп разрядов; проверить unit-тестом на значения `1234,56`, `1 234.56`, отрицательное значение и нечисловой ввод (возвращается ошибка разбора).
+
+## 5. Локализация и провайдеры
+
+- [x] 5.1 Добавить строки в `lib/core/l10n/app_ru.arb` и `lib/core/l10n/app_en.arb` (подписи вкладок, заголовок и текст «раздел в разработке», тексты пустого состояния счетов, подписи и сообщения формы счета, действия архивирования и удаления, тексты предложения первого счета и пропуска) и выполнить `flutter gen-l10n`; проверить, что генерация проходит без предупреждений о недостающих ключах и оба ресурса содержат одинаковый набор ключей.
+- [x] 5.2 Добавить `accountUseCasesProvider` в `lib/core/di/finance_providers.dart` и `activeBookProvider` (`FutureProvider<FinanceBook?>`, первая активная книга через `BooksRepository.list()`) в `lib/core/di/app_providers.dart`; проверить unit-тестом с in-memory базой, что после bootstrap возвращается созданная книга, а при отсутствии активной книги возвращается `null`.
+- [x] 5.3 Создать `lib/presentation/providers/accounts_controller.dart` с `accountsOverviewProvider` (`FutureProvider.family<AccountsOverview, String bookId>`), `hasActiveAccountsProvider` и `firstAccountPromptDismissedProvider`, а также `AccountsController` (`AsyncNotifier`) для создания, изменения, архивирования и удаления счета с инвалидацией обзора после мутации; проверить unit-тестом с переопределением `appDatabaseProvider` на in-memory базу: после создания счета обзор содержит новую группу валюты, после архивирования счет исчезает из обзора, а `hasActiveAccountsProvider` возвращает `false` при пустой книге и `true` после создания счета.
+
+## 6. Навигационная оболочка
+
+- [x] 6.1 Создать `lib/core/router/app_destination.dart` с enum `AppDestination { accounts, operations, analytics, settings }` (иконка и ключ локализованной подписи) и `lib/core/router/app_shell.dart` с `NavigationBar`, `activeDestinationProvider` и правилом видимости действия добавления (доступно на разделе «Счета», отсутствует на «Аналитике», «Настройках» и на разделах без содержимого); проверить компиляцию командой `flutter analyze`.
+- [x] 6.2 Создать `lib/presentation/shared/empty_states/section_in_development_page.dart` — единое состояние «раздел в разработке» с сообщением из ARB, без пустых списков и нулевых итогов; подключить его для разделов «Операции», «Аналитика» и «Настройки»; проверить widget-тестом, что все три раздела показывают сообщение и не показывают действий добавления.
+- [x] 6.3 Подключить `AppShell` как экран после успешной инициализации в `lib/presentation/features/bootstrap/app_bootstrap_gate.dart` вместо `BudgetTrackerHomePage` и удалить `lib/presentation/features/home/budget_tracker_home_page.dart`; проверить widget-тестом, что после инициализации отображается оболочка с активной вкладкой «Счета».
+- [x] 6.4 Добавить `test/widget/app_shell_test.dart`: стартовая вкладка «Счета», переключение между четырьмя вкладками, отсутствие действия добавления на «Аналитике» и «Настройках»; проверить командой `flutter test test/widget/app_shell_test.dart`.
+- [x] 6.5 Обновить `test/widget_test.dart` под новую оболочку: состояния загрузки и ошибки инициализации, успешная инициализация и разрешение локали должны проходить без изменений смысла проверок; проверить командой `flutter test test/widget_test.dart`.
+
+## 7. Экран счетов и форма счета
+
+- [x] 7.1 Создать `lib/presentation/features/accounts/widgets/bank_avatar.dart`: круг с цветом из `FinanceBank.colorHex` и буквенным обозначением из наименования банка, нейтральный цвет темы при отсутствии или некорректном HEX, контрастный цвет текста; проверить widget-тестом на банк с цветом, банк без цвета и банк без данных отображения.
+- [x] 7.2 Создать `lib/presentation/features/accounts/widgets/currency_picker_sheet.dart`: выбор валюты из справочника через `CurrenciesRepository.search` с полем поиска и отображением кода, символа и наименования по текущей локали; проверить widget-тестом, что поиск по коду и по наименованию фильтрует список, а действия добавления или изменения валюты отсутствуют.
+- [x] 7.3 Создать `lib/presentation/features/accounts/accounts_page.dart`: группы по валютам с итогом на группу (через `money_formatter`), элементы списка с названием, остатком, валютой и маркером банка, состояния загрузки и ошибки, пустое состояние с приглашением добавить счет, действие добавления счета; проверить widget-тестом на счета в двух валютах (раздельные итоги и отсутствие общего итога), отсутствие архивных счетов в списке и в итогах и на пустое состояние книги.
+- [x] 7.4 Создать `lib/presentation/features/accounts/account_form_page.dart`: создание и редактирование счета — название, банк (необязательно), валюта через `currency_picker_sheet` с предварительно выбранной валютой из `AccountUseCases.defaultCurrencyCodeFor`, начальный остаток через `money_input_parser`, сообщения валидации, запрет смены валюты для счета с операциями, действие удаления или архивирования по результату `deleteOrArchive`; проверить widget-тестами на успешное создание, ошибку пустого названия, отказ смены валюты счета с операциями и предложение архивирования вместо удаления.
+- [x] 7.5 Покрыть в `test/widget/accounts_page_test.dart` случай «счет без банка»: маркер банка не отображается, пустая подпись на месте маркера отсутствует; проверить командой `flutter test test/widget/accounts_page_test.dart`.
+
+## 8. Предложение первого счета
+
+- [x] 8.1 Создать `lib/presentation/features/bootstrap/first_account_prompt_page.dart` с действиями добавления счета и пропуска; показывать его из `AppBootstrapGate` только при отсутствии активных счетов и отсутствии пропуска в текущей сессии; проверить widget-тестами на показ предложения при пустой книге, переход к списку после создания счета, переход к оболочке после пропуска и отсутствие предложения при существующих счетах.
+- [x] 8.2 Проверить в `test/widget/first_account_prompt_test.dart`, что ошибка инициализации не показывает предложение первого счета и сохраняет контролируемое состояние ошибки, а пропуск не изменяет данные первого запуска.
+
+## 9. ADR
+
+- [x] 9.1 Создать `docs/adr/0002-default-account-currency.md` со ссылкой на ADR-0001: решение «валюта по умолчанию для нового счета зависит от локали интерфейса: `ru` -> `RUB`, иначе `USD`», обоснование, последствия (смена языка не изменяет валюты созданных счетов) и явное указание, что решения ADR-0001 не изменяются и его статус остается `Accepted`; проверить, что запись ссылается на ADR-0001 и не противоречит разделу «Отложенные вопросы» ADR-0001.
+
+## 10. Проверка
+
+- [x] 10.1 Запустить `flutter analyze` и устранить все замечания, появившиеся в новых и измененных файлах.
+- [x] 10.2 Запустить полный `flutter test` и убедиться, что существующие тесты `app-foundation`, модели данных, use cases транзакций, первого запуска и справочников проходят.
+- [x] 10.3 Проверить соответствие реализации решениям ADR-0001 (1.4, 2.1, 2.2, 2.4, 3.1, 4.2, 4.4, 8.1, 9.1): стартовая вкладка «Счета», раздельные итоги по валютам без конвертации, начальный остаток не создает доход, архивирование вместо удаления при наличии истории, отсутствие действия добавления на «Аналитике» и «Настройках»; подтвердить в описании PR, что новая запись ADR требуется только для валюты по умолчанию.
+- [x] 10.4 Вручную проверить на Android-устройстве: четыре вкладки и переключение между ними, создание счетов в двух валютах, раздельные итоги, редактирование начального остатка, архивирование счета с операцией, удаление счета без операций, показ предложения первого счета и его пропуск.
