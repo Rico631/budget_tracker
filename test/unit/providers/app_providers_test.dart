@@ -93,4 +93,27 @@ void main() {
     expect(await database.select(database.books).get(), hasLength(1));
     expect(await database.select(database.categories).get(), hasLength(37));
   });
+
+  test('provides the active book after bootstrap and null without books', () async {
+    final database = AppDatabase.forTesting();
+    final container = ProviderContainer(
+      overrides: [appDatabaseProvider.overrideWithValue(database)],
+    );
+    addTearDown(() async {
+      container.dispose();
+      await database.close();
+    });
+
+    expect(await container.read(activeBookProvider.future), isNull);
+
+    const request = (languageCode: 'ru', defaultBookName: 'Личная книга');
+    await container.read(firstRunBootstrapProvider(request).future);
+    container.invalidate(activeBookProvider);
+
+    final book = await container.read(activeBookProvider.future);
+
+    expect(book, isNotNull);
+    expect(book!.name, 'Личная книга');
+    expect(book.isArchived, isFalse);
+  });
 }

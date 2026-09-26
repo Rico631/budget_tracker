@@ -127,3 +127,47 @@ class FinanceTransaction {
   final DateTime updatedAt;
   final String? note;
 }
+
+/// Текущий остаток счета в минорных единицах валюты счета.
+class AccountBalance {
+  AccountBalance({required this.account, required this.balanceMinor});
+
+  final FinanceAccount account;
+  final int balanceMinor;
+}
+
+/// Счета книги одной валюты и их общий итог.
+///
+/// Итог считается только внутри группы валюты: суммы разных валют не
+/// складываются и не конвертируются.
+class AccountBalanceGroup {
+  AccountBalanceGroup({
+    required this.currencyCode,
+    required this.accounts,
+    required this.totalMinor,
+    this.currency,
+  });
+
+  final String currencyCode;
+
+  /// Позиция справочника валют; отсутствует, если код не найден в справочнике.
+  final FinanceCurrency? currency;
+
+  final List<AccountBalance> accounts;
+
+  /// Итог по счетам группы в минорных единицах валюты группы.
+  final int totalMinor;
+}
+
+/// Обзор счетов книги: активные счета, сгруппированные по валютам.
+class AccountsOverview {
+  AccountsOverview({required this.groups});
+
+  final List<AccountBalanceGroup> groups;
+
+  /// В книге нет ни одного активного счета.
+  bool get isEmpty => groups.every((group) => group.accounts.isEmpty);
+
+  /// В книге есть хотя бы один активный счет.
+  bool get hasActiveAccounts => !isEmpty;
+}

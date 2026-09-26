@@ -88,4 +88,16 @@ class DriftAccountsRepository implements AccountsRepository {
       database.accounts,
     )..where((account) => account.id.equals(id))).go();
   }
+
+  @override
+  Future<bool> hasTransactions(String accountId) async {
+    final query = database.selectOnly(database.transactions)
+      ..addColumns([database.transactions.id])
+      ..where(
+        database.transactions.accountId.equals(accountId) |
+            database.transactions.toAccountId.equals(accountId),
+      )
+      ..limit(1);
+    return await query.getSingleOrNull() != null;
+  }
 }

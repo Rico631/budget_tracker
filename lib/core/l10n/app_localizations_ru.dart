@@ -12,13 +12,153 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'Бюджетный трекер';
 
   @override
-  String get welcomeMessage =>
-      'Добро пожаловать в приложение для учета расходов';
-
-  @override
   String get defaultBookName => 'Личная книга';
 
   @override
   String get bootstrapErrorMessage =>
       'Не удалось подготовить данные приложения. Перезапустите приложение.';
+
+  @override
+  String get navAccountsTabLabel => 'Счета';
+
+  @override
+  String get navOperationsTabLabel => 'Операции';
+
+  @override
+  String get navAnalyticsTabLabel => 'Аналитика';
+
+  @override
+  String get navSettingsTabLabel => 'Настройки';
+
+  @override
+  String get sectionInDevelopmentTitle => 'Раздел в разработке';
+
+  @override
+  String get sectionInDevelopmentMessage =>
+      'Содержимое раздела появится в следующих обновлениях приложения.';
+
+  @override
+  String get accountsTitle => 'Мои счета';
+
+  @override
+  String get accountsAddAccountTooltip => 'Добавить счет';
+
+  @override
+  String get accountsEmptyTitle => 'Пока нет счетов';
+
+  @override
+  String get accountsEmptyMessage =>
+      'Добавьте первый счет, чтобы видеть остатки и вести учет операций.';
+
+  @override
+  String get accountsEmptyAction => 'Добавить счет';
+
+  @override
+  String get accountsLoadErrorMessage =>
+      'Не удалось загрузить счета. Повторите попытку.';
+
+  @override
+  String get accountsRetryAction => 'Повторить';
+
+  @override
+  String get accountsGroupTotalLabel => 'Итого';
+
+  @override
+  String get accountFormCreateTitle => 'Новый счет';
+
+  @override
+  String get accountFormEditTitle => 'Редактирование счета';
+
+  @override
+  String get accountFormNameLabel => 'Название';
+
+  @override
+  String get accountFormBankLabel => 'Банк';
+
+  @override
+  String get accountFormBankNoneLabel => 'Без банка';
+
+  @override
+  String get accountFormCurrencyLabel => 'Валюта';
+
+  @override
+  String get accountFormInitialBalanceLabel => 'Начальный остаток';
+
+  @override
+  String get accountFormSaveAction => 'Сохранить';
+
+  @override
+  String get accountFormDeleteAction => 'Удалить';
+
+  @override
+  String get accountFormArchiveAction => 'Архивировать';
+
+  @override
+  String get accountFormNameRequiredError => 'Укажите название счета.';
+
+  @override
+  String get accountFormCurrencyInvalidError =>
+      'Выберите валюту счета из справочника.';
+
+  @override
+  String get accountFormAmountInvalidError =>
+      'Введите корректную сумму, например 1 234,56.';
+
+  @override
+  String get accountFormCurrencyLockedError =>
+      'По счету есть операции: валюта не изменяется. Архивируйте счет и создайте новый.';
+
+  @override
+  String get accountFormArchiveDialogTitle => 'Архивировать счет?';
+
+  @override
+  String get accountFormArchiveDialogMessage =>
+      'По счету зарегистрированы операции. Счет будет архивирован, а операции сохранятся в истории книги.';
+
+  @override
+  String get accountFormArchiveDialogCancelAction => 'Отмена';
+
+  @override
+  String get accountFormSaveErrorMessage =>
+      'Не удалось сохранить счет. Повторите попытку.';
+
+  @override
+  String get accountFormDeleteErrorMessage =>
+      'Не удалось удалить счет. Повторите попытку.';
+
+  @override
+  String get currencyPickerTitle => 'Выбор валюты';
+
+  @override
+  String get currencyPickerSearchHint => 'Поиск валюты';
+
+  @override
+  String get currencyPickerEmptyMessage =>
+      'Валюты с такими данными не найдены.';
+
+  @override
+  String get currencyPickerLoadErrorMessage =>
+      'Не удалось загрузить справочник валют. Повторите попытку.';
+
+  @override
+  String get bankPickerTitle => 'Выбор банка';
+
+  @override
+  String get bankPickerSearchHint => 'Поиск банка';
+
+  @override
+  String get bankPickerEmptyMessage => 'Банки с такими данными не найдены.';
+
+  @override
+  String get firstAccountPromptTitle => 'Добавьте первый счет';
+
+  @override
+  String get firstAccountPromptMessage =>
+      'Счет нужен, чтобы учитывать доходы, расходы и переводы. Это можно сделать позже.';
+
+  @override
+  String get firstAccountPromptAddAction => 'Добавить счет';
+
+  @override
+  String get firstAccountPromptSkipAction => 'Пропустить';
 }

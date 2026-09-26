@@ -38,6 +38,10 @@ abstract interface class AccountsRepository {
   Future<void> update(FinanceAccount account);
   Future<void> archive(String id);
   Future<void> delete(String id);
+
+  /// Есть ли у счета связанные операции: счет как источник операции или как
+  /// получатель перевода.
+  Future<bool> hasTransactions(String accountId);
 }
 
 abstract interface class CategoriesRepository {

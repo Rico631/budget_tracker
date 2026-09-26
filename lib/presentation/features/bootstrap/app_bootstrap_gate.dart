@@ -1,11 +1,14 @@
 import 'package:budget_tracker/core/di/app_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/presentation/features/home/budget_tracker_home_page.dart';
+import 'package:budget_tracker/core/router/app_shell.dart';
+import 'package:budget_tracker/presentation/features/bootstrap/first_account_prompt_page.dart';
+import 'package:budget_tracker/presentation/providers/accounts_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Ожидает завершения инициализации первого запуска и показывает состояние
-/// загрузки, контролируемое состояние ошибки или домашний экран.
+/// загрузки, контролируемое состояние ошибки, предложение добавить первый счет
+/// или навигационную оболочку.
 class AppBootstrapGate extends ConsumerWidget {
   const AppBootstrapGate({super.key});
 
@@ -22,8 +25,35 @@ class AppBootstrapGate extends ConsumerWidget {
       loading: () => const _BootstrapLoadingView(),
       error: (error, stackTrace) =>
           _BootstrapErrorView(message: localizations.bootstrapErrorMessage),
-      data: (result) => const BudgetTrackerHomePage(),
+      data: (result) => const _FirstAccountStep(),
     );
+  }
+}
+
+/// Выбирает между предложением добавить первый счет и оболочкой разделов.
+///
+/// Предложение показывается, только если инициализация завершилась успешно, в
+/// книге нет активных счетов и пользователь не пропустил предложение в текущей
+/// сессии.
+class _FirstAccountStep extends ConsumerWidget {
+  const _FirstAccountStep();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localizations = AppLocalizations.of(context);
+    final dismissed = ref.watch(firstAccountPromptDismissedProvider);
+
+    return ref
+        .watch(hasActiveAccountsProvider)
+        .when(
+          loading: () => const _BootstrapLoadingView(),
+          error: (error, stackTrace) => _BootstrapErrorView(
+            message: localizations.bootstrapErrorMessage,
+          ),
+          data: (hasActiveAccounts) => hasActiveAccounts || dismissed
+              ? const AppShell()
+              : const FirstAccountPromptPage(),
+        );
   }
 }
 

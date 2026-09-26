@@ -1,10 +1,6 @@
 {
   "@@locale": "en",
   "appTitle": "Budget Tracker",
-  "welcomeMessage": "Welcome to the expense management app",
-  "@welcomeMessage": {
-    "description": "Home screen welcome copy"
-  },
   "defaultBookName": "Personal book",
   "@defaultBookName": {
     "description": "Default book name created on the first run"
@@ -12,5 +8,181 @@
   "bootstrapErrorMessage": "Failed to prepare the app data. Please restart the app.",
   "@bootstrapErrorMessage": {
     "description": "First run initialization error message"
+  },
+  "navAccountsTabLabel": "Accounts",
+  "@navAccountsTabLabel": {
+    "description": "Bottom tab label of the accounts section"
+  },
+  "navOperationsTabLabel": "Operations",
+  "@navOperationsTabLabel": {
+    "description": "Bottom tab label of the operations section"
+  },
+  "navAnalyticsTabLabel": "Analytics",
+  "@navAnalyticsTabLabel": {
+    "description": "Bottom tab label of the analytics section"
+  },
+  "navSettingsTabLabel": "Settings",
+  "@navSettingsTabLabel": {
+    "description": "Bottom tab label of the settings section"
+  },
+  "sectionInDevelopmentTitle": "Section in development",
+  "@sectionInDevelopmentTitle": {
+    "description": "Title of the controlled state for sections without content"
+  },
+  "sectionInDevelopmentMessage": "This section will appear in upcoming releases of the app.",
+  "@sectionInDevelopmentMessage": {
+    "description": "Message of the controlled state for sections without content"
+  },
+  "accountsTitle": "My accounts",
+  "@accountsTitle": {
+    "description": "Title of the accounts section"
+  },
+  "accountsAddAccountTooltip": "Add account",
+  "@accountsAddAccountTooltip": {
+    "description": "Tooltip of the add account action"
+  },
+  "accountsEmptyTitle": "No accounts yet",
+  "@accountsEmptyTitle": {
+    "description": "Title of the empty accounts list"
+  },
+  "accountsEmptyMessage": "Add your first account to see balances and record operations.",
+  "@accountsEmptyMessage": {
+    "description": "Invitation to add the first account"
+  },
+  "accountsEmptyAction": "Add account",
+  "@accountsEmptyAction": {
+    "description": "Action leading to account creation"
+  },
+  "accountsLoadErrorMessage": "Failed to load accounts. Please try again.",
+  "@accountsLoadErrorMessage": {
+    "description": "Error message of the accounts list loading"
+  },
+  "accountsRetryAction": "Retry",
+  "@accountsRetryAction": {
+    "description": "Action reloading the accounts list"
+  },
+  "accountsGroupTotalLabel": "Total",
+  "@accountsGroupTotalLabel": {
+    "description": "Label of the currency group total"
+  },
+  "accountFormCreateTitle": "New account",
+  "@accountFormCreateTitle": {
+    "description": "Title of the account creation form"
+  },
+  "accountFormEditTitle": "Edit account",
+  "@accountFormEditTitle": {
+    "description": "Title of the account editing form"
+  },
+  "accountFormNameLabel": "Name",
+  "@accountFormNameLabel": {
+    "description": "Label of the account name field"
+  },
+  "accountFormBankLabel": "Bank",
+  "@accountFormBankLabel": {
+    "description": "Label of the bank selection field"
+  },
+  "accountFormBankNoneLabel": "No bank",
+  "@accountFormBankNoneLabel": {
+    "description": "Option of an account without a bank"
+  },
+  "accountFormCurrencyLabel": "Currency",
+  "@accountFormCurrencyLabel": {
+    "description": "Label of the currency selection field"
+  },
+  "accountFormInitialBalanceLabel": "Initial balance",
+  "@accountFormInitialBalanceLabel": {
+    "description": "Label of the initial balance field"
+  },
+  "accountFormSaveAction": "Save",
+  "@accountFormSaveAction": {
+    "description": "Action saving the account"
+  },
+  "accountFormDeleteAction": "Delete",
+  "@accountFormDeleteAction": {
+    "description": "Action deleting the account"
+  },
+  "accountFormArchiveAction": "Archive",
+  "@accountFormArchiveAction": {
+    "description": "Action archiving the account"
+  },
+  "accountFormNameRequiredError": "Enter an account name.",
+  "@accountFormNameRequiredError": {
+    "description": "Validation error of the empty account name"
+  },
+  "accountFormCurrencyInvalidError": "Choose the account currency from the catalog.",
+  "@accountFormCurrencyInvalidError": {
+    "description": "Validation error of the account currency code"
+  },
+  "accountFormAmountInvalidError": "Enter a valid amount, for example 1,234.56.",
+  "@accountFormAmountInvalidError": {
+    "description": "Parsing error of the entered amount"
+  },
+  "accountFormCurrencyLockedError": "The account has operations, so its currency cannot change. Archive the account and create a new one.",
+  "@accountFormCurrencyLockedError": {
+    "description": "Rejection of the currency change for an account with history"
+  },
+  "accountFormArchiveDialogTitle": "Archive the account?",
+  "@accountFormArchiveDialogTitle": {
+    "description": "Title of the archiving suggestion"
+  },
+  "accountFormArchiveDialogMessage": "The account has recorded operations. It will be archived and its operations will stay in the book history.",
+  "@accountFormArchiveDialogMessage": {
+    "description": "Message of the archiving suggestion"
+  },
+  "accountFormArchiveDialogCancelAction": "Cancel",
+  "@accountFormArchiveDialogCancelAction": {
+    "description": "Action declining the archiving suggestion"
+  },
+  "accountFormSaveErrorMessage": "Failed to save the account. Please try again.",
+  "@accountFormSaveErrorMessage": {
+    "description": "Error message of the account saving"
+  },
+  "accountFormDeleteErrorMessage": "Failed to delete the account. Please try again.",
+  "@accountFormDeleteErrorMessage": {
+    "description": "Error message of the account deletion"
+  },
+  "currencyPickerTitle": "Choose currency",
+  "@currencyPickerTitle": {
+    "description": "Title of the account currency picker"
+  },
+  "currencyPickerSearchHint": "Search currency",
+  "@currencyPickerSearchHint": {
+    "description": "Hint of the currency search field"
+  },
+  "currencyPickerEmptyMessage": "No currencies match the query.",
+  "@currencyPickerEmptyMessage": {
+    "description": "Message of the empty currency search result"
+  },
+  "currencyPickerLoadErrorMessage": "Failed to load the currency catalog. Please try again.",
+  "@currencyPickerLoadErrorMessage": {
+    "description": "Error message of the currency catalog loading"
+  },
+  "bankPickerTitle": "Choose bank",
+  "@bankPickerTitle": {
+    "description": "Title of the account bank picker"
+  },
+  "bankPickerSearchHint": "Search bank",
+  "@bankPickerSearchHint": {
+    "description": "Hint of the bank search field"
+  },
+  "bankPickerEmptyMessage": "No banks match the query.",
+  "@bankPickerEmptyMessage": {
+    "description": "Message of the empty bank search result"
+  },
+  "firstAccountPromptTitle": "Add your first account",
+  "@firstAccountPromptTitle": {
+    "description": "Title of the first account suggestion"
+  },
+  "firstAccountPromptMessage": "An account is needed to track income, expenses and transfers. You can do it later.",
+  "@firstAccountPromptMessage": {
+    "description": "Message of the first account suggestion"
+  },
+  "firstAccountPromptAddAction": "Add account",
+  "@firstAccountPromptAddAction": {
+    "description": "Action leading to the first account creation"
+  },
+  "firstAccountPromptSkipAction": "Skip",
+  "@firstAccountPromptSkipAction": {
+    "description": "Action skipping the first account suggestion"
   }
 }

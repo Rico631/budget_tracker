@@ -1,10 +1,6 @@
 {
   "@@locale": "ru",
   "appTitle": "Бюджетный трекер",
-  "welcomeMessage": "Добро пожаловать в приложение для учета расходов",
-  "@welcomeMessage": {
-    "description": "Приветственный текст главного экрана"
-  },
   "defaultBookName": "Личная книга",
   "@defaultBookName": {
     "description": "Имя книги по умолчанию при первом запуске"
@@ -12,5 +8,181 @@
   "bootstrapErrorMessage": "Не удалось подготовить данные приложения. Перезапустите приложение.",
   "@bootstrapErrorMessage": {
     "description": "Сообщение об ошибке инициализации первого запуска"
+  },
+  "navAccountsTabLabel": "Счета",
+  "@navAccountsTabLabel": {
+    "description": "Подпись нижней вкладки раздела счетов"
+  },
+  "navOperationsTabLabel": "Операции",
+  "@navOperationsTabLabel": {
+    "description": "Подпись нижней вкладки раздела операций"
+  },
+  "navAnalyticsTabLabel": "Аналитика",
+  "@navAnalyticsTabLabel": {
+    "description": "Подпись нижней вкладки раздела аналитики"
+  },
+  "navSettingsTabLabel": "Настройки",
+  "@navSettingsTabLabel": {
+    "description": "Подпись нижней вкладки раздела настроек"
+  },
+  "sectionInDevelopmentTitle": "Раздел в разработке",
+  "@sectionInDevelopmentTitle": {
+    "description": "Заголовок состояния для разделов без содержимого"
+  },
+  "sectionInDevelopmentMessage": "Содержимое раздела появится в следующих обновлениях приложения.",
+  "@sectionInDevelopmentMessage": {
+    "description": "Текст состояния для разделов без содержимого"
+  },
+  "accountsTitle": "Мои счета",
+  "@accountsTitle": {
+    "description": "Заголовок раздела счетов"
+  },
+  "accountsAddAccountTooltip": "Добавить счет",
+  "@accountsAddAccountTooltip": {
+    "description": "Подсказка действия добавления счета"
+  },
+  "accountsEmptyTitle": "Пока нет счетов",
+  "@accountsEmptyTitle": {
+    "description": "Заголовок пустого списка счетов"
+  },
+  "accountsEmptyMessage": "Добавьте первый счет, чтобы видеть остатки и вести учет операций.",
+  "@accountsEmptyMessage": {
+    "description": "Приглашение добавить первый счет"
+  },
+  "accountsEmptyAction": "Добавить счет",
+  "@accountsEmptyAction": {
+    "description": "Действие перехода к созданию счета"
+  },
+  "accountsLoadErrorMessage": "Не удалось загрузить счета. Повторите попытку.",
+  "@accountsLoadErrorMessage": {
+    "description": "Сообщение об ошибке загрузки списка счетов"
+  },
+  "accountsRetryAction": "Повторить",
+  "@accountsRetryAction": {
+    "description": "Действие повторной загрузки списка счетов"
+  },
+  "accountsGroupTotalLabel": "Итого",
+  "@accountsGroupTotalLabel": {
+    "description": "Подпись итога группы валюты"
+  },
+  "accountFormCreateTitle": "Новый счет",
+  "@accountFormCreateTitle": {
+    "description": "Заголовок формы создания счета"
+  },
+  "accountFormEditTitle": "Редактирование счета",
+  "@accountFormEditTitle": {
+    "description": "Заголовок формы редактирования счета"
+  },
+  "accountFormNameLabel": "Название",
+  "@accountFormNameLabel": {
+    "description": "Подпись поля названия счета"
+  },
+  "accountFormBankLabel": "Банк",
+  "@accountFormBankLabel": {
+    "description": "Подпись поля выбора банка"
+  },
+  "accountFormBankNoneLabel": "Без банка",
+  "@accountFormBankNoneLabel": {
+    "description": "Вариант счета без банка"
+  },
+  "accountFormCurrencyLabel": "Валюта",
+  "@accountFormCurrencyLabel": {
+    "description": "Подпись поля выбора валюты"
+  },
+  "accountFormInitialBalanceLabel": "Начальный остаток",
+  "@accountFormInitialBalanceLabel": {
+    "description": "Подпись поля начального остатка"
+  },
+  "accountFormSaveAction": "Сохранить",
+  "@accountFormSaveAction": {
+    "description": "Действие сохранения счета"
+  },
+  "accountFormDeleteAction": "Удалить",
+  "@accountFormDeleteAction": {
+    "description": "Действие удаления счета"
+  },
+  "accountFormArchiveAction": "Архивировать",
+  "@accountFormArchiveAction": {
+    "description": "Действие архивирования счета"
+  },
+  "accountFormNameRequiredError": "Укажите название счета.",
+  "@accountFormNameRequiredError": {
+    "description": "Ошибка валидации пустого названия счета"
+  },
+  "accountFormCurrencyInvalidError": "Выберите валюту счета из справочника.",
+  "@accountFormCurrencyInvalidError": {
+    "description": "Ошибка валидации кода валюты счета"
+  },
+  "accountFormAmountInvalidError": "Введите корректную сумму, например 1 234,56.",
+  "@accountFormAmountInvalidError": {
+    "description": "Ошибка разбора введенной суммы"
+  },
+  "accountFormCurrencyLockedError": "По счету есть операции: валюта не изменяется. Архивируйте счет и создайте новый.",
+  "@accountFormCurrencyLockedError": {
+    "description": "Отказ изменения валюты счета с историей"
+  },
+  "accountFormArchiveDialogTitle": "Архивировать счет?",
+  "@accountFormArchiveDialogTitle": {
+    "description": "Заголовок предложения архивирования счета"
+  },
+  "accountFormArchiveDialogMessage": "По счету зарегистрированы операции. Счет будет архивирован, а операции сохранятся в истории книги.",
+  "@accountFormArchiveDialogMessage": {
+    "description": "Текст предложения архивирования счета"
+  },
+  "accountFormArchiveDialogCancelAction": "Отмена",
+  "@accountFormArchiveDialogCancelAction": {
+    "description": "Действие отказа от архивирования счета"
+  },
+  "accountFormSaveErrorMessage": "Не удалось сохранить счет. Повторите попытку.",
+  "@accountFormSaveErrorMessage": {
+    "description": "Сообщение об ошибке сохранения счета"
+  },
+  "accountFormDeleteErrorMessage": "Не удалось удалить счет. Повторите попытку.",
+  "@accountFormDeleteErrorMessage": {
+    "description": "Сообщение об ошибке удаления счета"
+  },
+  "currencyPickerTitle": "Выбор валюты",
+  "@currencyPickerTitle": {
+    "description": "Заголовок выбора валюты счета"
+  },
+  "currencyPickerSearchHint": "Поиск валюты",
+  "@currencyPickerSearchHint": {
+    "description": "Подсказка поля поиска валюты"
+  },
+  "currencyPickerEmptyMessage": "Валюты с такими данными не найдены.",
+  "@currencyPickerEmptyMessage": {
+    "description": "Сообщение пустого результата поиска валют"
+  },
+  "currencyPickerLoadErrorMessage": "Не удалось загрузить справочник валют. Повторите попытку.",
+  "@currencyPickerLoadErrorMessage": {
+    "description": "Сообщение об ошибке загрузки справочника валют"
+  },
+  "bankPickerTitle": "Выбор банка",
+  "@bankPickerTitle": {
+    "description": "Заголовок выбора банка счета"
+  },
+  "bankPickerSearchHint": "Поиск банка",
+  "@bankPickerSearchHint": {
+    "description": "Подсказка поля поиска банка"
+  },
+  "bankPickerEmptyMessage": "Банки с такими данными не найдены.",
+  "@bankPickerEmptyMessage": {
+    "description": "Сообщение пустого результата поиска банков"
+  },
+  "firstAccountPromptTitle": "Добавьте первый счет",
+  "@firstAccountPromptTitle": {
+    "description": "Заголовок предложения добавить первый счет"
+  },
+  "firstAccountPromptMessage": "Счет нужен, чтобы учитывать доходы, расходы и переводы. Это можно сделать позже.",
+  "@firstAccountPromptMessage": {
+    "description": "Текст предложения добавить первый счет"
+  },
+  "firstAccountPromptAddAction": "Добавить счет",
+  "@firstAccountPromptAddAction": {
+    "description": "Действие перехода к созданию первого счета"
+  },
+  "firstAccountPromptSkipAction": "Пропустить",
+  "@firstAccountPromptSkipAction": {
+    "description": "Действие пропуска предложения первого счета"
   }
 }

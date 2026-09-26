@@ -2,6 +2,7 @@ import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
+import 'package:budget_tracker/domain/services/account_balance_rule.dart';
 
 class FinanceTransactionUseCases {
   FinanceTransactionUseCases({
@@ -70,21 +71,7 @@ class FinanceTransactionUseCases {
     if (account == null) return 0;
 
     final accountTransactions = await transactions.listByBook(account.bookId);
-    var balance = account.initialBalanceMinor;
-    for (final transaction in accountTransactions) {
-      if (transaction.accountId == accountId) {
-        balance += switch (transaction.kind) {
-          TransactionKind.income => transaction.amountMinor,
-          TransactionKind.expense ||
-          TransactionKind.transfer => -transaction.amountMinor,
-        };
-      }
-      if (transaction.kind == TransactionKind.transfer &&
-          transaction.toAccountId == accountId) {
-        balance += transaction.amountMinor;
-      }
-    }
-    return balance;
+    return accountBalanceMinor(account, accountTransactions);
   }
 
   Future<int> calculateBookBalance(String bookId) async {

@@ -44,7 +44,7 @@ void main() {
     expect(resolved, const Locale('ru'));
   });
 
-  testWidgets('renders the home screen after the first run initialization', (
+  testWidgets('renders the first account suggestion after initialization', (
     WidgetTester tester,
   ) async {
     final database = AppDatabase.forTesting();
@@ -59,12 +59,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(Scaffold), findsOneWidget);
-    expect(find.text('Бюджетный трекер'), findsOneWidget);
-    expect(
-      find.text('Добро пожаловать в приложение для учета расходов'),
-      findsOneWidget,
-    );
+    expect(find.text('Добавьте первый счет'), findsOneWidget);
+    expect(find.text('Добавить счет'), findsOneWidget);
+    expect(find.text('Пропустить'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
     expect(await database.select(database.books).get(), hasLength(1));
   });
 
@@ -83,11 +81,8 @@ void main() {
     );
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text('Бюджетный трекер'), findsNothing);
-    expect(
-      find.text('Добро пожаловать в приложение для учета расходов'),
-      findsNothing,
-    );
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.text('Мои счета'), findsNothing);
   });
 
   testWidgets('shows a controlled error state when the initialization fails', (
@@ -113,7 +108,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('Бюджетный трекер'), findsNothing);
+    expect(find.byType(NavigationBar), findsNothing);
   });
 
   test('database opens and closes in memory without subject tables', () async {

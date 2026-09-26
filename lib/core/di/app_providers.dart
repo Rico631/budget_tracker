@@ -1,6 +1,7 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/data/repositories/currencies_repository.dart';
 import 'package:budget_tracker/data/repositories/first_run_bootstrap_repository.dart';
+import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/bootstrap_repositories.dart';
 import 'package:budget_tracker/domain/repositories/catalog_repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,3 +34,10 @@ final firstRunBootstrapProvider =
             defaultBookName: request.defaultBookName,
           );
     });
+
+/// Активная книга учета: список книг упорядочен по дате создания, поэтому
+/// активной считается первая книга, созданная при первом запуске.
+final activeBookProvider = FutureProvider<FinanceBook?>((ref) async {
+  final books = await ref.watch(booksRepositoryProvider).list();
+  return books.isEmpty ? null : books.first;
+});
