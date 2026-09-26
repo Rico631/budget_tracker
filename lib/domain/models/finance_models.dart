@@ -22,6 +22,9 @@ class FinanceBank {
     required this.name,
     this.displayName,
     this.displayDetails,
+    this.colorHex,
+    this.iconDomain,
+    this.isPreset = false,
     this.isArchived = false,
   });
 
@@ -29,7 +32,26 @@ class FinanceBank {
   final String name;
   final String? displayName;
   final String? displayDetails;
+  final String? colorHex;
+  final String? iconDomain;
+  final bool isPreset;
   final bool isArchived;
+}
+
+class FinanceCurrency {
+  FinanceCurrency({
+    required this.code,
+    required this.numericCode,
+    required this.nameRu,
+    required this.nameEn,
+    this.symbol,
+  });
+
+  final String code;
+  final String numericCode;
+  final String? symbol;
+  final String nameRu;
+  final String nameEn;
 }
 
 class FinanceAccount {

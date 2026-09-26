@@ -60,6 +60,9 @@ class DriftBanksRepository implements BanksRepository {
         name: bank.name,
         displayName: bank.displayName,
         displayDetails: bank.displayDetails,
+        colorHex: bank.colorHex,
+        iconDomain: bank.iconDomain,
+        isPreset: bank.isPreset,
         isArchived: true,
       ),
     );

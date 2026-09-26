@@ -4,5 +4,13 @@
   "welcomeMessage": "Добро пожаловать в приложение для учета расходов",
   "@welcomeMessage": {
     "description": "Приветственный текст главного экрана"
+  },
+  "defaultBookName": "Личная книга",
+  "@defaultBookName": {
+    "description": "Имя книги по умолчанию при первом запуске"
+  },
+  "bootstrapErrorMessage": "Не удалось подготовить данные приложения. Перезапустите приложение.",
+  "@bootstrapErrorMessage": {
+    "description": "Сообщение об ошибке инициализации первого запуска"
   }
 }

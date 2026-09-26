@@ -1,5 +1,5 @@
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/presentation/features/home/budget_tracker_home_page.dart';
+import 'package:budget_tracker/presentation/features/bootstrap/app_bootstrap_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +42,7 @@ class BudgetTrackerApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const BudgetTrackerHomePage(),
+      home: const AppBootstrapGate(),
     );
   }
 }

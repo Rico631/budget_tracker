@@ -8,6 +8,68 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Схема версии 2 без колонок `Banks` и таблиц справочника валют и настроек.
+const List<String> _version2Schema = <String>[
+  '''
+  CREATE TABLE books (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE banks (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    display_name TEXT,
+    display_details TEXT,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE accounts (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    bank_id TEXT REFERENCES banks (id),
+    name TEXT NOT NULL,
+    currency_code TEXT NOT NULL,
+    initial_balance_minor INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE categories (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    parent_id TEXT REFERENCES categories (id),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE transactions (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    account_id TEXT NOT NULL REFERENCES accounts (id),
+    to_account_id TEXT REFERENCES accounts (id),
+    category_id TEXT REFERENCES categories (id),
+    kind TEXT NOT NULL,
+    amount_minor INTEGER NOT NULL,
+    occurred_at INTEGER NOT NULL,
+    note TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )
+  ''',
+];
+
 void main() {
   group('Finance database schema', () {
     test('creates finance tables and required indexes in memory', () async {
@@ -16,7 +78,7 @@ void main() {
 
       final tables = await database
           .customSelect(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('books', 'banks', 'accounts', 'categories', 'transactions') ORDER BY name",
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('books', 'banks', 'accounts', 'categories', 'transactions', 'currencies', 'app_settings') ORDER BY name",
           )
           .get();
 
@@ -24,9 +86,11 @@ void main() {
 
       expect(names, [
         'accounts',
+        'app_settings',
         'banks',
         'books',
         'categories',
+        'currencies',
         'transactions',
       ]);
 
@@ -39,7 +103,7 @@ void main() {
       expect(indexes, isNotEmpty);
     });
 
-    test('upgrades an existing version 1 database to version 2', () async {
+    test('upgrades an existing version 1 database to version 3', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -59,12 +123,71 @@ void main() {
 
       final tables = await database
           .customSelect(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('books', 'banks', 'accounts', 'categories', 'transactions')",
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('books', 'banks', 'accounts', 'categories', 'transactions', 'currencies', 'app_settings')",
           )
           .get();
 
-      expect(tables, hasLength(5));
-      expect(database.schemaVersion, 2);
+      expect(tables, hasLength(7));
+      expect(database.schemaVersion, 3);
+    });
+
+    test('upgrades an existing version 2 database to version 3', () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'budget_tracker_',
+      );
+      final file = File.fromUri(directory.uri.resolve('finance.sqlite'));
+      final database = AppDatabase.forTesting(
+        NativeDatabase(
+          file,
+          setup: (connection) {
+            for (final statement in _version2Schema) {
+              connection.execute(statement);
+            }
+            connection.execute(
+              "INSERT INTO banks (id, name, display_name, display_details, is_archived) VALUES ('bank-1', 'СберБанк', 'Sber', NULL, 0)",
+            );
+            connection.execute('PRAGMA user_version = 2');
+          },
+        ),
+      );
+      addTearDown(() async {
+        await database.close();
+        await directory.delete(recursive: true);
+      });
+
+      expect(database.schemaVersion, 3);
+
+      final tables = await database
+          .customSelect(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('currencies', 'app_settings') ORDER BY name",
+          )
+          .get();
+
+      expect(tables.map((row) => row.data['name']), [
+        'app_settings',
+        'currencies',
+      ]);
+
+      final bankColumns = await database
+          .customSelect('PRAGMA table_info(banks)')
+          .get();
+      final columnNames = bankColumns
+          .map((row) => row.data['name'] as String)
+          .toList();
+
+      expect(
+        columnNames,
+        containsAll(<String>['color_hex', 'icon_domain', 'is_preset']),
+      );
+
+      final banks = await database.select(database.banks).get();
+
+      expect(banks, hasLength(1));
+      expect(banks.single.name, 'СберБанк');
+      expect(banks.single.displayName, 'Sber');
+      expect(banks.single.colorHex, isNull);
+      expect(banks.single.iconDomain, isNull);
+      expect(banks.single.isPreset, isFalse);
     });
   });
 

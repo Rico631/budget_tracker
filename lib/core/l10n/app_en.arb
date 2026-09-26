@@ -4,5 +4,13 @@
   "welcomeMessage": "Welcome to the expense management app",
   "@welcomeMessage": {
     "description": "Home screen welcome copy"
+  },
+  "defaultBookName": "Personal book",
+  "@defaultBookName": {
+    "description": "Default book name created on the first run"
+  },
+  "bootstrapErrorMessage": "Failed to prepare the app data. Please restart the app.",
+  "@bootstrapErrorMessage": {
+    "description": "First run initialization error message"
   }
 }

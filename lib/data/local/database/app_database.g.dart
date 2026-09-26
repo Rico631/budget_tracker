@@ -414,6 +414,43 @@ class $BanksTable extends Banks with TableInfo<$BanksTable, Bank> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _colorHexMeta = const VerificationMeta(
+    'colorHex',
+  );
+  @override
+  late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
+    'color_hex',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _iconDomainMeta = const VerificationMeta(
+    'iconDomain',
+  );
+  @override
+  late final GeneratedColumn<String> iconDomain = GeneratedColumn<String>(
+    'icon_domain',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isPresetMeta = const VerificationMeta(
+    'isPreset',
+  );
+  @override
+  late final GeneratedColumn<bool> isPreset = GeneratedColumn<bool>(
+    'is_preset',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_preset" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _isArchivedMeta = const VerificationMeta(
     'isArchived',
   );
@@ -435,6 +472,9 @@ class $BanksTable extends Banks with TableInfo<$BanksTable, Bank> {
     name,
     displayName,
     displayDetails,
+    colorHex,
+    iconDomain,
+    isPreset,
     isArchived,
   ];
   @override
@@ -480,6 +520,24 @@ class $BanksTable extends Banks with TableInfo<$BanksTable, Bank> {
         ),
       );
     }
+    if (data.containsKey('color_hex')) {
+      context.handle(
+        _colorHexMeta,
+        colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta),
+      );
+    }
+    if (data.containsKey('icon_domain')) {
+      context.handle(
+        _iconDomainMeta,
+        iconDomain.isAcceptableOrUnknown(data['icon_domain']!, _iconDomainMeta),
+      );
+    }
+    if (data.containsKey('is_preset')) {
+      context.handle(
+        _isPresetMeta,
+        isPreset.isAcceptableOrUnknown(data['is_preset']!, _isPresetMeta),
+      );
+    }
     if (data.containsKey('is_archived')) {
       context.handle(
         _isArchivedMeta,
@@ -511,6 +569,18 @@ class $BanksTable extends Banks with TableInfo<$BanksTable, Bank> {
         DriftSqlType.string,
         data['${effectivePrefix}display_details'],
       ),
+      colorHex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_hex'],
+      ),
+      iconDomain: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_domain'],
+      ),
+      isPreset: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_preset'],
+      )!,
       isArchived: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_archived'],
@@ -529,12 +599,18 @@ class Bank extends DataClass implements Insertable<Bank> {
   final String name;
   final String? displayName;
   final String? displayDetails;
+  final String? colorHex;
+  final String? iconDomain;
+  final bool isPreset;
   final bool isArchived;
   const Bank({
     required this.id,
     required this.name,
     this.displayName,
     this.displayDetails,
+    this.colorHex,
+    this.iconDomain,
+    required this.isPreset,
     required this.isArchived,
   });
   @override
@@ -548,6 +624,13 @@ class Bank extends DataClass implements Insertable<Bank> {
     if (!nullToAbsent || displayDetails != null) {
       map['display_details'] = Variable<String>(displayDetails);
     }
+    if (!nullToAbsent || colorHex != null) {
+      map['color_hex'] = Variable<String>(colorHex);
+    }
+    if (!nullToAbsent || iconDomain != null) {
+      map['icon_domain'] = Variable<String>(iconDomain);
+    }
+    map['is_preset'] = Variable<bool>(isPreset);
     map['is_archived'] = Variable<bool>(isArchived);
     return map;
   }
@@ -562,6 +645,13 @@ class Bank extends DataClass implements Insertable<Bank> {
       displayDetails: displayDetails == null && nullToAbsent
           ? const Value.absent()
           : Value(displayDetails),
+      colorHex: colorHex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(colorHex),
+      iconDomain: iconDomain == null && nullToAbsent
+          ? const Value.absent()
+          : Value(iconDomain),
+      isPreset: Value(isPreset),
       isArchived: Value(isArchived),
     );
   }
@@ -576,6 +666,9 @@ class Bank extends DataClass implements Insertable<Bank> {
       name: serializer.fromJson<String>(json['name']),
       displayName: serializer.fromJson<String?>(json['displayName']),
       displayDetails: serializer.fromJson<String?>(json['displayDetails']),
+      colorHex: serializer.fromJson<String?>(json['colorHex']),
+      iconDomain: serializer.fromJson<String?>(json['iconDomain']),
+      isPreset: serializer.fromJson<bool>(json['isPreset']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
     );
   }
@@ -587,6 +680,9 @@ class Bank extends DataClass implements Insertable<Bank> {
       'name': serializer.toJson<String>(name),
       'displayName': serializer.toJson<String?>(displayName),
       'displayDetails': serializer.toJson<String?>(displayDetails),
+      'colorHex': serializer.toJson<String?>(colorHex),
+      'iconDomain': serializer.toJson<String?>(iconDomain),
+      'isPreset': serializer.toJson<bool>(isPreset),
       'isArchived': serializer.toJson<bool>(isArchived),
     };
   }
@@ -596,6 +692,9 @@ class Bank extends DataClass implements Insertable<Bank> {
     String? name,
     Value<String?> displayName = const Value.absent(),
     Value<String?> displayDetails = const Value.absent(),
+    Value<String?> colorHex = const Value.absent(),
+    Value<String?> iconDomain = const Value.absent(),
+    bool? isPreset,
     bool? isArchived,
   }) => Bank(
     id: id ?? this.id,
@@ -604,6 +703,9 @@ class Bank extends DataClass implements Insertable<Bank> {
     displayDetails: displayDetails.present
         ? displayDetails.value
         : this.displayDetails,
+    colorHex: colorHex.present ? colorHex.value : this.colorHex,
+    iconDomain: iconDomain.present ? iconDomain.value : this.iconDomain,
+    isPreset: isPreset ?? this.isPreset,
     isArchived: isArchived ?? this.isArchived,
   );
   Bank copyWithCompanion(BanksCompanion data) {
@@ -616,6 +718,11 @@ class Bank extends DataClass implements Insertable<Bank> {
       displayDetails: data.displayDetails.present
           ? data.displayDetails.value
           : this.displayDetails,
+      colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      iconDomain: data.iconDomain.present
+          ? data.iconDomain.value
+          : this.iconDomain,
+      isPreset: data.isPreset.present ? data.isPreset.value : this.isPreset,
       isArchived: data.isArchived.present
           ? data.isArchived.value
           : this.isArchived,
@@ -629,14 +736,25 @@ class Bank extends DataClass implements Insertable<Bank> {
           ..write('name: $name, ')
           ..write('displayName: $displayName, ')
           ..write('displayDetails: $displayDetails, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('iconDomain: $iconDomain, ')
+          ..write('isPreset: $isPreset, ')
           ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, displayName, displayDetails, isArchived);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    displayName,
+    displayDetails,
+    colorHex,
+    iconDomain,
+    isPreset,
+    isArchived,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -645,6 +763,9 @@ class Bank extends DataClass implements Insertable<Bank> {
           other.name == this.name &&
           other.displayName == this.displayName &&
           other.displayDetails == this.displayDetails &&
+          other.colorHex == this.colorHex &&
+          other.iconDomain == this.iconDomain &&
+          other.isPreset == this.isPreset &&
           other.isArchived == this.isArchived);
 }
 
@@ -653,6 +774,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
   final Value<String> name;
   final Value<String?> displayName;
   final Value<String?> displayDetails;
+  final Value<String?> colorHex;
+  final Value<String?> iconDomain;
+  final Value<bool> isPreset;
   final Value<bool> isArchived;
   final Value<int> rowid;
   const BanksCompanion({
@@ -660,6 +784,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
     this.name = const Value.absent(),
     this.displayName = const Value.absent(),
     this.displayDetails = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.iconDomain = const Value.absent(),
+    this.isPreset = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -668,6 +795,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
     required String name,
     this.displayName = const Value.absent(),
     this.displayDetails = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.iconDomain = const Value.absent(),
+    this.isPreset = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -677,6 +807,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
     Expression<String>? name,
     Expression<String>? displayName,
     Expression<String>? displayDetails,
+    Expression<String>? colorHex,
+    Expression<String>? iconDomain,
+    Expression<bool>? isPreset,
     Expression<bool>? isArchived,
     Expression<int>? rowid,
   }) {
@@ -685,6 +818,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
       if (name != null) 'name': name,
       if (displayName != null) 'display_name': displayName,
       if (displayDetails != null) 'display_details': displayDetails,
+      if (colorHex != null) 'color_hex': colorHex,
+      if (iconDomain != null) 'icon_domain': iconDomain,
+      if (isPreset != null) 'is_preset': isPreset,
       if (isArchived != null) 'is_archived': isArchived,
       if (rowid != null) 'rowid': rowid,
     });
@@ -695,6 +831,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
     Value<String>? name,
     Value<String?>? displayName,
     Value<String?>? displayDetails,
+    Value<String?>? colorHex,
+    Value<String?>? iconDomain,
+    Value<bool>? isPreset,
     Value<bool>? isArchived,
     Value<int>? rowid,
   }) {
@@ -703,6 +842,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
       name: name ?? this.name,
       displayName: displayName ?? this.displayName,
       displayDetails: displayDetails ?? this.displayDetails,
+      colorHex: colorHex ?? this.colorHex,
+      iconDomain: iconDomain ?? this.iconDomain,
+      isPreset: isPreset ?? this.isPreset,
       isArchived: isArchived ?? this.isArchived,
       rowid: rowid ?? this.rowid,
     );
@@ -723,6 +865,15 @@ class BanksCompanion extends UpdateCompanion<Bank> {
     if (displayDetails.present) {
       map['display_details'] = Variable<String>(displayDetails.value);
     }
+    if (colorHex.present) {
+      map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (iconDomain.present) {
+      map['icon_domain'] = Variable<String>(iconDomain.value);
+    }
+    if (isPreset.present) {
+      map['is_preset'] = Variable<bool>(isPreset.value);
+    }
     if (isArchived.present) {
       map['is_archived'] = Variable<bool>(isArchived.value);
     }
@@ -739,6 +890,9 @@ class BanksCompanion extends UpdateCompanion<Bank> {
           ..write('name: $name, ')
           ..write('displayName: $displayName, ')
           ..write('displayDetails: $displayDetails, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('iconDomain: $iconDomain, ')
+          ..write('isPreset: $isPreset, ')
           ..write('isArchived: $isArchived, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2516,6 +2670,639 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   }
 }
 
+class $CurrenciesTable extends Currencies
+    with TableInfo<$CurrenciesTable, Currency> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CurrenciesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _numericCodeMeta = const VerificationMeta(
+    'numericCode',
+  );
+  @override
+  late final GeneratedColumn<String> numericCode = GeneratedColumn<String>(
+    'numeric_code',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _symbolMeta = const VerificationMeta('symbol');
+  @override
+  late final GeneratedColumn<String> symbol = GeneratedColumn<String>(
+    'symbol',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameRuMeta = const VerificationMeta('nameRu');
+  @override
+  late final GeneratedColumn<String> nameRu = GeneratedColumn<String>(
+    'name_ru',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    code,
+    numericCode,
+    symbol,
+    nameRu,
+    nameEn,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'currencies';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Currency> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('numeric_code')) {
+      context.handle(
+        _numericCodeMeta,
+        numericCode.isAcceptableOrUnknown(
+          data['numeric_code']!,
+          _numericCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_numericCodeMeta);
+    }
+    if (data.containsKey('symbol')) {
+      context.handle(
+        _symbolMeta,
+        symbol.isAcceptableOrUnknown(data['symbol']!, _symbolMeta),
+      );
+    }
+    if (data.containsKey('name_ru')) {
+      context.handle(
+        _nameRuMeta,
+        nameRu.isAcceptableOrUnknown(data['name_ru']!, _nameRuMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameRuMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {code};
+  @override
+  Currency map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Currency(
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      numericCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}numeric_code'],
+      )!,
+      symbol: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}symbol'],
+      ),
+      nameRu: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ru'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+    );
+  }
+
+  @override
+  $CurrenciesTable createAlias(String alias) {
+    return $CurrenciesTable(attachedDatabase, alias);
+  }
+}
+
+class Currency extends DataClass implements Insertable<Currency> {
+  final String code;
+  final String numericCode;
+  final String? symbol;
+  final String nameRu;
+  final String nameEn;
+  const Currency({
+    required this.code,
+    required this.numericCode,
+    this.symbol,
+    required this.nameRu,
+    required this.nameEn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['code'] = Variable<String>(code);
+    map['numeric_code'] = Variable<String>(numericCode);
+    if (!nullToAbsent || symbol != null) {
+      map['symbol'] = Variable<String>(symbol);
+    }
+    map['name_ru'] = Variable<String>(nameRu);
+    map['name_en'] = Variable<String>(nameEn);
+    return map;
+  }
+
+  CurrenciesCompanion toCompanion(bool nullToAbsent) {
+    return CurrenciesCompanion(
+      code: Value(code),
+      numericCode: Value(numericCode),
+      symbol: symbol == null && nullToAbsent
+          ? const Value.absent()
+          : Value(symbol),
+      nameRu: Value(nameRu),
+      nameEn: Value(nameEn),
+    );
+  }
+
+  factory Currency.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Currency(
+      code: serializer.fromJson<String>(json['code']),
+      numericCode: serializer.fromJson<String>(json['numericCode']),
+      symbol: serializer.fromJson<String?>(json['symbol']),
+      nameRu: serializer.fromJson<String>(json['nameRu']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'code': serializer.toJson<String>(code),
+      'numericCode': serializer.toJson<String>(numericCode),
+      'symbol': serializer.toJson<String?>(symbol),
+      'nameRu': serializer.toJson<String>(nameRu),
+      'nameEn': serializer.toJson<String>(nameEn),
+    };
+  }
+
+  Currency copyWith({
+    String? code,
+    String? numericCode,
+    Value<String?> symbol = const Value.absent(),
+    String? nameRu,
+    String? nameEn,
+  }) => Currency(
+    code: code ?? this.code,
+    numericCode: numericCode ?? this.numericCode,
+    symbol: symbol.present ? symbol.value : this.symbol,
+    nameRu: nameRu ?? this.nameRu,
+    nameEn: nameEn ?? this.nameEn,
+  );
+  Currency copyWithCompanion(CurrenciesCompanion data) {
+    return Currency(
+      code: data.code.present ? data.code.value : this.code,
+      numericCode: data.numericCode.present
+          ? data.numericCode.value
+          : this.numericCode,
+      symbol: data.symbol.present ? data.symbol.value : this.symbol,
+      nameRu: data.nameRu.present ? data.nameRu.value : this.nameRu,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Currency(')
+          ..write('code: $code, ')
+          ..write('numericCode: $numericCode, ')
+          ..write('symbol: $symbol, ')
+          ..write('nameRu: $nameRu, ')
+          ..write('nameEn: $nameEn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(code, numericCode, symbol, nameRu, nameEn);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Currency &&
+          other.code == this.code &&
+          other.numericCode == this.numericCode &&
+          other.symbol == this.symbol &&
+          other.nameRu == this.nameRu &&
+          other.nameEn == this.nameEn);
+}
+
+class CurrenciesCompanion extends UpdateCompanion<Currency> {
+  final Value<String> code;
+  final Value<String> numericCode;
+  final Value<String?> symbol;
+  final Value<String> nameRu;
+  final Value<String> nameEn;
+  final Value<int> rowid;
+  const CurrenciesCompanion({
+    this.code = const Value.absent(),
+    this.numericCode = const Value.absent(),
+    this.symbol = const Value.absent(),
+    this.nameRu = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CurrenciesCompanion.insert({
+    required String code,
+    required String numericCode,
+    this.symbol = const Value.absent(),
+    required String nameRu,
+    required String nameEn,
+    this.rowid = const Value.absent(),
+  }) : code = Value(code),
+       numericCode = Value(numericCode),
+       nameRu = Value(nameRu),
+       nameEn = Value(nameEn);
+  static Insertable<Currency> custom({
+    Expression<String>? code,
+    Expression<String>? numericCode,
+    Expression<String>? symbol,
+    Expression<String>? nameRu,
+    Expression<String>? nameEn,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (code != null) 'code': code,
+      if (numericCode != null) 'numeric_code': numericCode,
+      if (symbol != null) 'symbol': symbol,
+      if (nameRu != null) 'name_ru': nameRu,
+      if (nameEn != null) 'name_en': nameEn,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CurrenciesCompanion copyWith({
+    Value<String>? code,
+    Value<String>? numericCode,
+    Value<String?>? symbol,
+    Value<String>? nameRu,
+    Value<String>? nameEn,
+    Value<int>? rowid,
+  }) {
+    return CurrenciesCompanion(
+      code: code ?? this.code,
+      numericCode: numericCode ?? this.numericCode,
+      symbol: symbol ?? this.symbol,
+      nameRu: nameRu ?? this.nameRu,
+      nameEn: nameEn ?? this.nameEn,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (numericCode.present) {
+      map['numeric_code'] = Variable<String>(numericCode.value);
+    }
+    if (symbol.present) {
+      map['symbol'] = Variable<String>(symbol.value);
+    }
+    if (nameRu.present) {
+      map['name_ru'] = Variable<String>(nameRu.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CurrenciesCompanion(')
+          ..write('code: $code, ')
+          ..write('numericCode: $numericCode, ')
+          ..write('symbol: $symbol, ')
+          ..write('nameRu: $nameRu, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AppSettingsTable extends AppSettings
+    with TableInfo<$AppSettingsTable, AppSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  AppSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppSetting(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AppSettingsTable createAlias(String alias) {
+    return $AppSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class AppSetting extends DataClass implements Insertable<AppSetting> {
+  final String key;
+  final String value;
+  final DateTime updatedAt;
+  const AppSetting({
+    required this.key,
+    required this.value,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AppSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AppSettingsCompanion(
+      key: Value(key),
+      value: Value(value),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AppSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppSetting(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AppSetting copyWith({String? key, String? value, DateTime? updatedAt}) =>
+      AppSetting(
+        key: key ?? this.key,
+        value: value ?? this.value,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  AppSetting copyWithCompanion(AppSettingsCompanion data) {
+    return AppSetting(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSetting(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppSetting &&
+          other.key == this.key &&
+          other.value == this.value &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const AppSettingsCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppSettingsCompanion.insert({
+    required String key,
+    required String value,
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<AppSetting> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppSettingsCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AppSettingsCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingsCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2524,6 +3311,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AccountsTable accounts = $AccountsTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
+  late final $CurrenciesTable currencies = $CurrenciesTable(this);
+  late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final Index idxAccountsBookId = Index(
     'idx_accounts_book_id',
     'CREATE INDEX idx_accounts_book_id ON accounts (book_id)',
@@ -2558,6 +3347,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     accounts,
     categories,
     transactions,
+    currencies,
+    appSettings,
     idxAccountsBookId,
     idxAccountsBankId,
     idxCategoriesBookId,
@@ -3063,6 +3854,9 @@ typedef $$BanksTableCreateCompanionBuilder =
       required String name,
       Value<String?> displayName,
       Value<String?> displayDetails,
+      Value<String?> colorHex,
+      Value<String?> iconDomain,
+      Value<bool> isPreset,
       Value<bool> isArchived,
       Value<int> rowid,
     });
@@ -3072,6 +3866,9 @@ typedef $$BanksTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> displayName,
       Value<String?> displayDetails,
+      Value<String?> colorHex,
+      Value<String?> iconDomain,
+      Value<bool> isPreset,
       Value<bool> isArchived,
       Value<int> rowid,
     });
@@ -3125,6 +3922,21 @@ class $$BanksTableFilterComposer extends Composer<_$AppDatabase, $BanksTable> {
 
   ColumnFilters<String> get displayDetails => $composableBuilder(
     column: $table.displayDetails,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconDomain => $composableBuilder(
+    column: $table.iconDomain,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isPreset => $composableBuilder(
+    column: $table.isPreset,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3188,6 +4000,21 @@ class $$BanksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconDomain => $composableBuilder(
+    column: $table.iconDomain,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isPreset => $composableBuilder(
+    column: $table.isPreset,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
     builder: (column) => ColumnOrderings(column),
@@ -3218,6 +4045,17 @@ class $$BanksTableAnnotationComposer
     column: $table.displayDetails,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get colorHex =>
+      $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<String> get iconDomain => $composableBuilder(
+    column: $table.iconDomain,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isPreset =>
+      $composableBuilder(column: $table.isPreset, builder: (column) => column);
 
   GeneratedColumn<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
@@ -3282,6 +4120,9 @@ class $$BanksTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> displayName = const Value.absent(),
                 Value<String?> displayDetails = const Value.absent(),
+                Value<String?> colorHex = const Value.absent(),
+                Value<String?> iconDomain = const Value.absent(),
+                Value<bool> isPreset = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BanksCompanion(
@@ -3289,6 +4130,9 @@ class $$BanksTableTableManager
                 name: name,
                 displayName: displayName,
                 displayDetails: displayDetails,
+                colorHex: colorHex,
+                iconDomain: iconDomain,
+                isPreset: isPreset,
                 isArchived: isArchived,
                 rowid: rowid,
               ),
@@ -3298,6 +4142,9 @@ class $$BanksTableTableManager
                 required String name,
                 Value<String?> displayName = const Value.absent(),
                 Value<String?> displayDetails = const Value.absent(),
+                Value<String?> colorHex = const Value.absent(),
+                Value<String?> iconDomain = const Value.absent(),
+                Value<bool> isPreset = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BanksCompanion.insert(
@@ -3305,6 +4152,9 @@ class $$BanksTableTableManager
                 name: name,
                 displayName: displayName,
                 displayDetails: displayDetails,
+                colorHex: colorHex,
+                iconDomain: iconDomain,
+                isPreset: isPreset,
                 isArchived: isArchived,
                 rowid: rowid,
               ),
@@ -5121,6 +5971,364 @@ typedef $$TransactionsTableProcessedTableManager =
         bool categoryId,
       })
     >;
+typedef $$CurrenciesTableCreateCompanionBuilder =
+    CurrenciesCompanion Function({
+      required String code,
+      required String numericCode,
+      Value<String?> symbol,
+      required String nameRu,
+      required String nameEn,
+      Value<int> rowid,
+    });
+typedef $$CurrenciesTableUpdateCompanionBuilder =
+    CurrenciesCompanion Function({
+      Value<String> code,
+      Value<String> numericCode,
+      Value<String?> symbol,
+      Value<String> nameRu,
+      Value<String> nameEn,
+      Value<int> rowid,
+    });
+
+class $$CurrenciesTableFilterComposer
+    extends Composer<_$AppDatabase, $CurrenciesTable> {
+  $$CurrenciesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get numericCode => $composableBuilder(
+    column: $table.numericCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get symbol => $composableBuilder(
+    column: $table.symbol,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameRu => $composableBuilder(
+    column: $table.nameRu,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CurrenciesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CurrenciesTable> {
+  $$CurrenciesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get numericCode => $composableBuilder(
+    column: $table.numericCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get symbol => $composableBuilder(
+    column: $table.symbol,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameRu => $composableBuilder(
+    column: $table.nameRu,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CurrenciesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CurrenciesTable> {
+  $$CurrenciesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get numericCode => $composableBuilder(
+    column: $table.numericCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get symbol =>
+      $composableBuilder(column: $table.symbol, builder: (column) => column);
+
+  GeneratedColumn<String> get nameRu =>
+      $composableBuilder(column: $table.nameRu, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+}
+
+class $$CurrenciesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CurrenciesTable,
+          Currency,
+          $$CurrenciesTableFilterComposer,
+          $$CurrenciesTableOrderingComposer,
+          $$CurrenciesTableAnnotationComposer,
+          $$CurrenciesTableCreateCompanionBuilder,
+          $$CurrenciesTableUpdateCompanionBuilder,
+          (Currency, BaseReferences<_$AppDatabase, $CurrenciesTable, Currency>),
+          Currency,
+          PrefetchHooks Function()
+        > {
+  $$CurrenciesTableTableManager(_$AppDatabase db, $CurrenciesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CurrenciesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CurrenciesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CurrenciesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> code = const Value.absent(),
+                Value<String> numericCode = const Value.absent(),
+                Value<String?> symbol = const Value.absent(),
+                Value<String> nameRu = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CurrenciesCompanion(
+                code: code,
+                numericCode: numericCode,
+                symbol: symbol,
+                nameRu: nameRu,
+                nameEn: nameEn,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String code,
+                required String numericCode,
+                Value<String?> symbol = const Value.absent(),
+                required String nameRu,
+                required String nameEn,
+                Value<int> rowid = const Value.absent(),
+              }) => CurrenciesCompanion.insert(
+                code: code,
+                numericCode: numericCode,
+                symbol: symbol,
+                nameRu: nameRu,
+                nameEn: nameEn,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CurrenciesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CurrenciesTable,
+      Currency,
+      $$CurrenciesTableFilterComposer,
+      $$CurrenciesTableOrderingComposer,
+      $$CurrenciesTableAnnotationComposer,
+      $$CurrenciesTableCreateCompanionBuilder,
+      $$CurrenciesTableUpdateCompanionBuilder,
+      (Currency, BaseReferences<_$AppDatabase, $CurrenciesTable, Currency>),
+      Currency,
+      PrefetchHooks Function()
+    >;
+typedef $$AppSettingsTableCreateCompanionBuilder =
+    AppSettingsCompanion Function({
+      required String key,
+      required String value,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AppSettingsTableUpdateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AppSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AppSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AppSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppSettingsTable,
+          AppSetting,
+          $$AppSettingsTableFilterComposer,
+          $$AppSettingsTableOrderingComposer,
+          $$AppSettingsTableAnnotationComposer,
+          $$AppSettingsTableCreateCompanionBuilder,
+          $$AppSettingsTableUpdateCompanionBuilder,
+          (
+            AppSetting,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+          ),
+          AppSetting,
+          PrefetchHooks Function()
+        > {
+  $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AppSettingsCompanion(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AppSettingsCompanion.insert(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppSettingsTable,
+      AppSetting,
+      $$AppSettingsTableFilterComposer,
+      $$AppSettingsTableOrderingComposer,
+      $$AppSettingsTableAnnotationComposer,
+      $$AppSettingsTableCreateCompanionBuilder,
+      $$AppSettingsTableUpdateCompanionBuilder,
+      (
+        AppSetting,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+      ),
+      AppSetting,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5135,4 +6343,8 @@ class $AppDatabaseManager {
       $$CategoriesTableTableManager(_db, _db.categories);
   $$TransactionsTableTableManager get transactions =>
       $$TransactionsTableTableManager(_db, _db.transactions);
+  $$CurrenciesTableTableManager get currencies =>
+      $$CurrenciesTableTableManager(_db, _db.currencies);
+  $$AppSettingsTableTableManager get appSettings =>
+      $$AppSettingsTableTableManager(_db, _db.appSettings);
 }

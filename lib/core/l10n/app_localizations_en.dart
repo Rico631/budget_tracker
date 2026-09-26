@@ -13,4 +13,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeMessage => 'Welcome to the expense management app';
+
+  @override
+  String get defaultBookName => 'Personal book';
+
+  @override
+  String get bootstrapErrorMessage =>
+      'Failed to prepare the app data. Please restart the app.';
 }

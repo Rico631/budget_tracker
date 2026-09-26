@@ -18,7 +18,20 @@ extension BankRowMapper on Bank {
     name: name,
     displayName: displayName,
     displayDetails: displayDetails,
+    colorHex: colorHex,
+    iconDomain: iconDomain,
+    isPreset: isPreset,
     isArchived: isArchived,
+  );
+}
+
+extension CurrencyRowMapper on Currency {
+  FinanceCurrency toDomain() => FinanceCurrency(
+    code: code,
+    numericCode: numericCode,
+    symbol: symbol,
+    nameRu: nameRu,
+    nameEn: nameEn,
   );
 }
 
@@ -78,8 +91,20 @@ BanksCompanion bankToCompanion(FinanceBank bank) => BanksCompanion.insert(
   name: bank.name,
   displayName: Value(bank.displayName),
   displayDetails: Value(bank.displayDetails),
+  colorHex: Value(bank.colorHex),
+  iconDomain: Value(bank.iconDomain),
+  isPreset: Value(bank.isPreset),
   isArchived: Value(bank.isArchived),
 );
+
+CurrenciesCompanion currencyToCompanion(FinanceCurrency currency) =>
+    CurrenciesCompanion.insert(
+      code: currency.code,
+      numericCode: currency.numericCode,
+      symbol: Value(currency.symbol),
+      nameRu: currency.nameRu,
+      nameEn: currency.nameEn,
+    );
 
 AccountsCompanion accountToCompanion(FinanceAccount account) =>
     AccountsCompanion.insert(

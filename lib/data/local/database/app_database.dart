@@ -21,6 +21,9 @@ class Banks extends Table {
   TextColumn get name => text()();
   TextColumn get displayName => text().nullable()();
   TextColumn get displayDetails => text().nullable()();
+  TextColumn get colorHex => text().nullable()();
+  TextColumn get iconDomain => text().nullable()();
+  BoolColumn get isPreset => boolean().withDefault(const Constant(false))();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
 
   @override
@@ -79,7 +82,37 @@ class Transactions extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Books, Banks, Accounts, Categories, Transactions])
+class Currencies extends Table {
+  TextColumn get code => text().withLength(min: 3, max: 3)();
+  TextColumn get numericCode => text().withLength(min: 3, max: 3)();
+  TextColumn get symbol => text().nullable()();
+  TextColumn get nameRu => text()();
+  TextColumn get nameEn => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {code};
+}
+
+class AppSettings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
+}
+
+@DriftDatabase(
+  tables: [
+    Books,
+    Banks,
+    Accounts,
+    Categories,
+    Transactions,
+    Currencies,
+    AppSettings,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -87,7 +120,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,11 +129,21 @@ class AppDatabase extends _$AppDatabase {
     },
     onUpgrade: (m, from, to) async {
       if (from < 2) {
+        // Версия 1 не содержала прикладных таблиц: они создаются по текущей
+        // схеме, поэтому колонки Banks появляются вместе с таблицей.
         await m.createTable(books);
         await m.createTable(banks);
         await m.createTable(accounts);
         await m.createTable(categories);
         await m.createTable(transactions);
+      } else if (from < 3) {
+        await m.addColumn(banks, banks.colorHex);
+        await m.addColumn(banks, banks.iconDomain);
+        await m.addColumn(banks, banks.isPreset);
+      }
+      if (from < 3) {
+        await m.createTable(currencies);
+        await m.createTable(appSettings);
       }
     },
   );

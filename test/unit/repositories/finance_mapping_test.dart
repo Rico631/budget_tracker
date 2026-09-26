@@ -1,4 +1,5 @@
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/banks_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
@@ -56,5 +57,67 @@ void main() {
     expect((await categories.getById(category.id))!.parentId, isNull);
     expect((await transactions.getById(transaction.id))!.toAccountId, isNull);
     expect((await transactions.getById(transaction.id))!.note, isNull);
+  });
+
+  test('round-trips preset bank fields and currency catalog rows', () async {
+    final presetBank = FinanceBank(
+      id: '018f8d2e-3f2d-7e2a-9b3a-9e6c2c3b7d8b',
+      name: 'СберБанк',
+      colorHex: '#21A038',
+      iconDomain: 'sberbank.ru',
+      isPreset: true,
+    );
+    await database.into(database.banks).insert(bankToCompanion(presetBank));
+
+    final storedBank = await banks.getById(presetBank.id);
+
+    expect(storedBank!.colorHex, '#21A038');
+    expect(storedBank.iconDomain, 'sberbank.ru');
+    expect(storedBank.isPreset, isTrue);
+
+    final customBank = await banks.create(name: 'Cash');
+
+    expect((await banks.getById(customBank.id))!.colorHex, isNull);
+    expect((await banks.getById(customBank.id))!.iconDomain, isNull);
+    expect((await banks.getById(customBank.id))!.isPreset, isFalse);
+
+    final currency = FinanceCurrency(
+      code: 'RUB',
+      numericCode: '643',
+      symbol: '₽',
+      nameRu: 'Российский рубль',
+      nameEn: 'Russian Rouble',
+    );
+    await database
+        .into(database.currencies)
+        .insert(currencyToCompanion(currency));
+
+    final storedCurrency = (await database.select(database.currencies).get())
+        .single
+        .toDomain();
+
+    expect(storedCurrency.code, 'RUB');
+    expect(storedCurrency.numericCode, '643');
+    expect(storedCurrency.symbol, '₽');
+    expect(storedCurrency.nameRu, 'Российский рубль');
+    expect(storedCurrency.nameEn, 'Russian Rouble');
+
+    final currencyWithoutSymbol = FinanceCurrency(
+      code: 'XAU',
+      numericCode: '959',
+      nameRu: 'Золото (тройская унция)',
+      nameEn: 'Gold',
+    );
+    await database
+        .into(database.currencies)
+        .insert(currencyToCompanion(currencyWithoutSymbol));
+
+    final storedMetals = (await database.select(database.currencies).get())
+        .where((row) => row.code == 'XAU')
+        .single
+        .toDomain();
+
+    expect(storedMetals.symbol, isNull);
+    expect(storedMetals.nameRu, 'Золото (тройская унция)');
   });
 }

@@ -1,9 +1,37 @@
-import 'package:budget_tracker/main.dart';
+import 'dart:async';
+
+import 'package:budget_tracker/core/di/app_providers.dart';
+import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/domain/repositories/bootstrap_repositories.dart';
+import 'package:budget_tracker/main.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+/// Bootstrap, который не завершается: проверяет состояние загрузки.
+class _PendingBootstrapRepository implements FirstRunBootstrapRepository {
+  final Completer<FirstRunBootstrapResult> _completer =
+      Completer<FirstRunBootstrapResult>();
+
+  @override
+  Future<FirstRunBootstrapResult> run({
+    required String languageCode,
+    required String defaultBookName,
+  }) => _completer.future;
+}
+
+/// Bootstrap, который падает: проверяет контролируемое состояние ошибки.
+class _FailingBootstrapRepository implements FirstRunBootstrapRepository {
+  @override
+  Future<FirstRunBootstrapResult> run({
+    required String languageCode,
+    required String defaultBookName,
+  }) async {
+    throw StateError('bootstrap failed');
+  }
+}
 
 void main() {
   drift.driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -16,21 +44,77 @@ void main() {
     expect(resolved, const Locale('ru'));
   });
 
-  testWidgets(
-    'app provides the root provider scope and renders the app shell',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(child: const BudgetTrackerApp(locale: Locale('ru'))),
-      );
+  testWidgets('renders the home screen after the first run initialization', (
+    WidgetTester tester,
+  ) async {
+    final database = AppDatabase.forTesting();
+    addTearDown(database.close);
 
-      expect(find.byType(Scaffold), findsOneWidget);
-      expect(find.text('Бюджетный трекер'), findsOneWidget);
-      expect(
-        find.text('Добро пожаловать в приложение для учета расходов'),
-        findsOneWidget,
-      );
-    },
-  );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+        child: const BudgetTrackerApp(locale: Locale('ru')),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Scaffold), findsOneWidget);
+    expect(find.text('Бюджетный трекер'), findsOneWidget);
+    expect(
+      find.text('Добро пожаловать в приложение для учета расходов'),
+      findsOneWidget,
+    );
+    expect(await database.select(database.books).get(), hasLength(1));
+  });
+
+  testWidgets('shows the loading state while the initialization runs', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          firstRunBootstrapRepositoryProvider.overrideWithValue(
+            _PendingBootstrapRepository(),
+          ),
+        ],
+        child: const BudgetTrackerApp(locale: Locale('ru')),
+      ),
+    );
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Бюджетный трекер'), findsNothing);
+    expect(
+      find.text('Добро пожаловать в приложение для учета расходов'),
+      findsNothing,
+    );
+  });
+
+  testWidgets('shows a controlled error state when the initialization fails', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          firstRunBootstrapRepositoryProvider.overrideWithValue(
+            _FailingBootstrapRepository(),
+          ),
+        ],
+        child: const BudgetTrackerApp(locale: Locale('ru')),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(
+      find.text(
+        'Не удалось подготовить данные приложения. Перезапустите приложение.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Бюджетный трекер'), findsNothing);
+  });
 
   test('database opens and closes in memory without subject tables', () async {
     final database = AppDatabase.forTesting();

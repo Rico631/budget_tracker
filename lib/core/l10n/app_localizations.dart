@@ -109,6 +109,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome to the expense management app'**
   String get welcomeMessage;
+
+  /// Default book name created on the first run
+  ///
+  /// In en, this message translates to:
+  /// **'Personal book'**
+  String get defaultBookName;
+
+  /// First run initialization error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to prepare the app data. Please restart the app.'**
+  String get bootstrapErrorMessage;
 }
 
 class _AppLocalizationsDelegate

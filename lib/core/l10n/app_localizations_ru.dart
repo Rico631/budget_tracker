@@ -14,4 +14,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get welcomeMessage =>
       'Добро пожаловать в приложение для учета расходов';
+
+  @override
+  String get defaultBookName => 'Личная книга';
+
+  @override
+  String get bootstrapErrorMessage =>
+      'Не удалось подготовить данные приложения. Перезапустите приложение.';
 }
