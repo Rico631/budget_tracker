@@ -1,7 +1,7 @@
 import 'package:budget_tracker/data/local/seed/seed_records.dart';
 
-/// Предустановленные банки России из раздела «Банки России» ADR-0001
-/// в порядке строк таблицы.
+/// Предустановленные банки России из раздела «Банки России» документа
+/// `docs/reference-data/banks.md` в порядке строк таблицы.
 const List<BankSeed> russianBankSeedCatalog = <BankSeed>[
   BankSeed(name: 'СберБанк', colorHex: '#21A038', iconDomain: 'sberbank.ru'),
   BankSeed(name: 'Банк ВТБ', colorHex: '#0072CE', iconDomain: 'vtb.ru'),
@@ -306,7 +306,7 @@ const List<BankSeed> russianBankSeedCatalog = <BankSeed>[
 ];
 
 /// Предустановленные банки США и Европы из разделов «США» и «Европа»
-/// ADR-0001 в порядке строк таблиц.
+/// документа `docs/reference-data/banks.md` в порядке строк таблиц.
 const List<BankSeed> internationalBankSeedCatalog = <BankSeed>[
   BankSeed(
     name: 'JPMorgan Chase',

@@ -1,8 +1,8 @@
 import 'package:budget_tracker/data/local/seed/seed_records.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 
-/// Стартовый набор категорий из раздела «Категории» ADR-0001:
-/// 11 доходных и 26 расходных категорий.
+/// Стартовый набор категорий из раздела «Категории» документа
+/// `docs/reference-data/categories.md`: 11 доходных и 26 расходных категорий.
 ///
 /// Категория типа `transfer` не создается: перевод не имеет
 /// категории (решение 3.3 ADR-0001).

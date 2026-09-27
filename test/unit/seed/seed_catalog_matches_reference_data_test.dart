@@ -7,26 +7,29 @@ import 'package:budget_tracker/data/local/seed/seed_records.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Таблица ADR-0001 содержит 166 строк валют, в которых коды `CUP` и `UYW`
-/// повторяются; в справочник повторяющийся код попадает один раз.
-const int _adrCurrencyRows = 166;
+/// Документ `docs/reference-data/currencies-iso-4217.md` содержит 166 строк
+/// валют, в которых коды `CUP` и `UYW` повторяются; в справочник повторяющийся
+/// код попадает один раз.
+const int _referenceDataCurrencyRows = 166;
 const int _uniqueCurrencyCodes = 164;
 
 void main() {
-  final lines = File(
-    'docs/adr/0001-budget-tracker-concept-and-ux.md',
-  ).readAsLinesSync().map((line) => line.trim()).toList();
+  final currencyLines = _readLines(
+    'docs/reference-data/currencies-iso-4217.md',
+  );
+  final bankLines = _readLines('docs/reference-data/banks.md');
+  final categoryLines = _readLines('docs/reference-data/categories.md');
 
-  group('Seed catalogs match ADR-0001', () {
+  group('Seed catalogs match the reference data documents', () {
     test('currencies match the ISO 4217 table with duplicate codes merged', () {
       final rows = _rows(
-        lines,
+        currencyLines,
         '## Таблица валют мира по стандарту ISO 4217',
-        '## Банки России',
+        null,
         skipFirstCell: 'Номер ISO 4217',
       );
 
-      expect(rows, hasLength(_adrCurrencyRows));
+      expect(rows, hasLength(_referenceDataCurrencyRows));
 
       final expected = <String, List<String>>{};
       for (final row in rows) {
@@ -38,7 +41,9 @@ void main() {
       expect(
         currencySeedCatalog.map((seed) => seed.code),
         expected.keys,
-        reason: 'порядок и состав кодов должны совпадать с таблицей ADR-0001',
+        reason:
+            'порядок и состав кодов должны совпадать с документом '
+            'docs/reference-data/currencies-iso-4217.md',
       );
 
       final actual = <String, CurrencySeed>{
@@ -70,16 +75,21 @@ void main() {
 
     test('bank catalogs match the Russian, US and European tables', () {
       final russianRows = _rows(
-        lines,
+        bankLines,
         '## Банки России',
         '## Банки США и Европы для en версии',
         skipFirstCell: '№',
       );
-      final usRows = _rows(lines, '### США', '### Европа', skipFirstCell: '№');
-      final europeRows = _rows(
-        lines,
+      final usRows = _rows(
+        bankLines,
+        '### США',
         '### Европа',
-        '## Категории',
+        skipFirstCell: '№',
+      );
+      final europeRows = _rows(
+        bankLines,
+        '### Европа',
+        null,
         skipFirstCell: '№',
       );
 
@@ -98,7 +108,7 @@ void main() {
 
     test('category catalog matches the category table without transfer', () {
       final rows = _rows(
-        lines,
+        categoryLines,
         '## Категории',
         null,
         skipFirstCell: 'Русское название',
@@ -152,6 +162,9 @@ void _expectBanksMatch(List<BankSeed> seeds, List<List<String>> rows) {
     );
   }
 }
+
+List<String> _readLines(String path) =>
+    File(path).readAsLinesSync().map((line) => line.trim()).toList();
 
 List<List<String>> _rows(
   List<String> lines,

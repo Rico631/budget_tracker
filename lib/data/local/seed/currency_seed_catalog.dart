@@ -1,8 +1,7 @@
 import 'package:budget_tracker/data/local/seed/seed_records.dart';
 
 /// Справочник валют ISO 4217 из раздела «Таблица валют мира по
-/// стандарту ISO 4217» ADR-0001
-/// (`docs/adr/0001-budget-tracker-concept-and-ux.md`).
+/// стандарту ISO 4217» документа `docs/reference-data/currencies-iso-4217.md`.
 ///
 /// Строки таблицы с повторяющимся буквенным кодом включены один
 /// раз: сохраняется первое вхождение (`CUP` — 931, `UYW` — 860).
