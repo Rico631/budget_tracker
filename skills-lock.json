@@ -162,6 +162,13 @@
       "sourceType": "github",
       "skillPath": "engineering/grill-me/skills/grill-me/SKILL.md",
       "computedHash": "e63ffc49b045c2186a64bc6c84c37ed6ded259b205c1755cee94f9fdb71b04d3"
+    },
+    "personal-finance": {
+      "source": "skills.volces.com",
+      "sourceUrl": "https://skills.volces.com/skills/clawhub/aka-anoop",
+      "sourceType": "well-known",
+      "computedHash": "a3f0dd6a1330df637acd896a73aac528eeda27a35126d311b925babca67e8a67",
+      "wellKnownDigest": "sha256:63f6a6e4dd8884bb81083c149bec95bf31e6e6f5ca748cd524493401f730bfea"
     }
   }
 }
