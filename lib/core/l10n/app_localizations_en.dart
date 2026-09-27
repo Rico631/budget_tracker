@@ -515,4 +515,128 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryFormDeleteDialogCancelAction => 'Cancel';
+
+  @override
+  String get analyticsTotalLabel => 'Total';
+
+  @override
+  String get analyticsStreamIncomeLabel => 'Income';
+
+  @override
+  String get analyticsStreamExpenseLabel => 'Expenses';
+
+  @override
+  String get analyticsPeriodModeMonthLabel => 'Month';
+
+  @override
+  String get analyticsPeriodModeYearLabel => 'Year';
+
+  @override
+  String analyticsPeriodMonthLabel(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String analyticsPeriodYearLabel(int year) {
+    return '$year';
+  }
+
+  @override
+  String get analyticsPreviousPeriodTooltip => 'Previous period';
+
+  @override
+  String get analyticsNextPeriodTooltip => 'Next period';
+
+  @override
+  String get analyticsMonthNameJanuary => 'January';
+
+  @override
+  String get analyticsMonthNameFebruary => 'February';
+
+  @override
+  String get analyticsMonthNameMarch => 'March';
+
+  @override
+  String get analyticsMonthNameApril => 'April';
+
+  @override
+  String get analyticsMonthNameMay => 'May';
+
+  @override
+  String get analyticsMonthNameJune => 'June';
+
+  @override
+  String get analyticsMonthNameJuly => 'July';
+
+  @override
+  String get analyticsMonthNameAugust => 'August';
+
+  @override
+  String get analyticsMonthNameSeptember => 'September';
+
+  @override
+  String get analyticsMonthNameOctober => 'October';
+
+  @override
+  String get analyticsMonthNameNovember => 'November';
+
+  @override
+  String get analyticsMonthNameDecember => 'December';
+
+  @override
+  String get analyticsAccountFilterAllLabel => 'All accounts';
+
+  @override
+  String get analyticsAccountFilterTitle => 'Account';
+
+  @override
+  String get analyticsAccountFilterArchivedLabel => 'Archived';
+
+  @override
+  String analyticsAccountFilterMultipleLabel(int count) {
+    return 'Accounts: $count';
+  }
+
+  @override
+  String get analyticsAccountFilterApplyAction => 'Done';
+
+  @override
+  String get analyticsEmptyBookTitle => 'No operations yet';
+
+  @override
+  String get analyticsEmptyBookMessage =>
+      'Operations are created in the \"Operations\" section: add the first operation there and analytics will show income and expenses for it.';
+
+  @override
+  String analyticsEmptyPeriodMessage(String period) {
+    return 'There are no operations of the selected flow in $period.';
+  }
+
+  @override
+  String analyticsEmptyAccountMessage(String account, String period) {
+    return 'There are no operations of the selected flow on the \"$account\" account in $period.';
+  }
+
+  @override
+  String analyticsEmptyAccountsMessage(String period) {
+    return 'There are no operations of the selected flow on the selected accounts in $period.';
+  }
+
+  @override
+  String get analyticsLoadErrorMessage =>
+      'Failed to load analytics. Please try again.';
+
+  @override
+  String get analyticsRetryAction => 'Retry';
+
+  @override
+  String get categoryOperationsTitle => 'Category operations';
+
+  @override
+  String get categoryOperationsTotalLabel => 'Category total';
+
+  @override
+  String categoryOperationsEmptyMessage(String period) {
+    return 'There are no operations in this category in $period.';
+  }
 }

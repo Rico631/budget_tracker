@@ -1021,6 +1021,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get categoryFormDeleteDialogCancelAction;
+
+  /// Total label of an analytics currency block
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get analyticsTotalLabel;
+
+  /// Income flow label in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get analyticsStreamIncomeLabel;
+
+  /// Expense flow label in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get analyticsStreamExpenseLabel;
+
+  /// Month period mode label
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get analyticsPeriodModeMonthLabel;
+
+  /// Year period mode label
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get analyticsPeriodModeYearLabel;
+
+  /// Label of the selected analytics month
+  ///
+  /// In en, this message translates to:
+  /// **'{month} {year}'**
+  String analyticsPeriodMonthLabel(String month, int year);
+
+  /// Label of the selected analytics year
+  ///
+  /// In en, this message translates to:
+  /// **'{year}'**
+  String analyticsPeriodYearLabel(int year);
+
+  /// Tooltip of the transition to the previous analytics period
+  ///
+  /// In en, this message translates to:
+  /// **'Previous period'**
+  String get analyticsPreviousPeriodTooltip;
+
+  /// Tooltip of the transition to the next analytics period
+  ///
+  /// In en, this message translates to:
+  /// **'Next period'**
+  String get analyticsNextPeriodTooltip;
+
+  /// January month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'January'**
+  String get analyticsMonthNameJanuary;
+
+  /// February month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'February'**
+  String get analyticsMonthNameFebruary;
+
+  /// March month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'March'**
+  String get analyticsMonthNameMarch;
+
+  /// April month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'April'**
+  String get analyticsMonthNameApril;
+
+  /// May month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get analyticsMonthNameMay;
+
+  /// June month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'June'**
+  String get analyticsMonthNameJune;
+
+  /// July month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'July'**
+  String get analyticsMonthNameJuly;
+
+  /// August month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'August'**
+  String get analyticsMonthNameAugust;
+
+  /// September month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'September'**
+  String get analyticsMonthNameSeptember;
+
+  /// October month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'October'**
+  String get analyticsMonthNameOctober;
+
+  /// November month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'November'**
+  String get analyticsMonthNameNovember;
+
+  /// December month name in analytics
+  ///
+  /// In en, this message translates to:
+  /// **'December'**
+  String get analyticsMonthNameDecember;
+
+  /// Account filter value that does not narrow the analytics slice
+  ///
+  /// In en, this message translates to:
+  /// **'All accounts'**
+  String get analyticsAccountFilterAllLabel;
+
+  /// Title of the account picker for the analytics filter
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get analyticsAccountFilterTitle;
+
+  /// Archived account marker in the analytics filter list
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get analyticsAccountFilterArchivedLabel;
+
+  /// Analytics filter label when several accounts are selected
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts: {count}'**
+  String analyticsAccountFilterMultipleLabel(int count);
+
+  /// Action applying the selected analytics accounts
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get analyticsAccountFilterApplyAction;
+
+  /// Analytics state title for a book without operations
+  ///
+  /// In en, this message translates to:
+  /// **'No operations yet'**
+  String get analyticsEmptyBookTitle;
+
+  /// Invitation to add the first operation with the section name
+  ///
+  /// In en, this message translates to:
+  /// **'Operations are created in the \"Operations\" section: add the first operation there and analytics will show income and expenses for it.'**
+  String get analyticsEmptyBookMessage;
+
+  /// Message about the missing operations of the selected flow in the period
+  ///
+  /// In en, this message translates to:
+  /// **'There are no operations of the selected flow in {period}.'**
+  String analyticsEmptyPeriodMessage(String period);
+
+  /// Message about the missing operations of the selected account in the period
+  ///
+  /// In en, this message translates to:
+  /// **'There are no operations of the selected flow on the \"{account}\" account in {period}.'**
+  String analyticsEmptyAccountMessage(String account, String period);
+
+  /// Message about the missing operations of the selected accounts in the period
+  ///
+  /// In en, this message translates to:
+  /// **'There are no operations of the selected flow on the selected accounts in {period}.'**
+  String analyticsEmptyAccountsMessage(String period);
+
+  /// Analytics read error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load analytics. Please try again.'**
+  String get analyticsLoadErrorMessage;
+
+  /// Analytics retry action
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get analyticsRetryAction;
+
+  /// Title of the category operations sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Category operations'**
+  String get categoryOperationsTitle;
+
+  /// Category total label in the sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Category total'**
+  String get categoryOperationsTotalLabel;
+
+  /// Message about the missing operations of the category in the period
+  ///
+  /// In en, this message translates to:
+  /// **'There are no operations in this category in {period}.'**
+  String categoryOperationsEmptyMessage(String period);
 }
 
 class _AppLocalizationsDelegate

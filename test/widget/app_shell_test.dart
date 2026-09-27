@@ -8,11 +8,29 @@ import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/presentation/features/analytics/widgets/period_control.dart';
+import 'package:budget_tracker/presentation/features/analytics/widgets/stream_switch.dart';
 import 'package:budget_tracker/presentation/features/settings/category_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// Наименования месяцев для подписи периода аналитики.
+const List<String> _monthNames = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+];
 
 void main() {
   drift.driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -71,14 +89,17 @@ void main() {
   ) async {
     await pumpShell(tester);
 
-    // Раздел без содержимого показывает контролируемое состояние.
+    // Раздел «Аналитика» показывает содержимое раздела вместо состояния
+    // разработки: разделов без содержимого в приложении не осталось.
     await tester.tap(find.text('Аналитика'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Раздел в разработке'), findsOneWidget);
+    expect(find.text('Раздел в разработке'), findsNothing);
+    expect(find.text('Пока нет операций'), findsOneWidget);
     expect(
       find.text(
-        'Содержимое раздела появится в следующих обновлениях приложения.',
+        'Операции создаются в разделе «Операции»: добавьте первую операцию '
+        'там, и аналитика покажет доходы и расходы по ней.',
       ),
       findsOneWidget,
     );
@@ -224,6 +245,109 @@ void main() {
       fallback.id,
     );
     expect((await transactions.getById(transaction.id))!.amountMinor, 1500);
+  });
+
+  testWidgets('аналитика пересчитывается после удаления операции из подэкрана', (
+    WidgetTester tester,
+  ) async {
+    final book = (await DriftBooksRepository(database).list()).single;
+    final accounts = DriftAccountsRepository(database);
+    final categories = DriftCategoriesRepository(database);
+    final transactions = DriftTransactionsRepository(database);
+    final account = await accounts.create(
+      bookId: book.id,
+      name: 'Рубли',
+      currencyCode: 'RUB',
+      initialBalanceMinor: 100000,
+    );
+    final food = await categories.create(
+      bookId: book.id,
+      name: 'Продукты',
+      kind: TransactionKind.expense,
+    );
+    final cafe = await categories.create(
+      bookId: book.id,
+      name: 'Кафе',
+      kind: TransactionKind.expense,
+    );
+    final now = DateTime.now();
+    await transactions.create(
+      bookId: book.id,
+      accountId: account.id,
+      categoryId: food.id,
+      kind: TransactionKind.expense,
+      amountMinor: 1500,
+      occurredAt: DateTime(now.year, now.month, 10),
+    );
+    await transactions.create(
+      bookId: book.id,
+      accountId: account.id,
+      categoryId: food.id,
+      kind: TransactionKind.expense,
+      amountMinor: 500,
+      occurredAt: DateTime(now.year, now.month, 20),
+    );
+    await transactions.create(
+      bookId: book.id,
+      accountId: account.id,
+      categoryId: cafe.id,
+      kind: TransactionKind.expense,
+      amountMinor: 900,
+      occurredAt: DateTime(now.year, now.month, 5),
+    );
+
+    await pumpShell(tester);
+
+    // Начальный остаток 1000,00 минус расходы 29,00 — остаток 971,00 в валюте счета.
+    expect(accountsTotal(tester), contains('971,00'));
+
+    // Раздел «Аналитика» -> подэкран операций категории -> удаление операции.
+    await tester.tap(find.text('Аналитика'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Итого: 29,00 RUB'), findsOneWidget);
+
+    await tester.tap(find.text('Продукты'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.text('-5,00 RUB'), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Удалить'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Удалить'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    // Итог и диаграмма раздела пересчитаны, период и поток сохранены.
+    expect(find.text('Итого: 24,00 RUB'), findsOneWidget);
+    expect(find.text('15,00 RUB'), findsOneWidget);
+    expect(find.text('-5,00 RUB'), findsNothing);
+    expect(
+      tester
+          .widget<SegmentedButton<TransactionKind>>(
+            find.byKey(analyticsStreamSwitchKey),
+          )
+          .selected,
+      {TransactionKind.expense},
+    );
+    expect(
+      tester
+          .widget<Text>(
+            find.descendant(
+              of: find.byKey(analyticsPeriodLabelKey),
+              matching: find.byType(Text),
+            ),
+          )
+          .data,
+      '${_monthNames[now.month - 1]} ${now.year}',
+    );
+
+    // Остатки счетов изменились только на влияние удаленной операции: 971,00 + 5,00.
+    await tester.tap(find.text('Счета'));
+    await tester.pumpAndSettle();
+
+    expect(accountsTotal(tester), contains('976,00'));
+    expect(await transactions.listByBook(book.id), hasLength(2));
   });
 
 

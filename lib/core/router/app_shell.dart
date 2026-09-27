@@ -2,10 +2,10 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/core/router/app_destination.dart';
 import 'package:budget_tracker/presentation/features/accounts/account_form_page.dart';
 import 'package:budget_tracker/presentation/features/accounts/accounts_page.dart';
+import 'package:budget_tracker/presentation/features/analytics/analytics_page.dart';
 import 'package:budget_tracker/presentation/features/settings/settings_page.dart';
 import 'package:budget_tracker/presentation/features/transactions/transaction_form_page.dart';
 import 'package:budget_tracker/presentation/features/transactions/transactions_page.dart';
-import 'package:budget_tracker/presentation/shared/empty_states/section_in_development_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,7 +53,7 @@ class AppShell extends ConsumerWidget {
       body: switch (destination) {
         AppDestination.accounts => const AccountsPage(),
         AppDestination.operations => const TransactionsPage(),
-        AppDestination.analytics => const SectionInDevelopmentPage(),
+        AppDestination.analytics => const AnalyticsPage(),
         AppDestination.settings => const SettingsPage(),
       },
       floatingActionButton: showsAddTransactionAction(destination)

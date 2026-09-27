@@ -8,6 +8,7 @@ import 'package:budget_tracker/data/repositories/currencies_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
+import 'package:budget_tracker/domain/usecases/analytics_usecases.dart';
 import 'package:budget_tracker/domain/usecases/catalog_usecases.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,6 +59,13 @@ final categoryUseCasesProvider = Provider<CategoryUseCases>(
   (ref) => CategoryUseCases(
     categories: ref.watch(categoriesRepositoryProvider),
     fallbackNameFor: fallbackCategoryName,
+  ),
+);
+
+final analyticsUseCasesProvider = Provider<AnalyticsUseCases>(
+  (ref) => AnalyticsUseCases(
+    accounts: ref.watch(accountsRepositoryProvider),
+    transactions: ref.watch(transactionsRepositoryProvider),
   ),
 );
 

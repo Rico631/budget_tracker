@@ -514,4 +514,128 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get categoryFormDeleteDialogCancelAction => 'Отмена';
+
+  @override
+  String get analyticsTotalLabel => 'Итого';
+
+  @override
+  String get analyticsStreamIncomeLabel => 'Доходы';
+
+  @override
+  String get analyticsStreamExpenseLabel => 'Расходы';
+
+  @override
+  String get analyticsPeriodModeMonthLabel => 'Месяц';
+
+  @override
+  String get analyticsPeriodModeYearLabel => 'Год';
+
+  @override
+  String analyticsPeriodMonthLabel(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String analyticsPeriodYearLabel(int year) {
+    return '$year';
+  }
+
+  @override
+  String get analyticsPreviousPeriodTooltip => 'Предыдущий период';
+
+  @override
+  String get analyticsNextPeriodTooltip => 'Следующий период';
+
+  @override
+  String get analyticsMonthNameJanuary => 'Январь';
+
+  @override
+  String get analyticsMonthNameFebruary => 'Февраль';
+
+  @override
+  String get analyticsMonthNameMarch => 'Март';
+
+  @override
+  String get analyticsMonthNameApril => 'Апрель';
+
+  @override
+  String get analyticsMonthNameMay => 'Май';
+
+  @override
+  String get analyticsMonthNameJune => 'Июнь';
+
+  @override
+  String get analyticsMonthNameJuly => 'Июль';
+
+  @override
+  String get analyticsMonthNameAugust => 'Август';
+
+  @override
+  String get analyticsMonthNameSeptember => 'Сентябрь';
+
+  @override
+  String get analyticsMonthNameOctober => 'Октябрь';
+
+  @override
+  String get analyticsMonthNameNovember => 'Ноябрь';
+
+  @override
+  String get analyticsMonthNameDecember => 'Декабрь';
+
+  @override
+  String get analyticsAccountFilterAllLabel => 'Все счета';
+
+  @override
+  String get analyticsAccountFilterTitle => 'Счет';
+
+  @override
+  String get analyticsAccountFilterArchivedLabel => 'Архивный';
+
+  @override
+  String analyticsAccountFilterMultipleLabel(int count) {
+    return 'Счета: $count';
+  }
+
+  @override
+  String get analyticsAccountFilterApplyAction => 'Готово';
+
+  @override
+  String get analyticsEmptyBookTitle => 'Пока нет операций';
+
+  @override
+  String get analyticsEmptyBookMessage =>
+      'Операции создаются в разделе «Операции»: добавьте первую операцию там, и аналитика покажет доходы и расходы по ней.';
+
+  @override
+  String analyticsEmptyPeriodMessage(String period) {
+    return 'За $period операций выбранного потока нет.';
+  }
+
+  @override
+  String analyticsEmptyAccountMessage(String account, String period) {
+    return 'По счету «$account» за $period операций выбранного потока нет.';
+  }
+
+  @override
+  String analyticsEmptyAccountsMessage(String period) {
+    return 'За $period по выбранным счетам операций выбранного потока нет.';
+  }
+
+  @override
+  String get analyticsLoadErrorMessage =>
+      'Не удалось загрузить аналитику. Попробуйте еще раз.';
+
+  @override
+  String get analyticsRetryAction => 'Повторить';
+
+  @override
+  String get categoryOperationsTitle => 'Операции категории';
+
+  @override
+  String get categoryOperationsTotalLabel => 'Итого по категории';
+
+  @override
+  String categoryOperationsEmptyMessage(String period) {
+    return 'За $period операций в этой категории нет.';
+  }
 }

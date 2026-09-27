@@ -618,5 +618,199 @@
   "bankFormDeleteDialogCancelAction": "Отмена",
   "@bankFormDeleteDialogCancelAction": {
     "description": "Действие отказа от удаления банка"
+  },
+  "analyticsTotalLabel": "Итого",
+  "@analyticsTotalLabel": {
+    "description": "Подпись итога валютного блока аналитики"
+  },
+  "analyticsStreamIncomeLabel": "Доходы",
+  "@analyticsStreamIncomeLabel": {
+    "description": "Подпись потока доходов в аналитике"
+  },
+  "analyticsStreamExpenseLabel": "Расходы",
+  "@analyticsStreamExpenseLabel": {
+    "description": "Подпись потока расходов в аналитике"
+  },
+  "analyticsPeriodModeMonthLabel": "Месяц",
+  "@analyticsPeriodModeMonthLabel": {
+    "description": "Подпись режима периода «Месяц»"
+  },
+  "analyticsPeriodModeYearLabel": "Год",
+  "@analyticsPeriodModeYearLabel": {
+    "description": "Подпись режима периода «Год»"
+  },
+  "analyticsPeriodMonthLabel": "{month} {year}",
+  "@analyticsPeriodMonthLabel": {
+    "description": "Подпись выбранного месяца аналитики",
+    "placeholders": {
+      "month": {
+        "type": "String",
+        "example": "Сентябрь"
+      },
+      "year": {
+        "type": "int",
+        "example": "2026"
+      }
+    }
+  },
+  "analyticsPeriodYearLabel": "{year}",
+  "@analyticsPeriodYearLabel": {
+    "description": "Подпись выбранного года аналитики",
+    "placeholders": {
+      "year": {
+        "type": "int",
+        "example": "2026"
+      }
+    }
+  },
+  "analyticsPreviousPeriodTooltip": "Предыдущий период",
+  "@analyticsPreviousPeriodTooltip": {
+    "description": "Подсказка перехода к предыдущему периоду аналитики"
+  },
+  "analyticsNextPeriodTooltip": "Следующий период",
+  "@analyticsNextPeriodTooltip": {
+    "description": "Подсказка перехода к следующему периоду аналитики"
+  },
+  "analyticsMonthNameJanuary": "Январь",
+  "@analyticsMonthNameJanuary": {
+    "description": "Наименование месяца января в аналитике"
+  },
+  "analyticsMonthNameFebruary": "Февраль",
+  "@analyticsMonthNameFebruary": {
+    "description": "Наименование месяца февраля в аналитике"
+  },
+  "analyticsMonthNameMarch": "Март",
+  "@analyticsMonthNameMarch": {
+    "description": "Наименование месяца марта в аналитике"
+  },
+  "analyticsMonthNameApril": "Апрель",
+  "@analyticsMonthNameApril": {
+    "description": "Наименование месяца апреля в аналитике"
+  },
+  "analyticsMonthNameMay": "Май",
+  "@analyticsMonthNameMay": {
+    "description": "Наименование месяца мая в аналитике"
+  },
+  "analyticsMonthNameJune": "Июнь",
+  "@analyticsMonthNameJune": {
+    "description": "Наименование месяца июня в аналитике"
+  },
+  "analyticsMonthNameJuly": "Июль",
+  "@analyticsMonthNameJuly": {
+    "description": "Наименование месяца июля в аналитике"
+  },
+  "analyticsMonthNameAugust": "Август",
+  "@analyticsMonthNameAugust": {
+    "description": "Наименование месяца августа в аналитике"
+  },
+  "analyticsMonthNameSeptember": "Сентябрь",
+  "@analyticsMonthNameSeptember": {
+    "description": "Наименование месяца сентября в аналитике"
+  },
+  "analyticsMonthNameOctober": "Октябрь",
+  "@analyticsMonthNameOctober": {
+    "description": "Наименование месяца октября в аналитике"
+  },
+  "analyticsMonthNameNovember": "Ноябрь",
+  "@analyticsMonthNameNovember": {
+    "description": "Наименование месяца ноября в аналитике"
+  },
+  "analyticsMonthNameDecember": "Декабрь",
+  "@analyticsMonthNameDecember": {
+    "description": "Наименование месяца декабря в аналитике"
+  },
+  "analyticsAccountFilterAllLabel": "Все счета",
+  "@analyticsAccountFilterAllLabel": {
+    "description": "Значение фильтра счета аналитики без сужения среза"
+  },
+  "analyticsAccountFilterTitle": "Счет",
+  "@analyticsAccountFilterTitle": {
+    "description": "Заголовок списка выбора счета для фильтра аналитики"
+  },
+  "analyticsAccountFilterArchivedLabel": "Архивный",
+  "@analyticsAccountFilterArchivedLabel": {
+    "description": "Признак архивного счета в списке фильтра аналитики"
+  },
+  "analyticsAccountFilterMultipleLabel": "Счета: {count}",
+  "@analyticsAccountFilterMultipleLabel": {
+    "description": "Подпись фильтра аналитики при выборе нескольких счетов",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "analyticsAccountFilterApplyAction": "Готово",
+  "@analyticsAccountFilterApplyAction": {
+    "description": "Действие применения выбранных счетов фильтра аналитики"
+  },
+  "analyticsEmptyBookTitle": "Пока нет операций",
+  "@analyticsEmptyBookTitle": {
+    "description": "Заголовок состояния аналитики в книге без операций"
+  },
+  "analyticsEmptyBookMessage": "Операции создаются в разделе «Операции»: добавьте первую операцию там, и аналитика покажет доходы и расходы по ней.",
+  "@analyticsEmptyBookMessage": {
+    "description": "Приглашение ввести первую операцию с указанием раздела"
+  },
+  "analyticsEmptyPeriodMessage": "За {period} операций выбранного потока нет.",
+  "@analyticsEmptyPeriodMessage": {
+    "description": "Сообщение об отсутствии операций выбранного потока за период",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "Сентябрь 2026"
+      }
+    }
+  },
+  "analyticsEmptyAccountMessage": "По счету «{account}» за {period} операций выбранного потока нет.",
+  "@analyticsEmptyAccountMessage": {
+    "description": "Сообщение об отсутствии операций по выбранному счету за период",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "Рубли"
+      },
+      "period": {
+        "type": "String",
+        "example": "Сентябрь 2026"
+      }
+    }
+  },
+  "analyticsEmptyAccountsMessage": "За {period} по выбранным счетам операций выбранного потока нет.",
+  "@analyticsEmptyAccountsMessage": {
+    "description": "Сообщение об отсутствии операций по выбранным счетам за период",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "Сентябрь 2026"
+      }
+    }
+  },
+  "analyticsLoadErrorMessage": "Не удалось загрузить аналитику. Попробуйте еще раз.",
+  "@analyticsLoadErrorMessage": {
+    "description": "Сообщение об ошибке чтения аналитики"
+  },
+  "analyticsRetryAction": "Повторить",
+  "@analyticsRetryAction": {
+    "description": "Действие повторной загрузки аналитики"
+  },
+  "categoryOperationsTitle": "Операции категории",
+  "@categoryOperationsTitle": {
+    "description": "Заголовок подэкрана операций категории"
+  },
+  "categoryOperationsTotalLabel": "Итого по категории",
+  "@categoryOperationsTotalLabel": {
+    "description": "Подпись итога категории за период в подэкране"
+  },
+  "categoryOperationsEmptyMessage": "За {period} операций в этой категории нет.",
+  "@categoryOperationsEmptyMessage": {
+    "description": "Сообщение об отсутствии операций категории за период",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "Сентябрь 2026"
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/presentation/providers/accounts_controller.dart';
+import 'package:budget_tracker/presentation/providers/analytics_controller.dart';
 import 'package:budget_tracker/presentation/providers/transactions_journal_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -85,6 +86,14 @@ class FinanceTransactionController extends AsyncNotifier<FinanceTransaction?> {
     ref.invalidate(transactionsJournalProvider(bookId));
     ref.invalidate(accountsOverviewProvider(bookId));
     ref.invalidate(hasActiveAccountsProvider);
+    // Аналитика читает те же операции книги, поэтому после мутации срез, годовой
+    // тренд, список периодов и состав подэкрана категории пересчитываются без
+    // перезапуска приложения (ADR-0003, решение 3.5).
+    ref.invalidate(bookTransactionsProvider(bookId));
+    ref.invalidate(analyticsSliceProvider(bookId));
+    ref.invalidate(analyticsYearTrendProvider(bookId));
+    ref.invalidate(availableAnalyticsPeriodsProvider(bookId));
+    ref.invalidate(categoryOperationsProvider);
   }
 }
 

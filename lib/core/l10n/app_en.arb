@@ -618,5 +618,199 @@
   "categoryFormDeleteDialogCancelAction": "Cancel",
   "@categoryFormDeleteDialogCancelAction": {
     "description": "Action declining the category deletion"
+  },
+  "analyticsTotalLabel": "Total",
+  "@analyticsTotalLabel": {
+    "description": "Total label of an analytics currency block"
+  },
+  "analyticsStreamIncomeLabel": "Income",
+  "@analyticsStreamIncomeLabel": {
+    "description": "Income flow label in analytics"
+  },
+  "analyticsStreamExpenseLabel": "Expenses",
+  "@analyticsStreamExpenseLabel": {
+    "description": "Expense flow label in analytics"
+  },
+  "analyticsPeriodModeMonthLabel": "Month",
+  "@analyticsPeriodModeMonthLabel": {
+    "description": "Month period mode label"
+  },
+  "analyticsPeriodModeYearLabel": "Year",
+  "@analyticsPeriodModeYearLabel": {
+    "description": "Year period mode label"
+  },
+  "analyticsPeriodMonthLabel": "{month} {year}",
+  "@analyticsPeriodMonthLabel": {
+    "description": "Label of the selected analytics month",
+    "placeholders": {
+      "month": {
+        "type": "String",
+        "example": "September"
+      },
+      "year": {
+        "type": "int",
+        "example": "2026"
+      }
+    }
+  },
+  "analyticsPeriodYearLabel": "{year}",
+  "@analyticsPeriodYearLabel": {
+    "description": "Label of the selected analytics year",
+    "placeholders": {
+      "year": {
+        "type": "int",
+        "example": "2026"
+      }
+    }
+  },
+  "analyticsPreviousPeriodTooltip": "Previous period",
+  "@analyticsPreviousPeriodTooltip": {
+    "description": "Tooltip of the transition to the previous analytics period"
+  },
+  "analyticsNextPeriodTooltip": "Next period",
+  "@analyticsNextPeriodTooltip": {
+    "description": "Tooltip of the transition to the next analytics period"
+  },
+  "analyticsMonthNameJanuary": "January",
+  "@analyticsMonthNameJanuary": {
+    "description": "January month name in analytics"
+  },
+  "analyticsMonthNameFebruary": "February",
+  "@analyticsMonthNameFebruary": {
+    "description": "February month name in analytics"
+  },
+  "analyticsMonthNameMarch": "March",
+  "@analyticsMonthNameMarch": {
+    "description": "March month name in analytics"
+  },
+  "analyticsMonthNameApril": "April",
+  "@analyticsMonthNameApril": {
+    "description": "April month name in analytics"
+  },
+  "analyticsMonthNameMay": "May",
+  "@analyticsMonthNameMay": {
+    "description": "May month name in analytics"
+  },
+  "analyticsMonthNameJune": "June",
+  "@analyticsMonthNameJune": {
+    "description": "June month name in analytics"
+  },
+  "analyticsMonthNameJuly": "July",
+  "@analyticsMonthNameJuly": {
+    "description": "July month name in analytics"
+  },
+  "analyticsMonthNameAugust": "August",
+  "@analyticsMonthNameAugust": {
+    "description": "August month name in analytics"
+  },
+  "analyticsMonthNameSeptember": "September",
+  "@analyticsMonthNameSeptember": {
+    "description": "September month name in analytics"
+  },
+  "analyticsMonthNameOctober": "October",
+  "@analyticsMonthNameOctober": {
+    "description": "October month name in analytics"
+  },
+  "analyticsMonthNameNovember": "November",
+  "@analyticsMonthNameNovember": {
+    "description": "November month name in analytics"
+  },
+  "analyticsMonthNameDecember": "December",
+  "@analyticsMonthNameDecember": {
+    "description": "December month name in analytics"
+  },
+  "analyticsAccountFilterAllLabel": "All accounts",
+  "@analyticsAccountFilterAllLabel": {
+    "description": "Account filter value that does not narrow the analytics slice"
+  },
+  "analyticsAccountFilterTitle": "Account",
+  "@analyticsAccountFilterTitle": {
+    "description": "Title of the account picker for the analytics filter"
+  },
+  "analyticsAccountFilterArchivedLabel": "Archived",
+  "@analyticsAccountFilterArchivedLabel": {
+    "description": "Archived account marker in the analytics filter list"
+  },
+  "analyticsAccountFilterMultipleLabel": "Accounts: {count}",
+  "@analyticsAccountFilterMultipleLabel": {
+    "description": "Analytics filter label when several accounts are selected",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "analyticsAccountFilterApplyAction": "Done",
+  "@analyticsAccountFilterApplyAction": {
+    "description": "Action applying the selected analytics accounts"
+  },
+  "analyticsEmptyBookTitle": "No operations yet",
+  "@analyticsEmptyBookTitle": {
+    "description": "Analytics state title for a book without operations"
+  },
+  "analyticsEmptyBookMessage": "Operations are created in the \"Operations\" section: add the first operation there and analytics will show income and expenses for it.",
+  "@analyticsEmptyBookMessage": {
+    "description": "Invitation to add the first operation with the section name"
+  },
+  "analyticsEmptyPeriodMessage": "There are no operations of the selected flow in {period}.",
+  "@analyticsEmptyPeriodMessage": {
+    "description": "Message about the missing operations of the selected flow in the period",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "September 2026"
+      }
+    }
+  },
+  "analyticsEmptyAccountMessage": "There are no operations of the selected flow on the \"{account}\" account in {period}.",
+  "@analyticsEmptyAccountMessage": {
+    "description": "Message about the missing operations of the selected account in the period",
+    "placeholders": {
+      "account": {
+        "type": "String",
+        "example": "Rubles"
+      },
+      "period": {
+        "type": "String",
+        "example": "September 2026"
+      }
+    }
+  },
+  "analyticsEmptyAccountsMessage": "There are no operations of the selected flow on the selected accounts in {period}.",
+  "@analyticsEmptyAccountsMessage": {
+    "description": "Message about the missing operations of the selected accounts in the period",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "September 2026"
+      }
+    }
+  },
+  "analyticsLoadErrorMessage": "Failed to load analytics. Please try again.",
+  "@analyticsLoadErrorMessage": {
+    "description": "Analytics read error message"
+  },
+  "analyticsRetryAction": "Retry",
+  "@analyticsRetryAction": {
+    "description": "Analytics retry action"
+  },
+  "categoryOperationsTitle": "Category operations",
+  "@categoryOperationsTitle": {
+    "description": "Title of the category operations sub-screen"
+  },
+  "categoryOperationsTotalLabel": "Category total",
+  "@categoryOperationsTotalLabel": {
+    "description": "Category total label in the sub-screen"
+  },
+  "categoryOperationsEmptyMessage": "There are no operations in this category in {period}.",
+  "@categoryOperationsEmptyMessage": {
+    "description": "Message about the missing operations of the category in the period",
+    "placeholders": {
+      "period": {
+        "type": "String",
+        "example": "September 2026"
+      }
+    }
   }
 }
