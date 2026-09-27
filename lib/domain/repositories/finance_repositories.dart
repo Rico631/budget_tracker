@@ -12,13 +12,28 @@ abstract interface class BooksRepository {
 abstract interface class BanksRepository {
   Future<FinanceBank> create({
     required String name,
+    String? colorHex,
     String? displayName,
     String? displayDetails,
   });
   Future<List<FinanceBank>> list({bool includeArchived = false});
   Future<FinanceBank?> getById(String id);
+
+  /// Банк с наименованием [name] или `null`.
+  ///
+  /// Сравнение выполняется в Dart без учета регистра и краевых пробелов:
+  /// SQLite без ICU не приводит кириллицу к нижнему регистру встроенной
+  /// функцией `lower()`, поэтому условие в SQL давало бы разные результаты для
+  /// локалей `ru` и `en` (ADR-0004, решение 4.5).
+  Future<FinanceBank?> findByName(String name);
+
   Future<void> update(FinanceBank bank);
-  Future<void> archive(String id);
+
+  /// Удаляет банк и очищает ссылку на него у связанных счетов одной
+  /// транзакцией: счета остаются валидными счетами без банка (ADR-0004,
+  /// решение 4.7).
+  Future<void> deleteWithAccountDetach(String id);
+
   Future<void> delete(String id);
 }
 
@@ -50,14 +65,38 @@ abstract interface class CategoriesRepository {
     required String name,
     required TransactionKind kind,
     String? parentId,
+    bool isFallback = false,
   });
   Future<List<FinanceCategory>> listByBook(
     String bookId, {
     bool includeArchived = false,
   });
   Future<FinanceCategory?> getById(String id);
+
+  /// Базовая категория типа [kind] в книге [bookId] или `null`.
+  ///
+  /// Базовая категория определяется сохраненным признаком, а не наименованием
+  /// (ADR-0004, решение 4.2).
+  Future<FinanceCategory?> findFallback(String bookId, TransactionKind kind);
+
+  /// Категория книги [bookId] типа [kind] с наименованием [name] или `null`.
+  ///
+  /// Сравнение выполняется в Dart без учета регистра и краевых пробелов:
+  /// SQLite без ICU не приводит кириллицу к нижнему регистру встроенной
+  /// функцией `lower()` (ADR-0004, решение 4.5).
+  Future<FinanceCategory?> findByName({
+    required String bookId,
+    required TransactionKind kind,
+    required String name,
+  });
+
   Future<void> update(FinanceCategory category);
-  Future<void> archive(String id);
+
+  /// Переносит операции категории [categoryId] на базовую категорию
+  /// [fallbackCategoryId] и удаляет категорию одной транзакцией: частично
+  /// измененное состояние не сохраняется (ADR-0004, решение 4.1).
+  Future<void> deleteWithReassignment(String categoryId, String fallbackCategoryId);
+
   Future<void> delete(String id);
 }
 

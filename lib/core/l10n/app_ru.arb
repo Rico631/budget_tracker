@@ -384,5 +384,239 @@
   "transactionFormSaveErrorMessage": "Не удалось сохранить операцию. Попробуйте еще раз.",
   "@transactionFormSaveErrorMessage": {
     "description": "Сообщение ошибки сохранения операции"
+  },
+  "settingsCategoriesItemLabel": "Категории",
+  "@settingsCategoriesItemLabel": {
+    "description": "Подпись пункта «Категории» раздела настроек"
+  },
+  "settingsBanksItemLabel": "Банки",
+  "@settingsBanksItemLabel": {
+    "description": "Подпись пункта «Банки» раздела настроек"
+  },
+  "catalogLoadErrorMessage": "Не удалось загрузить справочник. Попробуйте еще раз.",
+  "@catalogLoadErrorMessage": {
+    "description": "Сообщение ошибки загрузки справочника"
+  },
+  "catalogRetryAction": "Повторить",
+  "@catalogRetryAction": {
+    "description": "Действие повторной загрузки справочника"
+  },
+  "categoriesPageTitle": "Категории",
+  "@categoriesPageTitle": {
+    "description": "Заголовок подэкрана категорий"
+  },
+  "categoriesAddCategoryTooltip": "Добавить категорию",
+  "@categoriesAddCategoryTooltip": {
+    "description": "Подсказка действия добавления категории"
+  },
+  "categoriesIncomeSectionLabel": "Доходы",
+  "@categoriesIncomeSectionLabel": {
+    "description": "Подпись секции категорий доходов"
+  },
+  "categoriesExpenseSectionLabel": "Расходы",
+  "@categoriesExpenseSectionLabel": {
+    "description": "Подпись секции категорий расходов"
+  },
+  "categoriesEmptyMessage": "Категорий пока нет.",
+  "@categoriesEmptyMessage": {
+    "description": "Сообщение пустого списка категорий"
+  },
+  "banksPageTitle": "Банки",
+  "@banksPageTitle": {
+    "description": "Заголовок подэкрана банков"
+  },
+  "banksAddBankTooltip": "Добавить банк",
+  "@banksAddBankTooltip": {
+    "description": "Подсказка действия добавления банка"
+  },
+  "banksSearchHint": "Поиск банка",
+  "@banksSearchHint": {
+    "description": "Подсказка поля поиска банка в подэкране банков"
+  },
+  "banksEmptyMessage": "Нет банков, подходящих под запрос.",
+  "@banksEmptyMessage": {
+    "description": "Сообщение пустого результата поиска банков в подэкране банков"
+  },
+  "categoryFormCreateTitle": "Новая категория",
+  "@categoryFormCreateTitle": {
+    "description": "Заголовок формы создания категории"
+  },
+  "categoryFormEditTitle": "Изменение категории",
+  "@categoryFormEditTitle": {
+    "description": "Заголовок формы изменения категории"
+  },
+  "categoryFormNameLabel": "Наименование",
+  "@categoryFormNameLabel": {
+    "description": "Подпись поля наименования категории"
+  },
+  "categoryFormKindLabel": "Тип",
+  "@categoryFormKindLabel": {
+    "description": "Подпись поля типа категории, доступного только для чтения"
+  },
+  "categoryFormKindRequiredError": "Выберите тип категории.",
+  "@categoryFormKindRequiredError": {
+    "description": "Ошибка валидации отсутствующего типа категории"
+  },
+  "categoryFormSaveAction": "Сохранить",
+  "@categoryFormSaveAction": {
+    "description": "Действие сохранения категории"
+  },
+  "categoryFormDeleteAction": "Удалить",
+  "@categoryFormDeleteAction": {
+    "description": "Действие удаления категории"
+  },
+  "categoryFormFallbackNotice": "Базовую категорию нельзя переименовать или удалить: в нее переносятся операции удаленных категорий.",
+  "@categoryFormFallbackNotice": {
+    "description": "Пояснение режима только для чтения базовой категории"
+  },
+  "categoryFormNameRequiredError": "Введите наименование категории.",
+  "@categoryFormNameRequiredError": {
+    "description": "Ошибка валидации пустого наименования категории"
+  },
+  "categoryFormNameDuplicateError": "Категория с таким наименованием уже есть в этом типе.",
+  "@categoryFormNameDuplicateError": {
+    "description": "Отказ при дубликате наименования категории в книге и типе"
+  },
+  "categoryFormFallbackRenameRejectedError": "Базовую категорию нельзя переименовать.",
+  "@categoryFormFallbackRenameRejectedError": {
+    "description": "Отказ в переименовании базовой категории"
+  },
+  "categoryFormFallbackDeleteRejectedError": "Базовую категорию нельзя удалить.",
+  "@categoryFormFallbackDeleteRejectedError": {
+    "description": "Отказ в удалении базовой категории"
+  },
+  "categoryFormFallbackMissingError": "В книге нет базовой категории этого типа.",
+  "@categoryFormFallbackMissingError": {
+    "description": "Отказ в удалении без базовой категории того же типа"
+  },
+  "categoryFormKindNotAllowedError": "Категория может быть только доходом или расходом.",
+  "@categoryFormKindNotAllowedError": {
+    "description": "Отказ в типе перевода для категории"
+  },
+  "categoryFormSaveErrorMessage": "Не удалось сохранить категорию. Попробуйте еще раз.",
+  "@categoryFormSaveErrorMessage": {
+    "description": "Сообщение ошибки сохранения категории"
+  },
+  "categoryFormDeleteErrorMessage": "Не удалось удалить категорию. Попробуйте еще раз.",
+  "@categoryFormDeleteErrorMessage": {
+    "description": "Сообщение ошибки удаления категории"
+  },
+  "categoryFormDeleteDialogTitle": "Удалить категорию?",
+  "@categoryFormDeleteDialogTitle": {
+    "description": "Заголовок подтверждения удаления категории"
+  },
+  "categoryFormDeleteDialogMessage": "Категория будет удалена, а ее операции перейдут в базовую категорию того же типа. Суммы, счета и даты не изменятся.",
+  "@categoryFormDeleteDialogMessage": {
+    "description": "Сообщение подтверждения удаления категории"
+  },
+  "categoryFormDeleteDialogCancelAction": "Отмена",
+  "@categoryFormDeleteDialogCancelAction": {
+    "description": "Действие отказа от удаления категории"
+  },
+  "bankFormCreateTitle": "Новый банк",
+  "@bankFormCreateTitle": {
+    "description": "Заголовок формы создания банка"
+  },
+  "bankFormEditTitle": "Изменение банка",
+  "@bankFormEditTitle": {
+    "description": "Заголовок формы изменения банка"
+  },
+  "bankFormNameLabel": "Наименование",
+  "@bankFormNameLabel": {
+    "description": "Подпись поля наименования банка"
+  },
+  "bankFormColorLabel": "Цвет",
+  "@bankFormColorLabel": {
+    "description": "Подпись палитры цветов банка"
+  },
+  "bankFormColorNoneLabel": "Без цвета",
+  "@bankFormColorNoneLabel": {
+    "description": "Вариант банка без сохраненного цвета"
+  },
+  "bankColorCustomLabel": "Свой цвет",
+  "@bankColorCustomLabel": {
+    "description": "Вариант, открывающий подбор произвольного цвета банка"
+  },
+  "bankColorChannelRedLabel": "Красный",
+  "@bankColorChannelRedLabel": {
+    "description": "Подпись ползунка красного канала подбора цвета банка"
+  },
+  "bankColorChannelGreenLabel": "Зеленый",
+  "@bankColorChannelGreenLabel": {
+    "description": "Подпись ползунка зеленого канала подбора цвета банка"
+  },
+  "bankColorChannelBlueLabel": "Синий",
+  "@bankColorChannelBlueLabel": {
+    "description": "Подпись ползунка синего канала подбора цвета банка"
+  },
+  "bankColorChannelAlphaLabel": "Непрозрачность",
+  "@bankColorChannelAlphaLabel": {
+    "description": "Подпись ползунка непрозрачности подбора цвета банка"
+  },
+  "bankColorCodeLabel": "Код цвета",
+  "@bankColorCodeLabel": {
+    "description": "Подпись поля кода цвета в подборе цвета банка"
+  },
+  "bankColorCodeInvalidError": "Введите код вида #RRGGBB или #AARRGGBB.",
+  "@bankColorCodeInvalidError": {
+    "description": "Отказ при неразборчивом коде цвета в подборе цвета банка"
+  },
+  "bankColorDialogCancelAction": "Отмена",
+  "@bankColorDialogCancelAction": {
+    "description": "Действие отказа от произвольного цвета банка"
+  },
+  "bankColorDialogApplyAction": "Готово",
+  "@bankColorDialogApplyAction": {
+    "description": "Действие применения произвольного цвета банка"
+  },
+  "bankFormSaveAction": "Сохранить",
+  "@bankFormSaveAction": {
+    "description": "Действие сохранения банка"
+  },
+  "bankFormDeleteAction": "Удалить",
+  "@bankFormDeleteAction": {
+    "description": "Действие удаления банка"
+  },
+  "bankFormNameRequiredError": "Введите наименование банка.",
+  "@bankFormNameRequiredError": {
+    "description": "Ошибка валидации пустого наименования банка"
+  },
+  "bankFormNameDuplicateError": "Банк с таким наименованием уже есть в справочнике.",
+  "@bankFormNameDuplicateError": {
+    "description": "Отказ при дубликате наименования банка"
+  },
+  "bankFormColorInvalidError": "Выберите цвет из палитры.",
+  "@bankFormColorInvalidError": {
+    "description": "Отказ при некорректном значении цвета банка"
+  },
+  "bankFormSaveErrorMessage": "Не удалось сохранить банк. Попробуйте еще раз.",
+  "@bankFormSaveErrorMessage": {
+    "description": "Сообщение ошибки сохранения банка"
+  },
+  "bankFormDeleteErrorMessage": "Не удалось удалить банк. Попробуйте еще раз.",
+  "@bankFormDeleteErrorMessage": {
+    "description": "Сообщение ошибки удаления банка"
+  },
+  "bankFormDeleteDialogTitle": "Удалить банк?",
+  "@bankFormDeleteDialogTitle": {
+    "description": "Заголовок подтверждения удаления банка"
+  },
+  "bankFormDeleteDialogMessage": "Банк будет удален из справочника.",
+  "@bankFormDeleteDialogMessage": {
+    "description": "Сообщение подтверждения удаления банка без связанных счетов"
+  },
+  "bankFormDeleteDialogWithAccountsMessage": "Счетов с этим банком: {count}. У них будет снят признак банка, остатки и операции не изменятся.",
+  "@bankFormDeleteDialogWithAccountsMessage": {
+    "description": "Сообщение подтверждения удаления банка с числом связанных счетов",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "bankFormDeleteDialogCancelAction": "Отмена",
+  "@bankFormDeleteDialogCancelAction": {
+    "description": "Действие отказа от удаления банка"
   }
 }

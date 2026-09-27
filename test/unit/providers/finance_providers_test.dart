@@ -6,7 +6,6 @@ import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/presentation/providers/finance_transaction_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 void main() {
   test(
     'overrides providers with an in-memory database and controls errors',
@@ -73,6 +72,58 @@ void main() {
         isA<AsyncError>(),
       );
       expect((await transactions.listByBook(book.id)).length, 1);
+    },
+  );
+  test(
+    'провайдеры use case справочников работают через реальные репозитории',
+    () async {
+      final database = AppDatabase.forTesting();
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
+      addTearDown(() async {
+        container.dispose();
+        await database.close();
+      });
+
+      final book = await container
+          .read(booksRepositoryProvider)
+          .create(name: 'Provider test');
+      final categoryUseCases = container.read(categoryUseCasesProvider);
+      final bankUseCases = container.read(bankUseCasesProvider);
+      final categories = container.read(categoriesRepositoryProvider);
+      final bankRepository = container.read(banksRepositoryProvider);
+
+      final category = await categoryUseCases.create(
+        bookId: book.id,
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+
+      expect(category, isA<Valid<FinanceCategory>>());
+      expect(
+        await categories.findByName(
+          bookId: book.id,
+          kind: TransactionKind.expense,
+          name: 'Продукты',
+        ),
+        isNotNull,
+      );
+
+      await categoryUseCases.ensureFallbackCategories(
+        bookId: book.id,
+        languageCode: 'ru',
+      );
+
+      expect(
+        (await categories.findFallback(book.id, TransactionKind.income))!.name,
+        'Прочий доход',
+      );
+
+      final bank = await bankUseCases.create(name: 'Мой банк');
+
+      expect(bank, isA<Valid<FinanceBank>>());
+      expect(await bankRepository.findByName(' мой банк '), isNotNull);
     },
   );
 }

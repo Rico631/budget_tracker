@@ -99,12 +99,13 @@ void main() {
       name: 'Зарплата',
       kind: TransactionKind.income,
     );
-    final archived = await categories.create(
+    // Категория перевода приложением не создается, но выбор фильтрует
+    // категории по типу операции, а не по архивированию (ADR-0004, 4.6).
+    await categories.create(
       bookId: book.id,
-      name: 'Старая категория',
-      kind: TransactionKind.expense,
+      name: 'Перевод',
+      kind: TransactionKind.transfer,
     );
-    await categories.archive(archived.id);
 
     await pumpSheet(
       tester,
@@ -114,8 +115,9 @@ void main() {
     expect(find.text('Выбор категории'), findsOneWidget);
     expect(find.text('Кафе'), findsOneWidget);
     expect(find.text('Продукты'), findsOneWidget);
+    // Категория другого типа и категория перевода в выбор не попадают.
     expect(find.text('Зарплата'), findsNothing);
-    expect(find.text('Старая категория'), findsNothing);
+    expect(find.text('Перевод'), findsNothing);
 
     await tester.enterText(find.byKey(categoryPickerSearchFieldKey), 'прод');
     await tester.pumpAndSettle();

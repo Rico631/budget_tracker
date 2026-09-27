@@ -384,5 +384,239 @@
   "transactionFormSaveErrorMessage": "Failed to save the operation. Please try again.",
   "@transactionFormSaveErrorMessage": {
     "description": "Error message of the operation saving"
+  },
+  "settingsCategoriesItemLabel": "Categories",
+  "@settingsCategoriesItemLabel": {
+    "description": "Label of the categories item of the settings section"
+  },
+  "settingsBanksItemLabel": "Banks",
+  "@settingsBanksItemLabel": {
+    "description": "Label of the banks item of the settings section"
+  },
+  "catalogLoadErrorMessage": "Failed to load the catalog. Please try again.",
+  "@catalogLoadErrorMessage": {
+    "description": "Error message of the catalog loading"
+  },
+  "catalogRetryAction": "Retry",
+  "@catalogRetryAction": {
+    "description": "Action reloading the catalog"
+  },
+  "categoriesPageTitle": "Categories",
+  "@categoriesPageTitle": {
+    "description": "Title of the categories sub-screen"
+  },
+  "categoriesAddCategoryTooltip": "Add category",
+  "@categoriesAddCategoryTooltip": {
+    "description": "Tooltip of the add category action"
+  },
+  "categoriesIncomeSectionLabel": "Income",
+  "@categoriesIncomeSectionLabel": {
+    "description": "Label of the income categories section"
+  },
+  "categoriesExpenseSectionLabel": "Expenses",
+  "@categoriesExpenseSectionLabel": {
+    "description": "Label of the expense categories section"
+  },
+  "categoriesEmptyMessage": "No categories yet.",
+  "@categoriesEmptyMessage": {
+    "description": "Message of the empty categories list"
+  },
+  "banksPageTitle": "Banks",
+  "@banksPageTitle": {
+    "description": "Title of the banks sub-screen"
+  },
+  "banksAddBankTooltip": "Add bank",
+  "@banksAddBankTooltip": {
+    "description": "Tooltip of the add bank action"
+  },
+  "banksSearchHint": "Search bank",
+  "@banksSearchHint": {
+    "description": "Hint of the bank search field in the banks sub-screen"
+  },
+  "banksEmptyMessage": "No banks match the query.",
+  "@banksEmptyMessage": {
+    "description": "Message of the empty bank search result in the banks sub-screen"
+  },
+  "categoryFormCreateTitle": "New category",
+  "@categoryFormCreateTitle": {
+    "description": "Title of the category creation form"
+  },
+  "categoryFormEditTitle": "Edit category",
+  "@categoryFormEditTitle": {
+    "description": "Title of the category editing form"
+  },
+  "categoryFormNameLabel": "Name",
+  "@categoryFormNameLabel": {
+    "description": "Label of the category name field"
+  },
+  "categoryFormKindLabel": "Type",
+  "@categoryFormKindLabel": {
+    "description": "Label of the read-only category type field"
+  },
+  "categoryFormKindRequiredError": "Choose the category type.",
+  "@categoryFormKindRequiredError": {
+    "description": "Validation error of the missing category type"
+  },
+  "categoryFormSaveAction": "Save",
+  "@categoryFormSaveAction": {
+    "description": "Action saving the category"
+  },
+  "categoryFormDeleteAction": "Delete",
+  "@categoryFormDeleteAction": {
+    "description": "Action deleting the category"
+  },
+  "categoryFormFallbackNotice": "The base category cannot be renamed or deleted: operations of deleted categories are moved to it.",
+  "@categoryFormFallbackNotice": {
+    "description": "Explanation of the read-only base category"
+  },
+  "categoryFormNameRequiredError": "Enter a category name.",
+  "@categoryFormNameRequiredError": {
+    "description": "Validation error of the empty category name"
+  },
+  "categoryFormNameDuplicateError": "A category with the same name already exists in this type.",
+  "@categoryFormNameDuplicateError": {
+    "description": "Rejection of a duplicate category name in the book and type"
+  },
+  "categoryFormFallbackRenameRejectedError": "The base category cannot be renamed.",
+  "@categoryFormFallbackRenameRejectedError": {
+    "description": "Rejection of the base category renaming"
+  },
+  "categoryFormFallbackDeleteRejectedError": "The base category cannot be deleted.",
+  "@categoryFormFallbackDeleteRejectedError": {
+    "description": "Rejection of the base category deletion"
+  },
+  "categoryFormFallbackMissingError": "The book has no base category of this type.",
+  "@categoryFormFallbackMissingError": {
+    "description": "Rejection of the deletion without a base category of the same type"
+  },
+  "categoryFormKindNotAllowedError": "A category can be income or expense only.",
+  "@categoryFormKindNotAllowedError": {
+    "description": "Rejection of the transfer type for a category"
+  },
+  "categoryFormSaveErrorMessage": "Failed to save the category. Please try again.",
+  "@categoryFormSaveErrorMessage": {
+    "description": "Error message of the category saving"
+  },
+  "categoryFormDeleteErrorMessage": "Failed to delete the category. Please try again.",
+  "@categoryFormDeleteErrorMessage": {
+    "description": "Error message of the category deletion"
+  },
+  "bankFormCreateTitle": "New bank",
+  "@bankFormCreateTitle": {
+    "description": "Title of the bank creation form"
+  },
+  "bankFormEditTitle": "Edit bank",
+  "@bankFormEditTitle": {
+    "description": "Title of the bank editing form"
+  },
+  "bankFormNameLabel": "Name",
+  "@bankFormNameLabel": {
+    "description": "Label of the bank name field"
+  },
+  "bankFormColorLabel": "Color",
+  "@bankFormColorLabel": {
+    "description": "Label of the bank color palette"
+  },
+  "bankFormColorNoneLabel": "No color",
+  "@bankFormColorNoneLabel": {
+    "description": "Option of a bank without a color"
+  },
+  "bankColorCustomLabel": "Custom color",
+  "@bankColorCustomLabel": {
+    "description": "Option opening the custom bank color picker"
+  },
+  "bankColorChannelRedLabel": "Red",
+  "@bankColorChannelRedLabel": {
+    "description": "Label of the red channel slider of the custom bank color picker"
+  },
+  "bankColorChannelGreenLabel": "Green",
+  "@bankColorChannelGreenLabel": {
+    "description": "Label of the green channel slider of the custom bank color picker"
+  },
+  "bankColorChannelBlueLabel": "Blue",
+  "@bankColorChannelBlueLabel": {
+    "description": "Label of the blue channel slider of the custom bank color picker"
+  },
+  "bankColorChannelAlphaLabel": "Opacity",
+  "@bankColorChannelAlphaLabel": {
+    "description": "Label of the alpha channel slider of the custom bank color picker"
+  },
+  "bankColorCodeLabel": "Color code",
+  "@bankColorCodeLabel": {
+    "description": "Label of the color code field of the custom bank color picker"
+  },
+  "bankColorCodeInvalidError": "Enter a code like #RRGGBB or #AARRGGBB.",
+  "@bankColorCodeInvalidError": {
+    "description": "Rejection of an unparsable color code in the custom bank color picker"
+  },
+  "bankColorDialogCancelAction": "Cancel",
+  "@bankColorDialogCancelAction": {
+    "description": "Action declining the custom bank color"
+  },
+  "bankColorDialogApplyAction": "Done",
+  "@bankColorDialogApplyAction": {
+    "description": "Action applying the custom bank color"
+  },
+  "bankFormSaveAction": "Save",
+  "@bankFormSaveAction": {
+    "description": "Action saving the bank"
+  },
+  "bankFormDeleteAction": "Delete",
+  "@bankFormDeleteAction": {
+    "description": "Action deleting the bank"
+  },
+  "bankFormNameRequiredError": "Enter a bank name.",
+  "@bankFormNameRequiredError": {
+    "description": "Validation error of the empty bank name"
+  },
+  "bankFormNameDuplicateError": "A bank with the same name already exists in the catalog.",
+  "@bankFormNameDuplicateError": {
+    "description": "Rejection of a duplicate bank name"
+  },
+  "bankFormColorInvalidError": "Choose a color from the palette.",
+  "@bankFormColorInvalidError": {
+    "description": "Rejection of an invalid bank color value"
+  },
+  "bankFormSaveErrorMessage": "Failed to save the bank. Please try again.",
+  "@bankFormSaveErrorMessage": {
+    "description": "Error message of the bank saving"
+  },
+  "bankFormDeleteErrorMessage": "Failed to delete the bank. Please try again.",
+  "@bankFormDeleteErrorMessage": {
+    "description": "Error message of the bank deletion"
+  },
+  "bankFormDeleteDialogTitle": "Delete the bank?",
+  "@bankFormDeleteDialogTitle": {
+    "description": "Title of the bank deletion confirmation"
+  },
+  "bankFormDeleteDialogMessage": "The bank will be deleted from the catalog.",
+  "@bankFormDeleteDialogMessage": {
+    "description": "Message of the bank deletion confirmation without related accounts"
+  },
+  "bankFormDeleteDialogWithAccountsMessage": "Accounts with this bank: {count}. Their bank link will be cleared, balances and operations will not change.",
+  "@bankFormDeleteDialogWithAccountsMessage": {
+    "description": "Message of the bank deletion confirmation with the number of related accounts",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "bankFormDeleteDialogCancelAction": "Cancel",
+  "@bankFormDeleteDialogCancelAction": {
+    "description": "Action declining the bank deletion"
+  },
+  "categoryFormDeleteDialogTitle": "Delete the category?",
+  "@categoryFormDeleteDialogTitle": {
+    "description": "Title of the category deletion confirmation"
+  },
+  "categoryFormDeleteDialogMessage": "The category will be deleted, and its operations will be moved to the base category of the same type. Amounts, accounts and dates will not change.",
+  "@categoryFormDeleteDialogMessage": {
+    "description": "Message of the category deletion confirmation"
+  },
+  "categoryFormDeleteDialogCancelAction": "Cancel",
+  "@categoryFormDeleteDialogCancelAction": {
+    "description": "Action declining the category deletion"
   }
 }

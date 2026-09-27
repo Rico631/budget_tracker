@@ -1,6 +1,26 @@
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:flutter/material.dart';
 
+/// Разбирает HEX-цвет вида `#RRGGBB` или `#AARRGGBB`.
+///
+/// Некорректное значение не является цветом и возвращает `null`: вызывающая
+/// сторона подставляет нейтральный цвет темы. Функция общая для маркера банка и
+/// палитры выбора цвета, чтобы правило разбора было в одном месте.
+Color? bankColorFromHex(String? hex) {
+  if (hex == null) {
+    return null;
+  }
+  final value = hex.trim().replaceFirst('#', '').toUpperCase();
+  if (value.length != 6 && value.length != 8) {
+    return null;
+  }
+  final parsed = int.tryParse(value, radix: 16);
+  if (parsed == null) {
+    return null;
+  }
+  return Color(value.length == 6 ? 0xFF000000 | parsed : parsed);
+}
+
 /// Маркер банка: круг с сохраненным HEX-цветом банка и буквенным обозначением
 /// из наименования банка.
 ///
@@ -17,7 +37,8 @@ class BankAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final backgroundColor =
-        _parseHexColor(bank.colorHex) ?? theme.colorScheme.surfaceContainerHighest;
+        bankColorFromHex(bank.colorHex) ??
+        theme.colorScheme.surfaceContainerHighest;
 
     return Container(
       width: size,
@@ -46,21 +67,4 @@ class BankAvatar extends StatelessWidget {
       ThemeData.estimateBrightnessForColor(background) == Brightness.dark
       ? Colors.white
       : Colors.black87;
-
-  /// Разбирает HEX-цвет вида `#RRGGBB` или `#AARRGGBB`; некорректное значение
-  /// не является цветом и приводит к нейтральному цвету темы.
-  Color? _parseHexColor(String? hex) {
-    if (hex == null) {
-      return null;
-    }
-    final value = hex.trim().replaceFirst('#', '').toUpperCase();
-    if (value.length != 6 && value.length != 8) {
-      return null;
-    }
-    final parsed = int.tryParse(value, radix: 16);
-    if (parsed == null) {
-      return null;
-    }
-    return Color(value.length == 6 ? 0xFF000000 | parsed : parsed);
-  }
 }

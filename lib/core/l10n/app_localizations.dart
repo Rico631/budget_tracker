@@ -679,6 +679,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save the operation. Please try again.'**
   String get transactionFormSaveErrorMessage;
+
+  /// Label of the categories item of the settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get settingsCategoriesItemLabel;
+
+  /// Label of the banks item of the settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Banks'**
+  String get settingsBanksItemLabel;
+
+  /// Error message of the catalog loading
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the catalog. Please try again.'**
+  String get catalogLoadErrorMessage;
+
+  /// Action reloading the catalog
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get catalogRetryAction;
+
+  /// Title of the categories sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categoriesPageTitle;
+
+  /// Tooltip of the add category action
+  ///
+  /// In en, this message translates to:
+  /// **'Add category'**
+  String get categoriesAddCategoryTooltip;
+
+  /// Label of the income categories section
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get categoriesIncomeSectionLabel;
+
+  /// Label of the expense categories section
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get categoriesExpenseSectionLabel;
+
+  /// Message of the empty categories list
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet.'**
+  String get categoriesEmptyMessage;
+
+  /// Title of the banks sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Banks'**
+  String get banksPageTitle;
+
+  /// Tooltip of the add bank action
+  ///
+  /// In en, this message translates to:
+  /// **'Add bank'**
+  String get banksAddBankTooltip;
+
+  /// Hint of the bank search field in the banks sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Search bank'**
+  String get banksSearchHint;
+
+  /// Message of the empty bank search result in the banks sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'No banks match the query.'**
+  String get banksEmptyMessage;
+
+  /// Title of the category creation form
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get categoryFormCreateTitle;
+
+  /// Title of the category editing form
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get categoryFormEditTitle;
+
+  /// Label of the category name field
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get categoryFormNameLabel;
+
+  /// Label of the read-only category type field
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get categoryFormKindLabel;
+
+  /// Validation error of the missing category type
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the category type.'**
+  String get categoryFormKindRequiredError;
+
+  /// Action saving the category
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get categoryFormSaveAction;
+
+  /// Action deleting the category
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get categoryFormDeleteAction;
+
+  /// Explanation of the read-only base category
+  ///
+  /// In en, this message translates to:
+  /// **'The base category cannot be renamed or deleted: operations of deleted categories are moved to it.'**
+  String get categoryFormFallbackNotice;
+
+  /// Validation error of the empty category name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a category name.'**
+  String get categoryFormNameRequiredError;
+
+  /// Rejection of a duplicate category name in the book and type
+  ///
+  /// In en, this message translates to:
+  /// **'A category with the same name already exists in this type.'**
+  String get categoryFormNameDuplicateError;
+
+  /// Rejection of the base category renaming
+  ///
+  /// In en, this message translates to:
+  /// **'The base category cannot be renamed.'**
+  String get categoryFormFallbackRenameRejectedError;
+
+  /// Rejection of the base category deletion
+  ///
+  /// In en, this message translates to:
+  /// **'The base category cannot be deleted.'**
+  String get categoryFormFallbackDeleteRejectedError;
+
+  /// Rejection of the deletion without a base category of the same type
+  ///
+  /// In en, this message translates to:
+  /// **'The book has no base category of this type.'**
+  String get categoryFormFallbackMissingError;
+
+  /// Rejection of the transfer type for a category
+  ///
+  /// In en, this message translates to:
+  /// **'A category can be income or expense only.'**
+  String get categoryFormKindNotAllowedError;
+
+  /// Error message of the category saving
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save the category. Please try again.'**
+  String get categoryFormSaveErrorMessage;
+
+  /// Error message of the category deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the category. Please try again.'**
+  String get categoryFormDeleteErrorMessage;
+
+  /// Title of the bank creation form
+  ///
+  /// In en, this message translates to:
+  /// **'New bank'**
+  String get bankFormCreateTitle;
+
+  /// Title of the bank editing form
+  ///
+  /// In en, this message translates to:
+  /// **'Edit bank'**
+  String get bankFormEditTitle;
+
+  /// Label of the bank name field
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get bankFormNameLabel;
+
+  /// Label of the bank color palette
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get bankFormColorLabel;
+
+  /// Option of a bank without a color
+  ///
+  /// In en, this message translates to:
+  /// **'No color'**
+  String get bankFormColorNoneLabel;
+
+  /// Option opening the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Custom color'**
+  String get bankColorCustomLabel;
+
+  /// Label of the red channel slider of the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get bankColorChannelRedLabel;
+
+  /// Label of the green channel slider of the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get bankColorChannelGreenLabel;
+
+  /// Label of the blue channel slider of the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get bankColorChannelBlueLabel;
+
+  /// Label of the alpha channel slider of the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get bankColorChannelAlphaLabel;
+
+  /// Label of the color code field of the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Color code'**
+  String get bankColorCodeLabel;
+
+  /// Rejection of an unparsable color code in the custom bank color picker
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a code like #RRGGBB or #AARRGGBB.'**
+  String get bankColorCodeInvalidError;
+
+  /// Action declining the custom bank color
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get bankColorDialogCancelAction;
+
+  /// Action applying the custom bank color
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get bankColorDialogApplyAction;
+
+  /// Action saving the bank
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get bankFormSaveAction;
+
+  /// Action deleting the bank
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get bankFormDeleteAction;
+
+  /// Validation error of the empty bank name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a bank name.'**
+  String get bankFormNameRequiredError;
+
+  /// Rejection of a duplicate bank name
+  ///
+  /// In en, this message translates to:
+  /// **'A bank with the same name already exists in the catalog.'**
+  String get bankFormNameDuplicateError;
+
+  /// Rejection of an invalid bank color value
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a color from the palette.'**
+  String get bankFormColorInvalidError;
+
+  /// Error message of the bank saving
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save the bank. Please try again.'**
+  String get bankFormSaveErrorMessage;
+
+  /// Error message of the bank deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the bank. Please try again.'**
+  String get bankFormDeleteErrorMessage;
+
+  /// Title of the bank deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the bank?'**
+  String get bankFormDeleteDialogTitle;
+
+  /// Message of the bank deletion confirmation without related accounts
+  ///
+  /// In en, this message translates to:
+  /// **'The bank will be deleted from the catalog.'**
+  String get bankFormDeleteDialogMessage;
+
+  /// Message of the bank deletion confirmation with the number of related accounts
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts with this bank: {count}. Their bank link will be cleared, balances and operations will not change.'**
+  String bankFormDeleteDialogWithAccountsMessage(int count);
+
+  /// Action declining the bank deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get bankFormDeleteDialogCancelAction;
+
+  /// Title of the category deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the category?'**
+  String get categoryFormDeleteDialogTitle;
+
+  /// Message of the category deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'The category will be deleted, and its operations will be moved to the base category of the same type. Amounts, accounts and dates will not change.'**
+  String get categoryFormDeleteDialogMessage;
+
+  /// Action declining the category deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get categoryFormDeleteDialogCancelAction;
 }
 
 class _AppLocalizationsDelegate

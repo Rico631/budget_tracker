@@ -151,6 +151,88 @@ const List<String> _version3Schema = <String>[
   ''',
 ];
 
+/// Схема версии 4: без колонки признака базовой категории.
+const List<String> _version4Schema = <String>[
+  '''
+  CREATE TABLE books (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE banks (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    display_name TEXT,
+    display_details TEXT,
+    color_hex TEXT,
+    icon_domain TEXT,
+    is_preset INTEGER NOT NULL DEFAULT 0,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE accounts (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    bank_id TEXT REFERENCES banks (id),
+    name TEXT NOT NULL,
+    currency_code TEXT NOT NULL,
+    initial_balance_minor INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE categories (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    parent_id TEXT REFERENCES categories (id),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE transactions (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    account_id TEXT NOT NULL REFERENCES accounts (id),
+    to_account_id TEXT REFERENCES accounts (id),
+    category_id TEXT REFERENCES categories (id),
+    kind TEXT NOT NULL,
+    amount_minor INTEGER NOT NULL,
+    occurred_at INTEGER NOT NULL,
+    note TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    to_amount_minor INTEGER
+  )
+  ''',
+  '''
+  CREATE TABLE currencies (
+    code TEXT NOT NULL PRIMARY KEY,
+    numeric_code TEXT NOT NULL,
+    symbol TEXT,
+    name_ru TEXT NOT NULL,
+    name_en TEXT NOT NULL
+  )
+  ''',
+  '''
+  CREATE TABLE app_settings (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )
+  ''',
+];
+
 void main() {
   group('Finance database schema', () {
     test('creates finance tables and required indexes in memory', () async {
@@ -184,7 +266,7 @@ void main() {
       expect(indexes, isNotEmpty);
     });
 
-    test('upgrades an existing version 1 database to version 4', () async {
+    test('upgrades an existing version 1 database to version 5', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -209,10 +291,10 @@ void main() {
           .get();
 
       expect(tables, hasLength(7));
-      expect(database.schemaVersion, 4);
+      expect(database.schemaVersion, 5);
     });
 
-    test('upgrades an existing version 2 database to version 4', () async {
+    test('upgrades an existing version 2 database to version 5', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -236,7 +318,7 @@ void main() {
         await directory.delete(recursive: true);
       });
 
-      expect(database.schemaVersion, 4);
+      expect(database.schemaVersion, 5);
 
       final tables = await database
           .customSelect(
@@ -280,7 +362,7 @@ void main() {
       expect(banks.single.isPreset, isFalse);
     });
 
-    test('upgrades an existing version 3 database to version 4', () async {
+    test('upgrades an existing version 3 database to version 5', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -313,7 +395,7 @@ void main() {
         await directory.delete(recursive: true);
       });
 
-      expect(database.schemaVersion, 4);
+      expect(database.schemaVersion, 5);
 
       final books = await database.select(database.books).get();
       final accounts = await database.select(database.accounts).get();
@@ -330,6 +412,119 @@ void main() {
       expect(transactions.single.amountMinor, 250);
       expect(transactions.single.toAmountMinor, isNull);
     });
+
+    test(
+      'backfills the fallback category flag when upgrading from version 4',
+      () async {
+        final directory = await Directory.systemTemp.createTemp(
+          'budget_tracker_',
+        );
+        final file = File.fromUri(directory.uri.resolve('finance.sqlite'));
+        final database = AppDatabase.forTesting(
+          NativeDatabase(
+            file,
+            setup: (connection) {
+              for (final statement in _version4Schema) {
+                connection.execute(statement);
+              }
+              connection.execute(
+                "INSERT INTO books (id, name, created_at, updated_at, is_archived) VALUES ('book-1', 'Личная книга', 1, 1, 0)",
+              );
+              connection.execute(
+                "INSERT INTO books (id, name, created_at, updated_at, is_archived) VALUES ('book-2', 'Personal book', 2, 2, 0)",
+              );
+              connection.execute(
+                "INSERT INTO accounts (id, book_id, bank_id, name, currency_code, initial_balance_minor, created_at, updated_at, is_archived) VALUES ('account-1', 'book-1', NULL, 'Кошелек', 'RUB', 1000, 1, 1, 0)",
+              );
+              // 35 обычных категорий и две базовые категории русской локали:
+              // в книге 37 категорий, как в стартовом наборе до версии 5.
+              for (var index = 0; index < 35; index++) {
+                connection.execute(
+                  "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('category-$index', 'book-1', 'Категория $index', 'expense', NULL, 1, 1, 0)",
+                );
+              }
+              connection.execute(
+                "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('fallback-income', 'book-1', 'Прочий доход', 'income', NULL, 1, 1, 0)",
+              );
+              connection.execute(
+                "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('fallback-expense', 'book-1', 'Прочие расходы', 'expense', NULL, 1, 1, 0)",
+              );
+              connection.execute(
+                "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('fallback-income-en', 'book-2', 'Other Income', 'income', NULL, 2, 2, 0)",
+              );
+              connection.execute(
+                "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('fallback-expense-en', 'book-2', 'Other Expenses', 'expense', NULL, 2, 2, 0)",
+              );
+              connection.execute(
+                "INSERT INTO transactions (id, book_id, account_id, to_account_id, category_id, kind, amount_minor, occurred_at, note, created_at, updated_at, to_amount_minor) VALUES ('transaction-1', 'book-1', 'account-1', NULL, 'fallback-expense', 'expense', 250, 1000, NULL, 1, 1, NULL)",
+              );
+              connection.execute('PRAGMA user_version = 4');
+            },
+          ),
+        );
+        addTearDown(() async {
+          await database.close();
+          await directory.delete(recursive: true);
+        });
+
+        expect(database.schemaVersion, 5);
+
+        final categories = await database.select(database.categories).get();
+        final firstBook = categories
+            .where((row) => row.bookId == 'book-1')
+            .toList();
+        final secondBook = categories
+            .where((row) => row.bookId == 'book-2')
+            .toList();
+
+        expect(firstBook, hasLength(37));
+        // Признак проставлен ровно у двух категорий каждой книги: базовые
+        // категории распознаются по известным наименованиям своей локали.
+        expect(
+          firstBook.where((row) => row.isFallback).map((row) => row.id).toSet(),
+          {'fallback-income', 'fallback-expense'},
+        );
+        expect(
+          secondBook.where((row) => row.isFallback).map((row) => row.id).toSet(),
+          {'fallback-income-en', 'fallback-expense-en'},
+        );
+        // Наименования и типы существующих категорий не изменились.
+        expect(categories.map((row) => row.name), contains('Категория 0'));
+        final fallbackIncome = categories
+            .where((row) => row.id == 'fallback-income')
+            .single;
+
+        expect(fallbackIncome.name, 'Прочий доход');
+        expect(fallbackIncome.kind, 'income');
+        expect(
+          categories.where((row) => row.id == 'fallback-expense').single.kind,
+          'expense',
+        );
+
+        final transaction = (await database.select(
+          database.transactions,
+        ).get()).single;
+        final rawOccurredAt = await database
+            .customSelect(
+              "SELECT occurred_at AS value FROM transactions WHERE id = 'transaction-1'",
+            )
+            .getSingle();
+
+        expect(transaction.id, 'transaction-1');
+        expect(transaction.categoryId, 'fallback-expense');
+        expect(transaction.amountMinor, 250);
+        expect(rawOccurredAt.data['value'], 1000);
+
+        final categoryColumns = await database
+            .customSelect('PRAGMA table_info(categories)')
+            .get();
+
+        expect(
+          categoryColumns.map((row) => row.data['name']),
+          contains('is_fallback'),
+        );
+      },
+    );
   });
 
   group('UUIDv7 generation', () {

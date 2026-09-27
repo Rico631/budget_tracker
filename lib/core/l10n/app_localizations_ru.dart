@@ -327,4 +327,191 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get transactionFormSaveErrorMessage =>
       'Не удалось сохранить операцию. Попробуйте еще раз.';
+
+  @override
+  String get settingsCategoriesItemLabel => 'Категории';
+
+  @override
+  String get settingsBanksItemLabel => 'Банки';
+
+  @override
+  String get catalogLoadErrorMessage =>
+      'Не удалось загрузить справочник. Попробуйте еще раз.';
+
+  @override
+  String get catalogRetryAction => 'Повторить';
+
+  @override
+  String get categoriesPageTitle => 'Категории';
+
+  @override
+  String get categoriesAddCategoryTooltip => 'Добавить категорию';
+
+  @override
+  String get categoriesIncomeSectionLabel => 'Доходы';
+
+  @override
+  String get categoriesExpenseSectionLabel => 'Расходы';
+
+  @override
+  String get categoriesEmptyMessage => 'Категорий пока нет.';
+
+  @override
+  String get banksPageTitle => 'Банки';
+
+  @override
+  String get banksAddBankTooltip => 'Добавить банк';
+
+  @override
+  String get banksSearchHint => 'Поиск банка';
+
+  @override
+  String get banksEmptyMessage => 'Нет банков, подходящих под запрос.';
+
+  @override
+  String get categoryFormCreateTitle => 'Новая категория';
+
+  @override
+  String get categoryFormEditTitle => 'Изменение категории';
+
+  @override
+  String get categoryFormNameLabel => 'Наименование';
+
+  @override
+  String get categoryFormKindLabel => 'Тип';
+
+  @override
+  String get categoryFormKindRequiredError => 'Выберите тип категории.';
+
+  @override
+  String get categoryFormSaveAction => 'Сохранить';
+
+  @override
+  String get categoryFormDeleteAction => 'Удалить';
+
+  @override
+  String get categoryFormFallbackNotice =>
+      'Базовую категорию нельзя переименовать или удалить: в нее переносятся операции удаленных категорий.';
+
+  @override
+  String get categoryFormNameRequiredError => 'Введите наименование категории.';
+
+  @override
+  String get categoryFormNameDuplicateError =>
+      'Категория с таким наименованием уже есть в этом типе.';
+
+  @override
+  String get categoryFormFallbackRenameRejectedError =>
+      'Базовую категорию нельзя переименовать.';
+
+  @override
+  String get categoryFormFallbackDeleteRejectedError =>
+      'Базовую категорию нельзя удалить.';
+
+  @override
+  String get categoryFormFallbackMissingError =>
+      'В книге нет базовой категории этого типа.';
+
+  @override
+  String get categoryFormKindNotAllowedError =>
+      'Категория может быть только доходом или расходом.';
+
+  @override
+  String get categoryFormSaveErrorMessage =>
+      'Не удалось сохранить категорию. Попробуйте еще раз.';
+
+  @override
+  String get categoryFormDeleteErrorMessage =>
+      'Не удалось удалить категорию. Попробуйте еще раз.';
+
+  @override
+  String get bankFormCreateTitle => 'Новый банк';
+
+  @override
+  String get bankFormEditTitle => 'Изменение банка';
+
+  @override
+  String get bankFormNameLabel => 'Наименование';
+
+  @override
+  String get bankFormColorLabel => 'Цвет';
+
+  @override
+  String get bankFormColorNoneLabel => 'Без цвета';
+
+  @override
+  String get bankColorCustomLabel => 'Свой цвет';
+
+  @override
+  String get bankColorChannelRedLabel => 'Красный';
+
+  @override
+  String get bankColorChannelGreenLabel => 'Зеленый';
+
+  @override
+  String get bankColorChannelBlueLabel => 'Синий';
+
+  @override
+  String get bankColorChannelAlphaLabel => 'Непрозрачность';
+
+  @override
+  String get bankColorCodeLabel => 'Код цвета';
+
+  @override
+  String get bankColorCodeInvalidError =>
+      'Введите код вида #RRGGBB или #AARRGGBB.';
+
+  @override
+  String get bankColorDialogCancelAction => 'Отмена';
+
+  @override
+  String get bankColorDialogApplyAction => 'Готово';
+
+  @override
+  String get bankFormSaveAction => 'Сохранить';
+
+  @override
+  String get bankFormDeleteAction => 'Удалить';
+
+  @override
+  String get bankFormNameRequiredError => 'Введите наименование банка.';
+
+  @override
+  String get bankFormNameDuplicateError =>
+      'Банк с таким наименованием уже есть в справочнике.';
+
+  @override
+  String get bankFormColorInvalidError => 'Выберите цвет из палитры.';
+
+  @override
+  String get bankFormSaveErrorMessage =>
+      'Не удалось сохранить банк. Попробуйте еще раз.';
+
+  @override
+  String get bankFormDeleteErrorMessage =>
+      'Не удалось удалить банк. Попробуйте еще раз.';
+
+  @override
+  String get bankFormDeleteDialogTitle => 'Удалить банк?';
+
+  @override
+  String get bankFormDeleteDialogMessage => 'Банк будет удален из справочника.';
+
+  @override
+  String bankFormDeleteDialogWithAccountsMessage(int count) {
+    return 'Счетов с этим банком: $count. У них будет снят признак банка, остатки и операции не изменятся.';
+  }
+
+  @override
+  String get bankFormDeleteDialogCancelAction => 'Отмена';
+
+  @override
+  String get categoryFormDeleteDialogTitle => 'Удалить категорию?';
+
+  @override
+  String get categoryFormDeleteDialogMessage =>
+      'Категория будет удалена, а ее операции перейдут в базовую категорию того же типа. Суммы, счета и даты не изменятся.';
+
+  @override
+  String get categoryFormDeleteDialogCancelAction => 'Отмена';
 }

@@ -3,7 +3,12 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/core/router/app_shell.dart';
 import 'package:budget_tracker/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
+import 'package:budget_tracker/data/repositories/categories_repository.dart';
+import 'package:budget_tracker/data/repositories/transactions_repository.dart';
+import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/presentation/features/settings/category_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +45,12 @@ void main() {
   int selectedTab(WidgetTester tester) =>
       tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
 
+  /// Текст итога по валюте на разделе «Счета».
+  String accountsTotal(WidgetTester tester) => tester
+      .widgetList<Text>(find.byType(Text))
+      .map((text) => text.data ?? '')
+      .firstWhere((value) => value.startsWith('Итого'));
+
   testWidgets('стартовым разделом является «Счета»', (
     WidgetTester tester,
   ) async {
@@ -60,25 +71,33 @@ void main() {
   ) async {
     await pumpShell(tester);
 
-    for (final label in ['Аналитика', 'Настройки']) {
-      await tester.tap(find.text(label));
-      await tester.pumpAndSettle();
+    // Раздел без содержимого показывает контролируемое состояние.
+    await tester.tap(find.text('Аналитика'));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Раздел в разработке'), findsOneWidget);
-      expect(
-        find.text(
-          'Содержимое раздела появится в следующих обновлениях приложения.',
-        ),
-        findsOneWidget,
-      );
-      expect(find.byType(NavigationBar), findsOneWidget);
-      expect(
-        Theme.of(
-          tester.element(find.byType(NavigationBar)),
-        ).colorScheme.primary,
-        AppTheme.light.colorScheme.primary,
-      );
-    }
+    expect(find.text('Раздел в разработке'), findsOneWidget);
+    expect(
+      find.text(
+        'Содержимое раздела появится в следующих обновлениях приложения.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(
+      Theme.of(
+        tester.element(find.byType(NavigationBar)),
+      ).colorScheme.primary,
+      AppTheme.light.colorScheme.primary,
+    );
+
+    // «Настройки» показывают содержимое раздела вместо состояния разработки.
+    await tester.tap(find.text('Настройки'));
+    await tester.pumpAndSettle();
+
+    expect(selectedTab(tester), 3);
+    expect(find.text('Раздел в разработке'), findsNothing);
+    expect(find.text('Категории'), findsOneWidget);
+    expect(find.text('Банки'), findsOneWidget);
 
     await tester.tap(find.text('Счета'));
     await tester.pumpAndSettle();
@@ -117,8 +136,95 @@ void main() {
       expect(find.byIcon(Icons.add), findsNothing);
       expect(find.byType(FloatingActionButton), findsNothing);
       expect(find.text('Добавить счет'), findsNothing);
-      expect(find.text('Раздел в разработке'), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
     }
+
+    // Оболочка не показывает действий добавления и на «Настройках»: они
+    // размещаются в подэкранах справочников.
+    expect(find.text('Категории'), findsOneWidget);
+    expect(find.text('Банки'), findsOneWidget);
   });
+  testWidgets('удаление категории переносит операции в базовую категорию', (
+    WidgetTester tester,
+  ) async {
+    final book = (await DriftBooksRepository(database).list()).single;
+    final accounts = DriftAccountsRepository(database);
+    final categories = DriftCategoriesRepository(database);
+    final transactions = DriftTransactionsRepository(database);
+    final account = await accounts.create(
+      bookId: book.id,
+      name: 'Рубли',
+      currencyCode: 'RUB',
+      initialBalanceMinor: 100000,
+    );
+    final fallback = await categories.create(
+      bookId: book.id,
+      name: 'Прочие расходы',
+      kind: TransactionKind.expense,
+      isFallback: true,
+    );
+    final groceries = await categories.create(
+      bookId: book.id,
+      name: 'Продукты',
+      kind: TransactionKind.expense,
+    );
+    final transaction = await transactions.create(
+      bookId: book.id,
+      accountId: account.id,
+      categoryId: groceries.id,
+      kind: TransactionKind.expense,
+      amountMinor: 1500,
+      occurredAt: DateTime(2026, 9, 24),
+    );
+
+    await pumpShell(tester);
+
+    final totalBefore = accountsTotal(tester);
+
+    // «Настройки» -> «Категории» -> категория с операциями -> удаление.
+    await tester.tap(find.text('Настройки'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Категории'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Прочие расходы'), findsOneWidget);
+
+    await tester.tap(find.text('Продукты'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(categoryFormDeleteButtonKey));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Удалить категорию?'), findsOneWidget);
+
+    await tester.tap(find.byKey(categoryFormDeleteConfirmButtonKey));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Продукты'), findsNothing);
+    expect(find.text('Прочие расходы'), findsOneWidget);
+
+    // Возврат из подэкрана категорий в раздел «Настройки».
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    // Операция показывается с базовой категорией.
+    await tester.tap(find.text('Операции'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Прочие расходы · Рубли'), findsOneWidget);
+    expect(find.text('Продукты · Рубли'), findsNothing);
+
+    // Остатки счетов не изменились.
+    await tester.tap(find.text('Счета'));
+    await tester.pumpAndSettle();
+
+    expect(accountsTotal(tester), totalBefore);
+    expect(await categories.getById(groceries.id), isNull);
+    expect(
+      (await transactions.getById(transaction.id))!.categoryId,
+      fallback.id,
+    );
+    expect((await transactions.getById(transaction.id))!.amountMinor, 1500);
+  });
+
+
 }

@@ -65,6 +65,7 @@ class DriftFirstRunBootstrapRepository implements FirstRunBootstrapRepository {
                 kind: seed.kind,
                 createdAt: now,
                 updatedAt: now,
+                isFallback: seed.isFallback,
               ),
             ),
         ]);

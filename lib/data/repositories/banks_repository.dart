@@ -2,6 +2,7 @@ import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
+import 'package:budget_tracker/domain/services/catalog_name_rule.dart';
 import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:drift/drift.dart';
 
@@ -15,12 +16,14 @@ class DriftBanksRepository implements BanksRepository {
   @override
   Future<FinanceBank> create({
     required String name,
+    String? colorHex,
     String? displayName,
     String? displayDetails,
   }) async {
     final bank = FinanceBank(
       id: idGenerator.generateV7(),
       name: name,
+      colorHex: colorHex,
       displayName: displayName,
       displayDetails: displayDetails,
     );
@@ -50,22 +53,36 @@ class DriftBanksRepository implements BanksRepository {
     return database.update(database.banks).replace(bankToCompanion(bank));
   }
 
+  /// Ищет банк по наименованию в памяти: SQLite без ICU не приводит кириллицу к
+  /// нижнему регистру, поэтому сравнение выполняется в Dart (ADR-0004,
+  /// решение 4.5). Архивные записи в поиск не попадают: архивация справочников
+  /// выведена из модели (ADR-0004, решение 4.6).
   @override
-  Future<void> archive(String id) async {
-    final bank = await getById(id);
-    if (bank == null) return;
-    await update(
-      FinanceBank(
-        id: bank.id,
-        name: bank.name,
-        displayName: bank.displayName,
-        displayDetails: bank.displayDetails,
-        colorHex: bank.colorHex,
-        iconDomain: bank.iconDomain,
-        isPreset: bank.isPreset,
-        isArchived: true,
-      ),
-    );
+  Future<FinanceBank?> findByName(String name) async {
+    final normalizedName = normalizeCatalogName(name);
+    for (final bank in await list()) {
+      if (normalizeCatalogName(bank.name) == normalizedName) {
+        return bank;
+      }
+    }
+    return null;
+  }
+
+  /// Очищает ссылку на банк у связанных счетов и удаляет банк одной
+  /// транзакцией (ADR-0004, решение 4.7).
+  ///
+  /// Наименования, валюты, начальные остатки и операции счетов не изменяются:
+  /// счета читаются как счета без банка.
+  @override
+  Future<void> deleteWithAccountDetach(String id) {
+    return database.transaction(() async {
+      await (database.update(database.accounts)
+            ..where((account) => account.bankId.equals(id)))
+          .write(AccountsCompanion(bankId: Value(null)));
+      await (database.delete(
+        database.banks,
+      )..where((bank) => bank.id.equals(id))).go();
+    });
   }
 
   @override

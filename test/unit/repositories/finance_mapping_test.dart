@@ -55,11 +55,34 @@ void main() {
     expect((await banks.getById(bank.id))!.displayName, isNull);
     expect((await accounts.getById(account.id))!.bankId, isNull);
     expect((await categories.getById(category.id))!.parentId, isNull);
+    expect((await categories.getById(category.id))!.isFallback, isFalse);
     expect((await transactions.getById(transaction.id))!.toAccountId, isNull);
     expect((await transactions.getById(transaction.id))!.note, isNull);
     expect(
       (await transactions.getById(transaction.id))!.toAmountMinor,
       isNull,
+    );
+  });
+
+  test('keeps the fallback category flag through repositories', () async {
+    final book = await books.create(name: 'Категории');
+    final regular = await categories.create(
+      bookId: book.id,
+      name: 'Продукты',
+      kind: TransactionKind.expense,
+    );
+    final fallback = await categories.create(
+      bookId: book.id,
+      name: 'Прочие расходы',
+      kind: TransactionKind.expense,
+      isFallback: true,
+    );
+
+    expect((await categories.getById(regular.id))!.isFallback, isFalse);
+    expect((await categories.getById(fallback.id))!.isFallback, isTrue);
+    expect(
+      (await categories.findFallback(book.id, TransactionKind.expense))!.id,
+      fallback.id,
     );
   });
 

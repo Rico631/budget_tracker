@@ -1,4 +1,5 @@
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/data/local/seed/category_seed_catalog.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/banks_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
@@ -7,6 +8,7 @@ import 'package:budget_tracker/data/repositories/currencies_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
+import 'package:budget_tracker/domain/usecases/catalog_usecases.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -50,4 +52,15 @@ final accountUseCasesProvider = Provider<AccountUseCases>(
     transactions: ref.watch(transactionsRepositoryProvider),
     currencies: DriftCurrenciesRepository(ref.watch(appDatabaseProvider)),
   ),
+);
+
+final categoryUseCasesProvider = Provider<CategoryUseCases>(
+  (ref) => CategoryUseCases(
+    categories: ref.watch(categoriesRepositoryProvider),
+    fallbackNameFor: fallbackCategoryName,
+  ),
+);
+
+final bankUseCasesProvider = Provider<BankUseCases>(
+  (ref) => BankUseCases(banks: ref.watch(banksRepositoryProvider)),
 );

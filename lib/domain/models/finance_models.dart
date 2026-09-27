@@ -88,6 +88,7 @@ class FinanceCategory {
     required this.updatedAt,
     this.parentId,
     this.isArchived = false,
+    this.isFallback = false,
   });
 
   final String id;
@@ -98,6 +99,12 @@ class FinanceCategory {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isArchived;
+
+  /// Базовая категория: в книге ровно одна базовая категория типа `income` и
+  /// ровно одна типа `expense`. Базовая категория не удаляется и не
+  /// переименовывается, а операции удаленной категории переносятся в базовую
+  /// категорию того же типа (ADR-0004, решения 4.1-4.3).
+  final bool isFallback;
 }
 
 class FinanceTransaction {

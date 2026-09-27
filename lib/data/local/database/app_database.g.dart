@@ -1581,6 +1581,21 @@ class $CategoriesTable extends Categories
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _isFallbackMeta = const VerificationMeta(
+    'isFallback',
+  );
+  @override
+  late final GeneratedColumn<bool> isFallback = GeneratedColumn<bool>(
+    'is_fallback',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_fallback" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1591,6 +1606,7 @@ class $CategoriesTable extends Categories
     createdAt,
     updatedAt,
     isArchived,
+    isFallback,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1657,6 +1673,12 @@ class $CategoriesTable extends Categories
         isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
       );
     }
+    if (data.containsKey('is_fallback')) {
+      context.handle(
+        _isFallbackMeta,
+        isFallback.isAcceptableOrUnknown(data['is_fallback']!, _isFallbackMeta),
+      );
+    }
     return context;
   }
 
@@ -1698,6 +1720,10 @@ class $CategoriesTable extends Categories
         DriftSqlType.bool,
         data['${effectivePrefix}is_archived'],
       )!,
+      isFallback: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_fallback'],
+      )!,
     );
   }
 
@@ -1716,6 +1742,12 @@ class Category extends DataClass implements Insertable<Category> {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isArchived;
+
+  /// Признак базовой категории: в книге ровно одна базовая категория типа
+  /// `income` и ровно одна типа `expense` (ADR-0004, решение 4.2). Базовая
+  /// категория не удаляется и не переименовывается, а при удалении другой
+  /// категории операции переносятся в базовую категорию своего типа.
+  final bool isFallback;
   const Category({
     required this.id,
     required this.bookId,
@@ -1725,6 +1757,7 @@ class Category extends DataClass implements Insertable<Category> {
     required this.createdAt,
     required this.updatedAt,
     required this.isArchived,
+    required this.isFallback,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1739,6 +1772,7 @@ class Category extends DataClass implements Insertable<Category> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_archived'] = Variable<bool>(isArchived);
+    map['is_fallback'] = Variable<bool>(isFallback);
     return map;
   }
 
@@ -1754,6 +1788,7 @@ class Category extends DataClass implements Insertable<Category> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isArchived: Value(isArchived),
+      isFallback: Value(isFallback),
     );
   }
 
@@ -1771,6 +1806,7 @@ class Category extends DataClass implements Insertable<Category> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
+      isFallback: serializer.fromJson<bool>(json['isFallback']),
     );
   }
   @override
@@ -1785,6 +1821,7 @@ class Category extends DataClass implements Insertable<Category> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isArchived': serializer.toJson<bool>(isArchived),
+      'isFallback': serializer.toJson<bool>(isFallback),
     };
   }
 
@@ -1797,6 +1834,7 @@ class Category extends DataClass implements Insertable<Category> {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isArchived,
+    bool? isFallback,
   }) => Category(
     id: id ?? this.id,
     bookId: bookId ?? this.bookId,
@@ -1806,6 +1844,7 @@ class Category extends DataClass implements Insertable<Category> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     isArchived: isArchived ?? this.isArchived,
+    isFallback: isFallback ?? this.isFallback,
   );
   Category copyWithCompanion(CategoriesCompanion data) {
     return Category(
@@ -1819,6 +1858,9 @@ class Category extends DataClass implements Insertable<Category> {
       isArchived: data.isArchived.present
           ? data.isArchived.value
           : this.isArchived,
+      isFallback: data.isFallback.present
+          ? data.isFallback.value
+          : this.isFallback,
     );
   }
 
@@ -1832,7 +1874,8 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('parentId: $parentId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('isArchived: $isArchived')
+          ..write('isArchived: $isArchived, ')
+          ..write('isFallback: $isFallback')
           ..write(')'))
         .toString();
   }
@@ -1847,6 +1890,7 @@ class Category extends DataClass implements Insertable<Category> {
     createdAt,
     updatedAt,
     isArchived,
+    isFallback,
   );
   @override
   bool operator ==(Object other) =>
@@ -1859,7 +1903,8 @@ class Category extends DataClass implements Insertable<Category> {
           other.parentId == this.parentId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.isArchived == this.isArchived);
+          other.isArchived == this.isArchived &&
+          other.isFallback == this.isFallback);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -1871,6 +1916,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isArchived;
+  final Value<bool> isFallback;
   final Value<int> rowid;
   const CategoriesCompanion({
     this.id = const Value.absent(),
@@ -1881,6 +1927,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
+    this.isFallback = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CategoriesCompanion.insert({
@@ -1892,6 +1939,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
+    this.isFallback = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        bookId = Value(bookId),
@@ -1906,6 +1954,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isArchived,
+    Expression<bool>? isFallback,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1917,6 +1966,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isArchived != null) 'is_archived': isArchived,
+      if (isFallback != null) 'is_fallback': isFallback,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1930,6 +1980,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<bool>? isArchived,
+    Value<bool>? isFallback,
     Value<int>? rowid,
   }) {
     return CategoriesCompanion(
@@ -1941,6 +1992,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isArchived: isArchived ?? this.isArchived,
+      isFallback: isFallback ?? this.isFallback,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1972,6 +2024,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (isArchived.present) {
       map['is_archived'] = Variable<bool>(isArchived.value);
     }
+    if (isFallback.present) {
+      map['is_fallback'] = Variable<bool>(isFallback.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1989,6 +2044,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isArchived: $isArchived, ')
+          ..write('isFallback: $isFallback, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4760,6 +4816,7 @@ typedef $$CategoriesTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
+      Value<bool> isFallback,
       Value<int> rowid,
     });
 typedef $$CategoriesTableUpdateCompanionBuilder =
@@ -4772,6 +4829,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
+      Value<bool> isFallback,
       Value<int> rowid,
     });
 
@@ -4868,6 +4926,11 @@ class $$CategoriesTableFilterComposer
 
   ColumnFilters<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFallback => $composableBuilder(
+    column: $table.isFallback,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4982,6 +5045,11 @@ class $$CategoriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isFallback => $composableBuilder(
+    column: $table.isFallback,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$BooksTableOrderingComposer get bookId {
     final $$BooksTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -5055,6 +5123,11 @@ class $$CategoriesTableAnnotationComposer
 
   GeneratedColumn<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isFallback => $composableBuilder(
+    column: $table.isFallback,
     builder: (column) => column,
   );
 
@@ -5170,6 +5243,7 @@ class $$CategoriesTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
+                Value<bool> isFallback = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion(
                 id: id,
@@ -5180,6 +5254,7 @@ class $$CategoriesTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isArchived: isArchived,
+                isFallback: isFallback,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5192,6 +5267,7 @@ class $$CategoriesTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
+                Value<bool> isFallback = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion.insert(
                 id: id,
@@ -5202,6 +5278,7 @@ class $$CategoriesTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 isArchived: isArchived,
+                isFallback: isFallback,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

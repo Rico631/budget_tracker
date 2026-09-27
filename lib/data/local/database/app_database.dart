@@ -58,6 +58,12 @@ class Categories extends Table {
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
 
+  /// Признак базовой категории: в книге ровно одна базовая категория типа
+  /// `income` и ровно одна типа `expense` (ADR-0004, решение 4.2). Базовая
+  /// категория не удаляется и не переименовывается, а при удалении другой
+  /// категории операции переносятся в базовую категорию своего типа.
+  BoolColumn get isFallback => boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -127,7 +133,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -157,6 +163,23 @@ class AppDatabase extends _$AppDatabase {
         // колонкой суммы зачисления, поэтому она добавляется только базам
         // версий 2 и 3.
         await m.addColumn(transactions, transactions.toAmountMinor);
+      }
+      if (from < 5) {
+        // Версия 1 создает таблицу категорий по текущей схеме, то есть уже с
+        // колонкой признака базовой категории, поэтому колонка добавляется
+        // только базам версий 2-4.
+        if (from >= 2) {
+          await m.addColumn(categories, categories.isFallback);
+        }
+        // Существующим категориям признак проставляется массовым SQL по
+        // известным наименованиям базовых категорий внутри каждой книги
+        // (ADR-0004, решение 4.9). Книга без базовой категории получит ее
+        // идемпотентно при обращении к управлению категориями.
+        await m.database.customStatement(
+          'UPDATE categories SET is_fallback = 1 '
+          "WHERE (kind = 'income' AND name IN ('Прочий доход', 'Other Income')) "
+          "OR (kind = 'expense' AND name IN ('Прочие расходы', 'Other Expenses'))",
+        );
       }
     },
   );

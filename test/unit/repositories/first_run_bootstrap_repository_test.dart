@@ -65,6 +65,21 @@ void main() {
     expect(categories.every((row) => row.parentId == null), isTrue);
     expect(categories.map((row) => row.name), contains('Зарплата'));
 
+    final fallbackCategories = categories
+        .where((row) => row.isFallback)
+        .toList();
+
+    // Базовая категория каждого типа создается с признаком (ADR-0004, 4.2).
+    expect(fallbackCategories, hasLength(2));
+    expect(
+      fallbackCategories.where((row) => row.kind == 'income').single.name,
+      'Прочий доход',
+    );
+    expect(
+      fallbackCategories.where((row) => row.kind == 'expense').single.name,
+      'Прочие расходы',
+    );
+
     final banks = await database.select(database.banks).get();
 
     expect(banks, hasLength(100));
@@ -95,6 +110,10 @@ void main() {
     expect(banks.first.name, 'JPMorgan Chase');
     expect(names, contains('Salary'));
     expect(names, isNot(contains('Зарплата')));
+    expect(
+      categories.where((row) => row.isFallback).map((row) => row.name).toSet(),
+      {'Other Income', 'Other Expenses'},
+    );
   });
 
   test('falls back to Russian catalogs for an unsupported locale', () async {

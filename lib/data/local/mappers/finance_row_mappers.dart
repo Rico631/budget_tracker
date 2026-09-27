@@ -59,6 +59,7 @@ extension CategoryRowMapper on Category {
     createdAt: createdAt,
     updatedAt: updatedAt,
     isArchived: isArchived,
+    isFallback: isFallback,
   );
 }
 
@@ -130,6 +131,7 @@ CategoriesCompanion categoryToCompanion(FinanceCategory category) =>
       createdAt: Value(category.createdAt),
       updatedAt: Value(category.updatedAt),
       isArchived: Value(category.isArchived),
+      isFallback: Value(category.isFallback),
     );
 
 TransactionsCompanion transactionToCompanion(FinanceTransaction transaction) =>

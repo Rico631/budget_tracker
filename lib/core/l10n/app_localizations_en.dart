@@ -327,4 +327,192 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get transactionFormSaveErrorMessage =>
       'Failed to save the operation. Please try again.';
+
+  @override
+  String get settingsCategoriesItemLabel => 'Categories';
+
+  @override
+  String get settingsBanksItemLabel => 'Banks';
+
+  @override
+  String get catalogLoadErrorMessage =>
+      'Failed to load the catalog. Please try again.';
+
+  @override
+  String get catalogRetryAction => 'Retry';
+
+  @override
+  String get categoriesPageTitle => 'Categories';
+
+  @override
+  String get categoriesAddCategoryTooltip => 'Add category';
+
+  @override
+  String get categoriesIncomeSectionLabel => 'Income';
+
+  @override
+  String get categoriesExpenseSectionLabel => 'Expenses';
+
+  @override
+  String get categoriesEmptyMessage => 'No categories yet.';
+
+  @override
+  String get banksPageTitle => 'Banks';
+
+  @override
+  String get banksAddBankTooltip => 'Add bank';
+
+  @override
+  String get banksSearchHint => 'Search bank';
+
+  @override
+  String get banksEmptyMessage => 'No banks match the query.';
+
+  @override
+  String get categoryFormCreateTitle => 'New category';
+
+  @override
+  String get categoryFormEditTitle => 'Edit category';
+
+  @override
+  String get categoryFormNameLabel => 'Name';
+
+  @override
+  String get categoryFormKindLabel => 'Type';
+
+  @override
+  String get categoryFormKindRequiredError => 'Choose the category type.';
+
+  @override
+  String get categoryFormSaveAction => 'Save';
+
+  @override
+  String get categoryFormDeleteAction => 'Delete';
+
+  @override
+  String get categoryFormFallbackNotice =>
+      'The base category cannot be renamed or deleted: operations of deleted categories are moved to it.';
+
+  @override
+  String get categoryFormNameRequiredError => 'Enter a category name.';
+
+  @override
+  String get categoryFormNameDuplicateError =>
+      'A category with the same name already exists in this type.';
+
+  @override
+  String get categoryFormFallbackRenameRejectedError =>
+      'The base category cannot be renamed.';
+
+  @override
+  String get categoryFormFallbackDeleteRejectedError =>
+      'The base category cannot be deleted.';
+
+  @override
+  String get categoryFormFallbackMissingError =>
+      'The book has no base category of this type.';
+
+  @override
+  String get categoryFormKindNotAllowedError =>
+      'A category can be income or expense only.';
+
+  @override
+  String get categoryFormSaveErrorMessage =>
+      'Failed to save the category. Please try again.';
+
+  @override
+  String get categoryFormDeleteErrorMessage =>
+      'Failed to delete the category. Please try again.';
+
+  @override
+  String get bankFormCreateTitle => 'New bank';
+
+  @override
+  String get bankFormEditTitle => 'Edit bank';
+
+  @override
+  String get bankFormNameLabel => 'Name';
+
+  @override
+  String get bankFormColorLabel => 'Color';
+
+  @override
+  String get bankFormColorNoneLabel => 'No color';
+
+  @override
+  String get bankColorCustomLabel => 'Custom color';
+
+  @override
+  String get bankColorChannelRedLabel => 'Red';
+
+  @override
+  String get bankColorChannelGreenLabel => 'Green';
+
+  @override
+  String get bankColorChannelBlueLabel => 'Blue';
+
+  @override
+  String get bankColorChannelAlphaLabel => 'Opacity';
+
+  @override
+  String get bankColorCodeLabel => 'Color code';
+
+  @override
+  String get bankColorCodeInvalidError =>
+      'Enter a code like #RRGGBB or #AARRGGBB.';
+
+  @override
+  String get bankColorDialogCancelAction => 'Cancel';
+
+  @override
+  String get bankColorDialogApplyAction => 'Done';
+
+  @override
+  String get bankFormSaveAction => 'Save';
+
+  @override
+  String get bankFormDeleteAction => 'Delete';
+
+  @override
+  String get bankFormNameRequiredError => 'Enter a bank name.';
+
+  @override
+  String get bankFormNameDuplicateError =>
+      'A bank with the same name already exists in the catalog.';
+
+  @override
+  String get bankFormColorInvalidError => 'Choose a color from the palette.';
+
+  @override
+  String get bankFormSaveErrorMessage =>
+      'Failed to save the bank. Please try again.';
+
+  @override
+  String get bankFormDeleteErrorMessage =>
+      'Failed to delete the bank. Please try again.';
+
+  @override
+  String get bankFormDeleteDialogTitle => 'Delete the bank?';
+
+  @override
+  String get bankFormDeleteDialogMessage =>
+      'The bank will be deleted from the catalog.';
+
+  @override
+  String bankFormDeleteDialogWithAccountsMessage(int count) {
+    return 'Accounts with this bank: $count. Their bank link will be cleared, balances and operations will not change.';
+  }
+
+  @override
+  String get bankFormDeleteDialogCancelAction => 'Cancel';
+
+  @override
+  String get categoryFormDeleteDialogTitle => 'Delete the category?';
+
+  @override
+  String get categoryFormDeleteDialogMessage =>
+      'The category will be deleted, and its operations will be moved to the base category of the same type. Amounts, accounts and dates will not change.';
+
+  @override
+  String get categoryFormDeleteDialogCancelAction => 'Cancel';
 }

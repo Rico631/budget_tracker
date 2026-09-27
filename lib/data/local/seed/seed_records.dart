@@ -36,9 +36,14 @@ class CategorySeed {
     required this.nameRu,
     required this.nameEn,
     required this.kind,
+    this.isFallback = false,
   });
 
   final String nameRu;
   final String nameEn;
   final TransactionKind kind;
+
+  /// Базовая категория типа [kind]: такая запись помечается признаком при
+  /// создании стартового набора (ADR-0004, решение 4.2).
+  final bool isFallback;
 }

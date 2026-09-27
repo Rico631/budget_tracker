@@ -53,6 +53,7 @@ const List<CategorySeed> categorySeedCatalog = <CategorySeed>[
     nameRu: 'Прочий доход',
     nameEn: 'Other Income',
     kind: TransactionKind.income,
+    isFallback: true,
   ),
   CategorySeed(
     nameRu: 'Продукты',
@@ -179,5 +180,24 @@ const List<CategorySeed> categorySeedCatalog = <CategorySeed>[
     nameRu: 'Прочие расходы',
     nameEn: 'Other Expenses',
     kind: TransactionKind.expense,
+    isFallback: true,
   ),
 ];
+
+/// Запись базовой категории типа [kind] из стартового набора.
+///
+/// Базовая категория гарантирует, что операции удаляемой категории можно
+/// перенести в категорию того же типа (ADR-0004, решения 4.1-4.3).
+CategorySeed fallbackCategorySeed(TransactionKind kind) =>
+    categorySeedCatalog.firstWhere((seed) => seed.isFallback && seed.kind == kind);
+
+/// Наименование базовой категории типа [kind] на языке [languageCode].
+///
+/// Наименование берется из стартового набора, потому что наименования категорий
+/// являются данными (`docs/reference-data/categories.md`), а не строкой
+/// интерфейса. Для локали, отличной от `en`, используется русское наименование:
+/// так же поступает первый запуск при наполнении стартового набора.
+String fallbackCategoryName(TransactionKind kind, String languageCode) {
+  final seed = fallbackCategorySeed(kind);
+  return languageCode.trim().toLowerCase() == 'en' ? seed.nameEn : seed.nameRu;
+}

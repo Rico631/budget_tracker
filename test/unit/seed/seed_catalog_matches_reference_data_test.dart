@@ -129,6 +129,29 @@ void main() {
         hasLength(26),
       );
 
+      // Базовая категория каждого типа помечена признаком (ADR-0004, 4.2).
+      expect(categorySeedCatalog.where((seed) => seed.isFallback), hasLength(2));
+      expect(fallbackCategorySeed(TransactionKind.income).nameRu, 'Прочий доход');
+      expect(fallbackCategorySeed(TransactionKind.income).nameEn, 'Other Income');
+      expect(
+        fallbackCategorySeed(TransactionKind.expense).nameRu,
+        'Прочие расходы',
+      );
+      expect(
+        fallbackCategorySeed(TransactionKind.expense).nameEn,
+        'Other Expenses',
+      );
+      expect(fallbackCategoryName(TransactionKind.income, 'ru'), 'Прочий доход');
+      expect(fallbackCategoryName(TransactionKind.income, 'en'), 'Other Income');
+      expect(
+        fallbackCategoryName(TransactionKind.expense, 'en'),
+        'Other Expenses',
+      );
+      expect(
+        fallbackCategoryName(TransactionKind.expense, 'de'),
+        'Прочие расходы',
+      );
+
       for (var index = 0; index < rows.length; index++) {
         final row = rows[index];
         final seed = categorySeedCatalog[index];
