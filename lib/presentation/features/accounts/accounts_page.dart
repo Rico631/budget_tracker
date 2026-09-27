@@ -113,15 +113,18 @@ class _GroupHeader extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
+      // Код валюты прижат к левому краю строки, итог группы — к правому:
+      // свободное место уходит в единственный промежуток между ними.
       child: Row(
+        spacing: 12,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          Flexible(
             child: Text(
               group.currency?.code ?? group.currencyCode,
               style: theme.textTheme.titleSmall,
             ),
           ),
-          const SizedBox(width: 12),
           Flexible(
             child: FittedBox(
               fit: BoxFit.scaleDown,
@@ -169,27 +172,42 @@ class _AccountTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
+          // Маркер банка с названием счета прижаты к левому краю строки,
+          // остаток — к правому: свободное место уходит в единственный
+          // промежуток между сторонами. Обе стороны сжимаются при нехватке
+          // ширины, поэтому длинное название обрезается, а крупная сумма
+          // уменьшается, не переполняя строку.
+          spacing: 12,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (bank != null) ...[
-              BankAvatar(bank: bank),
-              const SizedBox(width: 12),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Flexible(
+              child: Row(
                 children: [
-                  Text(
-                    account.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium,
+                  if (bank != null) ...[
+                    BankAvatar(bank: bank),
+                    const SizedBox(width: 12),
+                  ],
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          account.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          account.currencyCode,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(account.currencyCode, style: theme.textTheme.bodySmall),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,

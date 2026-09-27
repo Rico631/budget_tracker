@@ -152,6 +152,16 @@ void main() {
 
     expect(find.byType(BankAvatar), findsOneWidget);
     expect(find.text('Б'), findsOneWidget);
+
+    // Маркер банка остается у левого края строки, остаток — у правого.
+    expect(
+      tester.getTopLeft(find.byType(BankAvatar)).dx,
+      moreOrLessEquals(16, epsilon: 1),
+    );
+    expect(
+      tester.getTopRight(find.text('0,00 ₽')).dx,
+      moreOrLessEquals(784, epsilon: 1),
+    );
   });
 
   testWidgets('не показывает маркер банка и пустую подпись для счета без банка', (
@@ -164,6 +174,29 @@ void main() {
     expect(find.text('Без банка'), findsOneWidget);
     expect(find.byType(BankAvatar), findsNothing);
     expect(find.text(''), findsNothing);
+  });
+
+  testWidgets('растягивает данные счета по краям строки', (
+    WidgetTester tester,
+  ) async {
+    await createAccount(name: 'Тестовый счет', initialBalanceMinor: 9200);
+
+    await pumpAccountsPage(tester);
+
+    // Строка списка занимает ширину 800 минус отступ 16 с каждой стороны:
+    // название счета прижато к левому краю, итог группы и остаток — к правому.
+    expect(
+      tester.getTopLeft(find.text('Тестовый счет')).dx,
+      moreOrLessEquals(16, epsilon: 1),
+    );
+    expect(
+      tester.getTopRight(find.text('Итого: 92,00 ₽')).dx,
+      moreOrLessEquals(784, epsilon: 1),
+    );
+    expect(
+      tester.getTopRight(find.text('92,00 ₽')).dx,
+      moreOrLessEquals(784, epsilon: 1),
+    );
   });
 
   testWidgets('не переполняет список при длинном названии и крупной сумме', (
