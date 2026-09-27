@@ -2088,6 +2088,17 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _toAmountMinorMeta = const VerificationMeta(
+    'toAmountMinor',
+  );
+  @override
+  late final GeneratedColumn<int> toAmountMinor = GeneratedColumn<int>(
+    'to_amount_minor',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _occurredAtMeta = const VerificationMeta(
     'occurredAt',
   );
@@ -2142,6 +2153,7 @@ class $TransactionsTable extends Transactions
     categoryId,
     kind,
     amountMinor,
+    toAmountMinor,
     occurredAt,
     note,
     createdAt,
@@ -2214,6 +2226,15 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_amountMinorMeta);
     }
+    if (data.containsKey('to_amount_minor')) {
+      context.handle(
+        _toAmountMinorMeta,
+        toAmountMinor.isAcceptableOrUnknown(
+          data['to_amount_minor']!,
+          _toAmountMinorMeta,
+        ),
+      );
+    }
     if (data.containsKey('occurred_at')) {
       context.handle(
         _occurredAtMeta,
@@ -2275,6 +2296,10 @@ class $TransactionsTable extends Transactions
         DriftSqlType.int,
         data['${effectivePrefix}amount_minor'],
       )!,
+      toAmountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}to_amount_minor'],
+      ),
       occurredAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}occurred_at'],
@@ -2308,6 +2333,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String? categoryId;
   final String kind;
   final int amountMinor;
+
+  /// Сумма зачисления мультивалютного перевода в валюте счета-получателя.
+  ///
+  /// `null` означает доход, расход или перевод между счетами одной валюты:
+  /// в этих случаях зачисление равно сумме списания [amountMinor].
+  final int? toAmountMinor;
   final DateTime occurredAt;
   final String? note;
   final DateTime createdAt;
@@ -2320,6 +2351,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     this.categoryId,
     required this.kind,
     required this.amountMinor,
+    this.toAmountMinor,
     required this.occurredAt,
     this.note,
     required this.createdAt,
@@ -2339,6 +2371,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     }
     map['kind'] = Variable<String>(kind);
     map['amount_minor'] = Variable<int>(amountMinor);
+    if (!nullToAbsent || toAmountMinor != null) {
+      map['to_amount_minor'] = Variable<int>(toAmountMinor);
+    }
     map['occurred_at'] = Variable<DateTime>(occurredAt);
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
@@ -2361,6 +2396,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           : Value(categoryId),
       kind: Value(kind),
       amountMinor: Value(amountMinor),
+      toAmountMinor: toAmountMinor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toAmountMinor),
       occurredAt: Value(occurredAt),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       createdAt: Value(createdAt),
@@ -2381,6 +2419,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       categoryId: serializer.fromJson<String?>(json['categoryId']),
       kind: serializer.fromJson<String>(json['kind']),
       amountMinor: serializer.fromJson<int>(json['amountMinor']),
+      toAmountMinor: serializer.fromJson<int?>(json['toAmountMinor']),
       occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
       note: serializer.fromJson<String?>(json['note']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -2398,6 +2437,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'categoryId': serializer.toJson<String?>(categoryId),
       'kind': serializer.toJson<String>(kind),
       'amountMinor': serializer.toJson<int>(amountMinor),
+      'toAmountMinor': serializer.toJson<int?>(toAmountMinor),
       'occurredAt': serializer.toJson<DateTime>(occurredAt),
       'note': serializer.toJson<String?>(note),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -2413,6 +2453,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     Value<String?> categoryId = const Value.absent(),
     String? kind,
     int? amountMinor,
+    Value<int?> toAmountMinor = const Value.absent(),
     DateTime? occurredAt,
     Value<String?> note = const Value.absent(),
     DateTime? createdAt,
@@ -2425,6 +2466,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     categoryId: categoryId.present ? categoryId.value : this.categoryId,
     kind: kind ?? this.kind,
     amountMinor: amountMinor ?? this.amountMinor,
+    toAmountMinor: toAmountMinor.present
+        ? toAmountMinor.value
+        : this.toAmountMinor,
     occurredAt: occurredAt ?? this.occurredAt,
     note: note.present ? note.value : this.note,
     createdAt: createdAt ?? this.createdAt,
@@ -2445,6 +2489,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       amountMinor: data.amountMinor.present
           ? data.amountMinor.value
           : this.amountMinor,
+      toAmountMinor: data.toAmountMinor.present
+          ? data.toAmountMinor.value
+          : this.toAmountMinor,
       occurredAt: data.occurredAt.present
           ? data.occurredAt.value
           : this.occurredAt,
@@ -2464,6 +2511,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('categoryId: $categoryId, ')
           ..write('kind: $kind, ')
           ..write('amountMinor: $amountMinor, ')
+          ..write('toAmountMinor: $toAmountMinor, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt, ')
@@ -2481,6 +2529,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     categoryId,
     kind,
     amountMinor,
+    toAmountMinor,
     occurredAt,
     note,
     createdAt,
@@ -2497,6 +2546,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.categoryId == this.categoryId &&
           other.kind == this.kind &&
           other.amountMinor == this.amountMinor &&
+          other.toAmountMinor == this.toAmountMinor &&
           other.occurredAt == this.occurredAt &&
           other.note == this.note &&
           other.createdAt == this.createdAt &&
@@ -2511,6 +2561,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String?> categoryId;
   final Value<String> kind;
   final Value<int> amountMinor;
+  final Value<int?> toAmountMinor;
   final Value<DateTime> occurredAt;
   final Value<String?> note;
   final Value<DateTime> createdAt;
@@ -2524,6 +2575,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.categoryId = const Value.absent(),
     this.kind = const Value.absent(),
     this.amountMinor = const Value.absent(),
+    this.toAmountMinor = const Value.absent(),
     this.occurredAt = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2538,6 +2590,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.categoryId = const Value.absent(),
     required String kind,
     required int amountMinor,
+    this.toAmountMinor = const Value.absent(),
     this.occurredAt = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2556,6 +2609,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? categoryId,
     Expression<String>? kind,
     Expression<int>? amountMinor,
+    Expression<int>? toAmountMinor,
     Expression<DateTime>? occurredAt,
     Expression<String>? note,
     Expression<DateTime>? createdAt,
@@ -2570,6 +2624,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (categoryId != null) 'category_id': categoryId,
       if (kind != null) 'kind': kind,
       if (amountMinor != null) 'amount_minor': amountMinor,
+      if (toAmountMinor != null) 'to_amount_minor': toAmountMinor,
       if (occurredAt != null) 'occurred_at': occurredAt,
       if (note != null) 'note': note,
       if (createdAt != null) 'created_at': createdAt,
@@ -2586,6 +2641,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Value<String?>? categoryId,
     Value<String>? kind,
     Value<int>? amountMinor,
+    Value<int?>? toAmountMinor,
     Value<DateTime>? occurredAt,
     Value<String?>? note,
     Value<DateTime>? createdAt,
@@ -2600,6 +2656,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       categoryId: categoryId ?? this.categoryId,
       kind: kind ?? this.kind,
       amountMinor: amountMinor ?? this.amountMinor,
+      toAmountMinor: toAmountMinor ?? this.toAmountMinor,
       occurredAt: occurredAt ?? this.occurredAt,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
@@ -2632,6 +2689,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (amountMinor.present) {
       map['amount_minor'] = Variable<int>(amountMinor.value);
     }
+    if (toAmountMinor.present) {
+      map['to_amount_minor'] = Variable<int>(toAmountMinor.value);
+    }
     if (occurredAt.present) {
       map['occurred_at'] = Variable<DateTime>(occurredAt.value);
     }
@@ -2660,6 +2720,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('categoryId: $categoryId, ')
           ..write('kind: $kind, ')
           ..write('amountMinor: $amountMinor, ')
+          ..write('toAmountMinor: $toAmountMinor, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt, ')
@@ -5263,6 +5324,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       Value<String?> categoryId,
       required String kind,
       required int amountMinor,
+      Value<int?> toAmountMinor,
       Value<DateTime> occurredAt,
       Value<String?> note,
       Value<DateTime> createdAt,
@@ -5278,6 +5340,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<String?> categoryId,
       Value<String> kind,
       Value<int> amountMinor,
+      Value<int?> toAmountMinor,
       Value<DateTime> occurredAt,
       Value<String?> note,
       Value<DateTime> createdAt,
@@ -5379,6 +5442,11 @@ class $$TransactionsTableFilterComposer
 
   ColumnFilters<int> get amountMinor => $composableBuilder(
     column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get toAmountMinor => $composableBuilder(
+    column: $table.toAmountMinor,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5519,6 +5587,11 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get toAmountMinor => $composableBuilder(
+    column: $table.toAmountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get occurredAt => $composableBuilder(
     column: $table.occurredAt,
     builder: (column) => ColumnOrderings(column),
@@ -5649,6 +5722,11 @@ class $$TransactionsTableAnnotationComposer
 
   GeneratedColumn<int> get amountMinor => $composableBuilder(
     column: $table.amountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get toAmountMinor => $composableBuilder(
+    column: $table.toAmountMinor,
     builder: (column) => column,
   );
 
@@ -5799,6 +5877,7 @@ class $$TransactionsTableTableManager
                 Value<String?> categoryId = const Value.absent(),
                 Value<String> kind = const Value.absent(),
                 Value<int> amountMinor = const Value.absent(),
+                Value<int?> toAmountMinor = const Value.absent(),
                 Value<DateTime> occurredAt = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5812,6 +5891,7 @@ class $$TransactionsTableTableManager
                 categoryId: categoryId,
                 kind: kind,
                 amountMinor: amountMinor,
+                toAmountMinor: toAmountMinor,
                 occurredAt: occurredAt,
                 note: note,
                 createdAt: createdAt,
@@ -5827,6 +5907,7 @@ class $$TransactionsTableTableManager
                 Value<String?> categoryId = const Value.absent(),
                 required String kind,
                 required int amountMinor,
+                Value<int?> toAmountMinor = const Value.absent(),
                 Value<DateTime> occurredAt = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5840,6 +5921,7 @@ class $$TransactionsTableTableManager
                 categoryId: categoryId,
                 kind: kind,
                 amountMinor: amountMinor,
+                toAmountMinor: toAmountMinor,
                 occurredAt: occurredAt,
                 note: note,
                 createdAt: createdAt,

@@ -34,3 +34,38 @@ String formatMoneyMinorForLocale(
   final currencyUnit = currencySymbol ?? currencyCode;
   return '${formatter.format(amountMinor / 100)} $currencyUnit';
 }
+
+/// Фактический курс перевода: `1 <валюта источника> = <курс> <валюта получателя>`.
+///
+/// Курс вычисляется доменом (`transferRate`) из двух сумм операции и передается
+/// готовым. Запись `1 USD = 91,5 RUB` не зависит от абсолютных сумм перевода и
+/// читается как привычная запись курса.
+///
+/// **Допущение:** курс показывается с округлением до четырех знаков
+/// (`design.md`, раздел «Правило остатка и вычисление фактического курса»):
+/// четырех знаков достаточно для валютных пар первых версий, а точность денег не
+/// страдает, потому что хранятся обе суммы в минорных единицах, а курс — только
+/// представление.
+String formatTransferRateForLocale(
+  String localeTag,
+  double rate, {
+  required String sourceCurrencyCode,
+  required String targetCurrencyCode,
+}) {
+  final formatter = NumberFormat('#,##0.####', localeTag);
+  return '1 $sourceCurrencyCode = ${formatter.format(rate)} '
+      '$targetCurrencyCode';
+}
+
+/// То же правило форматирования курса без зависимости от виджетов.
+String formatTransferRate(
+  BuildContext context,
+  double rate, {
+  required String sourceCurrencyCode,
+  required String targetCurrencyCode,
+}) => formatTransferRateForLocale(
+  Localizations.localeOf(context).toLanguageTag(),
+  rate,
+  sourceCurrencyCode: sourceCurrencyCode,
+  targetCurrencyCode: targetCurrencyCode,
+);

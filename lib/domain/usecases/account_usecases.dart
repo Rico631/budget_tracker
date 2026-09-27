@@ -9,6 +9,10 @@ import 'package:budget_tracker/domain/services/account_balance_rule.dart';
 const String accountCurrencyChangeRejectedError =
     'currencyCode cannot be changed for an account with transactions.';
 
+/// Код ошибки домена: тип операции не может быть изменен при обновлении.
+const String transactionKindChangeRejectedError =
+    'kind cannot be changed for an existing transaction.';
+
 /// Код ошибки домена: книга счета не совпадает с книгой редактируемого счета.
 const String accountBookMismatchError = 'bookId must match the account book.';
 

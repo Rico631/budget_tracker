@@ -160,4 +160,171 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get firstAccountPromptSkipAction => 'Skip';
+
+  @override
+  String get transactionsTitle => 'Operations';
+
+  @override
+  String get transactionsAddTransactionTooltip => 'Add operation';
+
+  @override
+  String get transactionsEmptyTitle => 'No operations yet';
+
+  @override
+  String get transactionsEmptyMessage =>
+      'Add your first operation to fill the book history.';
+
+  @override
+  String get transactionsEmptyAction => 'Add operation';
+
+  @override
+  String get transactionsLoadErrorMessage =>
+      'Failed to load the operation history. Please try again.';
+
+  @override
+  String get transactionsRetryAction => 'Retry';
+
+  @override
+  String get transactionsEditAction => 'Edit';
+
+  @override
+  String get transactionsDeleteAction => 'Delete';
+
+  @override
+  String get transactionsDeleteDialogTitle => 'Delete the operation?';
+
+  @override
+  String get transactionsDeleteDialogMessage =>
+      'Deletion is irreversible: the operation disappears from the history and the account balances are recalculated.';
+
+  @override
+  String get transactionsDeleteDialogCancelAction => 'Cancel';
+
+  @override
+  String get transactionsDeleteErrorMessage =>
+      'Failed to delete the operation. Please try again.';
+
+  @override
+  String get transactionsCreatedMessage => 'Operation added.';
+
+  @override
+  String get transactionsUpdatedMessage => 'Operation changes saved.';
+
+  @override
+  String get transactionsDeletedMessage => 'Operation deleted.';
+
+  @override
+  String get transactionKindIncomeLabel => 'Income';
+
+  @override
+  String get transactionKindExpenseLabel => 'Expense';
+
+  @override
+  String get transactionKindTransferLabel => 'Transfer';
+
+  @override
+  String get transactionFormCreateTitle => 'New operation';
+
+  @override
+  String get transactionFormEditTitle => 'Edit operation';
+
+  @override
+  String get transactionFormKindLabel => 'Operation kind';
+
+  @override
+  String get transactionFormAccountLabel => 'Account';
+
+  @override
+  String get transactionFormToAccountLabel => 'Destination account';
+
+  @override
+  String get transactionFormAmountLabel => 'Amount';
+
+  @override
+  String get transactionFormToAmountLabel => 'Destination amount';
+
+  @override
+  String get transactionFormCategoryLabel => 'Category';
+
+  @override
+  String get transactionFormDateLabel => 'Date';
+
+  @override
+  String get transactionFormNoteLabel => 'Note';
+
+  @override
+  String get transactionFormRateLabel => 'Effective rate';
+
+  @override
+  String get transactionFormSaveAction => 'Save';
+
+  @override
+  String get accountPickerTitle => 'Choose account';
+
+  @override
+  String get accountPickerSearchHint => 'Search account';
+
+  @override
+  String get accountPickerEmptyMessage => 'No accounts match the query.';
+
+  @override
+  String get accountPickerLoadErrorMessage =>
+      'Failed to load the accounts. Please try again.';
+
+  @override
+  String get categoryPickerTitle => 'Choose category';
+
+  @override
+  String get categoryPickerSearchHint => 'Search category';
+
+  @override
+  String get categoryPickerEmptyMessage => 'No categories match the query.';
+
+  @override
+  String get categoryPickerLoadErrorMessage =>
+      'Failed to load the categories. Please try again.';
+
+  @override
+  String get transactionFormAccountRequiredError =>
+      'Choose the operation account.';
+
+  @override
+  String get transactionFormToAccountRequiredError =>
+      'Choose the transfer destination account.';
+
+  @override
+  String get transactionFormSameAccountError =>
+      'The transfer accounts must differ.';
+
+  @override
+  String get transactionFormAmountRequiredError =>
+      'Enter the operation amount.';
+
+  @override
+  String get transactionFormAmountInvalidError =>
+      'Enter a valid amount, for example 1,234.56.';
+
+  @override
+  String get transactionFormToAmountRequiredError =>
+      'Enter the transfer destination amount.';
+
+  @override
+  String get transactionFormToAmountInvalidError =>
+      'Enter a valid destination amount.';
+
+  @override
+  String get transactionFormToAmountNotAllowedError =>
+      'A transfer between accounts of the same currency has no separate destination amount.';
+
+  @override
+  String get transactionFormCategoryRequiredError =>
+      'Choose the operation category.';
+
+  @override
+  String get transactionFormKindChangeRejectedError =>
+      'The operation kind cannot change. Delete the operation and create a new one.';
+
+  @override
+  String get transactionFormSaveErrorMessage =>
+      'Failed to save the operation. Please try again.';
 }

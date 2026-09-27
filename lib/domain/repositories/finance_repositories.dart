@@ -70,10 +70,21 @@ abstract interface class TransactionsRepository {
     required DateTime occurredAt,
     String? toAccountId,
     String? categoryId,
+    int? toAmountMinor,
     String? note,
   });
+
+  /// Операции книги в порядке от новых к старым: по дате операции, затем по
+  /// дате создания и идентификатору по убыванию.
+  ///
+  /// Дополнительные ключи сортировки делают порядок операций внутри одного дня
+  /// детерминированным и стабильным между перезапусками приложения.
   Future<List<FinanceTransaction>> listByBook(String bookId);
+
   Future<FinanceTransaction?> getById(String id);
+
+  /// Сохраняет операцию, сохраняя ее идентификатор и дату создания.
   Future<void> update(FinanceTransaction transaction);
+
   Future<void> delete(String id);
 }

@@ -73,6 +73,13 @@ class Transactions extends Table {
   TextColumn get categoryId => text().nullable().references(Categories, #id)();
   TextColumn get kind => text()();
   IntColumn get amountMinor => integer()();
+
+  /// Сумма зачисления мультивалютного перевода в валюте счета-получателя.
+  ///
+  /// `null` означает доход, расход или перевод между счетами одной валюты:
+  /// в этих случаях зачисление равно сумме списания [amountMinor].
+  IntColumn get toAmountMinor => integer().nullable()();
+
   DateTimeColumn get occurredAt => dateTime().withDefault(currentDateAndTime)();
   TextColumn get note => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -120,7 +127,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -144,6 +151,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.createTable(currencies);
         await m.createTable(appSettings);
+      }
+      if (from >= 2 && from < 4) {
+        // Версия 1 создает таблицу операций по текущей схеме, то есть уже с
+        // колонкой суммы зачисления, поэтому она добавляется только базам
+        // версий 2 и 3.
+        await m.addColumn(transactions, transactions.toAmountMinor);
       }
     },
   );

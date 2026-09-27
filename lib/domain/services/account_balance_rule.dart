@@ -4,8 +4,11 @@ import 'package:budget_tracker/domain/models/finance_models.dart';
 ///
 /// Правило: начальный остаток плюс влияние операций по этому счету.
 /// Доход увеличивает остаток, расход уменьшает его, перевод уменьшает остаток
-/// счета-источника и увеличивает остаток целевого счета на ту же сумму.
-/// Начальный остаток не создает операцию дохода и не учитывается как доход.
+/// счета-источника на сумму списания и увеличивает остаток целевого счета на
+/// сумму зачисления (`toAmountMinor ?? amountMinor`): у перевода между счетами
+/// одной валюты отдельная сумма зачисления не задается, поэтому зачисляется
+/// сумма списания. Начальный остаток не создает операцию дохода и не
+/// учитывается как доход.
 int accountBalanceMinor(
   FinanceAccount account,
   Iterable<FinanceTransaction> transactions,
@@ -21,7 +24,7 @@ int accountBalanceMinor(
     }
     if (transaction.kind == TransactionKind.transfer &&
         transaction.toAccountId == account.id) {
-      balance += transaction.amountMinor;
+      balance += transaction.toAmountMinor ?? transaction.amountMinor;
     }
   }
   return balance;

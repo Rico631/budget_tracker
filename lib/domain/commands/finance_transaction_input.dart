@@ -1,6 +1,15 @@
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 
+/// Код ошибки домена: сумма зачисления задана для операции, которой она не
+/// положена (доход или расход).
+const String transactionToAmountNotAllowedError =
+    'toAmountMinor must be empty.';
+
+/// Код ошибки домена: заданная сумма зачисления неположительна.
+const String transactionToAmountNotPositiveError =
+    'toAmountMinor must be positive.';
+
 class FinanceTransactionInput {
   const FinanceTransactionInput._({
     required this.bookId,
@@ -9,6 +18,7 @@ class FinanceTransactionInput {
     required this.amountMinor,
     this.toAccountId,
     this.categoryId,
+    this.toAmountMinor,
     this.note,
   });
 
@@ -19,6 +29,7 @@ class FinanceTransactionInput {
     required int amountMinor,
     String? toAccountId,
     String? categoryId,
+    int? toAmountMinor,
     String? note,
   }) {
     bookId = bookId.trim();
@@ -48,6 +59,9 @@ class FinanceTransactionInput {
         if (categoryId == null) {
           errors.add('categoryId is required.');
         }
+        if (toAmountMinor != null) {
+          errors.add(transactionToAmountNotAllowedError);
+        }
       case TransactionKind.transfer:
         if (accountId.isEmpty) {
           errors.add('accountId is required.');
@@ -59,6 +73,9 @@ class FinanceTransactionInput {
         }
         if (categoryId != null) {
           errors.add('categoryId must be empty.');
+        }
+        if (toAmountMinor != null && toAmountMinor <= 0) {
+          errors.add(transactionToAmountNotPositiveError);
         }
     }
 
@@ -74,6 +91,7 @@ class FinanceTransactionInput {
         amountMinor: amountMinor,
         toAccountId: toAccountId,
         categoryId: categoryId,
+        toAmountMinor: toAmountMinor,
         note: note,
       ),
     );
@@ -85,6 +103,10 @@ class FinanceTransactionInput {
   final String? categoryId;
   final TransactionKind kind;
   final int amountMinor;
+
+  /// Сумма зачисления мультивалютного перевода; для остальных операций `null`.
+  final int? toAmountMinor;
+
   final String? note;
 
   static String? _trimToNull(String? value) {

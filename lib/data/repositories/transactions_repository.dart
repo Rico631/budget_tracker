@@ -21,6 +21,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
     required DateTime occurredAt,
     String? toAccountId,
     String? categoryId,
+    int? toAmountMinor,
     String? note,
   }) async {
     final now = DateTime.now();
@@ -32,6 +33,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
       categoryId: categoryId,
       kind: kind,
       amountMinor: amountMinor,
+      toAmountMinor: toAmountMinor,
       occurredAt: occurredAt,
       note: note,
       createdAt: now,
@@ -45,11 +47,20 @@ class DriftTransactionsRepository implements TransactionsRepository {
     return transaction;
   }
 
+  /// Читает операции книги от новых к старым.
+  ///
+  /// Порядок задается в SQL по индексированной колонке [Transactions.occurredAt]
+  /// с дополнительными ключами `createdAt` и `id` по убыванию: без них порядок
+  /// операций внутри одного дня не детерминирован.
   @override
   Future<List<FinanceTransaction>> listByBook(String bookId) async {
     final query = database.select(database.transactions)
       ..where((transaction) => transaction.bookId.equals(bookId))
-      ..orderBy([(transaction) => OrderingTerm.asc(transaction.occurredAt)]);
+      ..orderBy([
+        (transaction) => OrderingTerm.desc(transaction.occurredAt),
+        (transaction) => OrderingTerm.desc(transaction.createdAt),
+        (transaction) => OrderingTerm.desc(transaction.id),
+      ]);
     return (await query.get()).map((row) => row.toDomain()).toList();
   }
 

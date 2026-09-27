@@ -184,5 +184,205 @@
   "firstAccountPromptSkipAction": "Пропустить",
   "@firstAccountPromptSkipAction": {
     "description": "Действие пропуска предложения первого счета"
+  },
+  "transactionsTitle": "Операции",
+  "@transactionsTitle": {
+    "description": "Заголовок раздела операций"
+  },
+  "transactionsAddTransactionTooltip": "Добавить операцию",
+  "@transactionsAddTransactionTooltip": {
+    "description": "Подсказка действия добавления операции"
+  },
+  "transactionsEmptyTitle": "Операций пока нет",
+  "@transactionsEmptyTitle": {
+    "description": "Заголовок пустой истории операций"
+  },
+  "transactionsEmptyMessage": "Добавьте первую операцию, чтобы история книги начала заполняться.",
+  "@transactionsEmptyMessage": {
+    "description": "Приглашение добавить первую операцию"
+  },
+  "transactionsEmptyAction": "Добавить операцию",
+  "@transactionsEmptyAction": {
+    "description": "Действие перехода к созданию операции"
+  },
+  "transactionsLoadErrorMessage": "Не удалось загрузить историю операций. Попробуйте еще раз.",
+  "@transactionsLoadErrorMessage": {
+    "description": "Сообщение ошибки загрузки истории операций"
+  },
+  "transactionsRetryAction": "Повторить",
+  "@transactionsRetryAction": {
+    "description": "Действие повторной загрузки истории операций"
+  },
+  "transactionsEditAction": "Редактировать",
+  "@transactionsEditAction": {
+    "description": "Действие открытия формы редактирования операции"
+  },
+  "transactionsDeleteAction": "Удалить",
+  "@transactionsDeleteAction": {
+    "description": "Действие удаления операции"
+  },
+  "transactionsDeleteDialogTitle": "Удалить операцию?",
+  "@transactionsDeleteDialogTitle": {
+    "description": "Заголовок подтверждения удаления операции"
+  },
+  "transactionsDeleteDialogMessage": "Удаление необратимо: операция исчезнет из истории, а остатки счетов пересчитаются.",
+  "@transactionsDeleteDialogMessage": {
+    "description": "Текст подтверждения удаления операции"
+  },
+  "transactionsDeleteDialogCancelAction": "Отмена",
+  "@transactionsDeleteDialogCancelAction": {
+    "description": "Действие отказа от удаления операции"
+  },
+  "transactionsDeleteErrorMessage": "Не удалось удалить операцию. Попробуйте еще раз.",
+  "@transactionsDeleteErrorMessage": {
+    "description": "Сообщение ошибки удаления операции"
+  },
+  "transactionsCreatedMessage": "Операция добавлена.",
+  "@transactionsCreatedMessage": {
+    "description": "Подтверждение успешного создания операции"
+  },
+  "transactionsUpdatedMessage": "Изменения операции сохранены.",
+  "@transactionsUpdatedMessage": {
+    "description": "Подтверждение успешного изменения операции"
+  },
+  "transactionsDeletedMessage": "Операция удалена.",
+  "@transactionsDeletedMessage": {
+    "description": "Подтверждение успешного удаления операции"
+  },
+  "transactionKindIncomeLabel": "Доход",
+  "@transactionKindIncomeLabel": {
+    "description": "Подпись типа операции «доход»"
+  },
+  "transactionKindExpenseLabel": "Расход",
+  "@transactionKindExpenseLabel": {
+    "description": "Подпись типа операции «расход»"
+  },
+  "transactionKindTransferLabel": "Перевод",
+  "@transactionKindTransferLabel": {
+    "description": "Подпись типа операции «перевод»"
+  },
+  "transactionFormCreateTitle": "Новая операция",
+  "@transactionFormCreateTitle": {
+    "description": "Заголовок формы создания операции"
+  },
+  "transactionFormEditTitle": "Операция",
+  "@transactionFormEditTitle": {
+    "description": "Заголовок формы редактирования операции"
+  },
+  "transactionFormKindLabel": "Тип операции",
+  "@transactionFormKindLabel": {
+    "description": "Подпись шага выбора типа операции"
+  },
+  "transactionFormAccountLabel": "Счет",
+  "@transactionFormAccountLabel": {
+    "description": "Подпись поля счета операции"
+  },
+  "transactionFormToAccountLabel": "Счет-получатель",
+  "@transactionFormToAccountLabel": {
+    "description": "Подпись поля счета-получателя перевода"
+  },
+  "transactionFormAmountLabel": "Сумма",
+  "@transactionFormAmountLabel": {
+    "description": "Подпись поля суммы операции"
+  },
+  "transactionFormToAmountLabel": "Сумма зачисления",
+  "@transactionFormToAmountLabel": {
+    "description": "Подпись поля суммы зачисления перевода"
+  },
+  "transactionFormCategoryLabel": "Категория",
+  "@transactionFormCategoryLabel": {
+    "description": "Подпись поля категории операции"
+  },
+  "transactionFormDateLabel": "Дата",
+  "@transactionFormDateLabel": {
+    "description": "Подпись поля даты операции"
+  },
+  "transactionFormNoteLabel": "Заметка",
+  "@transactionFormNoteLabel": {
+    "description": "Подпись необязательного поля заметки операции"
+  },
+  "transactionFormRateLabel": "Фактический курс",
+  "@transactionFormRateLabel": {
+    "description": "Подпись вычисленного курса мультивалютного перевода"
+  },
+  "transactionFormSaveAction": "Сохранить",
+  "@transactionFormSaveAction": {
+    "description": "Действие сохранения операции"
+  },
+  "accountPickerTitle": "Выбор счета",
+  "@accountPickerTitle": {
+    "description": "Заголовок шторки выбора счета операции"
+  },
+  "accountPickerSearchHint": "Поиск счета",
+  "@accountPickerSearchHint": {
+    "description": "Подсказка поля поиска счетов"
+  },
+  "accountPickerEmptyMessage": "Нет счетов, подходящих под запрос.",
+  "@accountPickerEmptyMessage": {
+    "description": "Сообщение пустого результата поиска счетов"
+  },
+  "accountPickerLoadErrorMessage": "Не удалось загрузить список счетов. Попробуйте еще раз.",
+  "@accountPickerLoadErrorMessage": {
+    "description": "Сообщение ошибки загрузки списка счетов"
+  },
+  "categoryPickerTitle": "Выбор категории",
+  "@categoryPickerTitle": {
+    "description": "Заголовок шторки выбора категории операции"
+  },
+  "categoryPickerSearchHint": "Поиск категории",
+  "@categoryPickerSearchHint": {
+    "description": "Подсказка поля поиска категорий"
+  },
+  "categoryPickerEmptyMessage": "Нет категорий, подходящих под запрос.",
+  "@categoryPickerEmptyMessage": {
+    "description": "Сообщение пустого результата поиска категорий"
+  },
+  "categoryPickerLoadErrorMessage": "Не удалось загрузить список категорий. Попробуйте еще раз.",
+  "@categoryPickerLoadErrorMessage": {
+    "description": "Сообщение ошибки загрузки списка категорий"
+  },
+  "transactionFormAccountRequiredError": "Выберите счет операции.",
+  "@transactionFormAccountRequiredError": {
+    "description": "Ошибка валидации отсутствующего счета операции"
+  },
+  "transactionFormToAccountRequiredError": "Выберите счет-получатель перевода.",
+  "@transactionFormToAccountRequiredError": {
+    "description": "Ошибка валидации отсутствующего счета-получателя"
+  },
+  "transactionFormSameAccountError": "Счета перевода должны различаться.",
+  "@transactionFormSameAccountError": {
+    "description": "Ошибка валидации совпадающих счетов перевода"
+  },
+  "transactionFormAmountRequiredError": "Введите сумму операции.",
+  "@transactionFormAmountRequiredError": {
+    "description": "Ошибка валидации пустой суммы операции"
+  },
+  "transactionFormAmountInvalidError": "Введите корректную сумму, например 1 234,56.",
+  "@transactionFormAmountInvalidError": {
+    "description": "Ошибка разбора введенной суммы операции"
+  },
+  "transactionFormToAmountRequiredError": "Введите сумму зачисления перевода.",
+  "@transactionFormToAmountRequiredError": {
+    "description": "Ошибка валидации отсутствующей суммы зачисления"
+  },
+  "transactionFormToAmountInvalidError": "Введите корректную сумму зачисления.",
+  "@transactionFormToAmountInvalidError": {
+    "description": "Ошибка разбора введенной суммы зачисления"
+  },
+  "transactionFormToAmountNotAllowedError": "Для перевода между счетами одной валюты сумма зачисления не задается.",
+  "@transactionFormToAmountNotAllowedError": {
+    "description": "Ошибка валидации суммы зачисления для перевода одной валюты"
+  },
+  "transactionFormCategoryRequiredError": "Выберите категорию операции.",
+  "@transactionFormCategoryRequiredError": {
+    "description": "Ошибка валидации отсутствующей категории операции"
+  },
+  "transactionFormKindChangeRejectedError": "Тип операции нельзя изменить. Удалите операцию и создайте новую.",
+  "@transactionFormKindChangeRejectedError": {
+    "description": "Отказ в изменении типа операции"
+  },
+  "transactionFormSaveErrorMessage": "Не удалось сохранить операцию. Попробуйте еще раз.",
+  "@transactionFormSaveErrorMessage": {
+    "description": "Сообщение ошибки сохранения операции"
   }
 }

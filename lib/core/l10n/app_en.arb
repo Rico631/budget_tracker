@@ -184,5 +184,205 @@
   "firstAccountPromptSkipAction": "Skip",
   "@firstAccountPromptSkipAction": {
     "description": "Action skipping the first account suggestion"
+  },
+  "transactionsTitle": "Operations",
+  "@transactionsTitle": {
+    "description": "Title of the operations section"
+  },
+  "transactionsAddTransactionTooltip": "Add operation",
+  "@transactionsAddTransactionTooltip": {
+    "description": "Tooltip of the add operation action"
+  },
+  "transactionsEmptyTitle": "No operations yet",
+  "@transactionsEmptyTitle": {
+    "description": "Title of the empty operations journal"
+  },
+  "transactionsEmptyMessage": "Add your first operation to fill the book history.",
+  "@transactionsEmptyMessage": {
+    "description": "Invitation to add the first operation"
+  },
+  "transactionsEmptyAction": "Add operation",
+  "@transactionsEmptyAction": {
+    "description": "Action leading to operation creation"
+  },
+  "transactionsLoadErrorMessage": "Failed to load the operation history. Please try again.",
+  "@transactionsLoadErrorMessage": {
+    "description": "Error message of the journal loading"
+  },
+  "transactionsRetryAction": "Retry",
+  "@transactionsRetryAction": {
+    "description": "Action reloading the journal"
+  },
+  "transactionsEditAction": "Edit",
+  "@transactionsEditAction": {
+    "description": "Action opening the operation editing form"
+  },
+  "transactionsDeleteAction": "Delete",
+  "@transactionsDeleteAction": {
+    "description": "Action deleting the operation"
+  },
+  "transactionsDeleteDialogTitle": "Delete the operation?",
+  "@transactionsDeleteDialogTitle": {
+    "description": "Title of the operation deletion confirmation"
+  },
+  "transactionsDeleteDialogMessage": "Deletion is irreversible: the operation disappears from the history and the account balances are recalculated.",
+  "@transactionsDeleteDialogMessage": {
+    "description": "Message of the operation deletion confirmation"
+  },
+  "transactionsDeleteDialogCancelAction": "Cancel",
+  "@transactionsDeleteDialogCancelAction": {
+    "description": "Action declining the operation deletion"
+  },
+  "transactionsDeleteErrorMessage": "Failed to delete the operation. Please try again.",
+  "@transactionsDeleteErrorMessage": {
+    "description": "Error message of the operation deletion"
+  },
+  "transactionsCreatedMessage": "Operation added.",
+  "@transactionsCreatedMessage": {
+    "description": "Confirmation after a successful operation creation"
+  },
+  "transactionsUpdatedMessage": "Operation changes saved.",
+  "@transactionsUpdatedMessage": {
+    "description": "Confirmation after a successful operation update"
+  },
+  "transactionsDeletedMessage": "Operation deleted.",
+  "@transactionsDeletedMessage": {
+    "description": "Confirmation after a successful operation deletion"
+  },
+  "transactionKindIncomeLabel": "Income",
+  "@transactionKindIncomeLabel": {
+    "description": "Label of the income operation kind"
+  },
+  "transactionKindExpenseLabel": "Expense",
+  "@transactionKindExpenseLabel": {
+    "description": "Label of the expense operation kind"
+  },
+  "transactionKindTransferLabel": "Transfer",
+  "@transactionKindTransferLabel": {
+    "description": "Label of the transfer operation kind"
+  },
+  "transactionFormCreateTitle": "New operation",
+  "@transactionFormCreateTitle": {
+    "description": "Title of the operation creation form"
+  },
+  "transactionFormEditTitle": "Edit operation",
+  "@transactionFormEditTitle": {
+    "description": "Title of the operation editing form"
+  },
+  "transactionFormKindLabel": "Operation kind",
+  "@transactionFormKindLabel": {
+    "description": "Label of the operation kind step"
+  },
+  "transactionFormAccountLabel": "Account",
+  "@transactionFormAccountLabel": {
+    "description": "Label of the operation account field"
+  },
+  "transactionFormToAccountLabel": "Destination account",
+  "@transactionFormToAccountLabel": {
+    "description": "Label of the transfer destination account field"
+  },
+  "transactionFormAmountLabel": "Amount",
+  "@transactionFormAmountLabel": {
+    "description": "Label of the operation amount field"
+  },
+  "transactionFormToAmountLabel": "Destination amount",
+  "@transactionFormToAmountLabel": {
+    "description": "Label of the transfer destination amount field"
+  },
+  "transactionFormCategoryLabel": "Category",
+  "@transactionFormCategoryLabel": {
+    "description": "Label of the operation category field"
+  },
+  "transactionFormDateLabel": "Date",
+  "@transactionFormDateLabel": {
+    "description": "Label of the operation date field"
+  },
+  "transactionFormNoteLabel": "Note",
+  "@transactionFormNoteLabel": {
+    "description": "Label of the optional operation note field"
+  },
+  "transactionFormRateLabel": "Effective rate",
+  "@transactionFormRateLabel": {
+    "description": "Label of the computed cross-currency transfer rate"
+  },
+  "transactionFormSaveAction": "Save",
+  "@transactionFormSaveAction": {
+    "description": "Action saving the operation"
+  },
+  "accountPickerTitle": "Choose account",
+  "@accountPickerTitle": {
+    "description": "Title of the operation account picker"
+  },
+  "accountPickerSearchHint": "Search account",
+  "@accountPickerSearchHint": {
+    "description": "Hint of the account search field"
+  },
+  "accountPickerEmptyMessage": "No accounts match the query.",
+  "@accountPickerEmptyMessage": {
+    "description": "Message of the empty account search result"
+  },
+  "accountPickerLoadErrorMessage": "Failed to load the accounts. Please try again.",
+  "@accountPickerLoadErrorMessage": {
+    "description": "Error message of the account list loading"
+  },
+  "categoryPickerTitle": "Choose category",
+  "@categoryPickerTitle": {
+    "description": "Title of the operation category picker"
+  },
+  "categoryPickerSearchHint": "Search category",
+  "@categoryPickerSearchHint": {
+    "description": "Hint of the category search field"
+  },
+  "categoryPickerEmptyMessage": "No categories match the query.",
+  "@categoryPickerEmptyMessage": {
+    "description": "Message of the empty category search result"
+  },
+  "categoryPickerLoadErrorMessage": "Failed to load the categories. Please try again.",
+  "@categoryPickerLoadErrorMessage": {
+    "description": "Error message of the category list loading"
+  },
+  "transactionFormAccountRequiredError": "Choose the operation account.",
+  "@transactionFormAccountRequiredError": {
+    "description": "Validation error of the missing operation account"
+  },
+  "transactionFormToAccountRequiredError": "Choose the transfer destination account.",
+  "@transactionFormToAccountRequiredError": {
+    "description": "Validation error of the missing destination account"
+  },
+  "transactionFormSameAccountError": "The transfer accounts must differ.",
+  "@transactionFormSameAccountError": {
+    "description": "Validation error of the same transfer accounts"
+  },
+  "transactionFormAmountRequiredError": "Enter the operation amount.",
+  "@transactionFormAmountRequiredError": {
+    "description": "Validation error of the empty operation amount"
+  },
+  "transactionFormAmountInvalidError": "Enter a valid amount, for example 1,234.56.",
+  "@transactionFormAmountInvalidError": {
+    "description": "Parsing error of the entered operation amount"
+  },
+  "transactionFormToAmountRequiredError": "Enter the transfer destination amount.",
+  "@transactionFormToAmountRequiredError": {
+    "description": "Validation error of the missing transfer destination amount"
+  },
+  "transactionFormToAmountInvalidError": "Enter a valid destination amount.",
+  "@transactionFormToAmountInvalidError": {
+    "description": "Parsing error of the entered destination amount"
+  },
+  "transactionFormToAmountNotAllowedError": "A transfer between accounts of the same currency has no separate destination amount.",
+  "@transactionFormToAmountNotAllowedError": {
+    "description": "Validation error of the destination amount on a same-currency transfer"
+  },
+  "transactionFormCategoryRequiredError": "Choose the operation category.",
+  "@transactionFormCategoryRequiredError": {
+    "description": "Validation error of the missing operation category"
+  },
+  "transactionFormKindChangeRejectedError": "The operation kind cannot change. Delete the operation and create a new one.",
+  "@transactionFormKindChangeRejectedError": {
+    "description": "Rejection of the operation kind change"
+  },
+  "transactionFormSaveErrorMessage": "Failed to save the operation. Please try again.",
+  "@transactionFormSaveErrorMessage": {
+    "description": "Error message of the operation saving"
   }
 }

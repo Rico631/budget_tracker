@@ -379,6 +379,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get firstAccountPromptSkipAction;
+
+  /// Title of the operations section
+  ///
+  /// In en, this message translates to:
+  /// **'Operations'**
+  String get transactionsTitle;
+
+  /// Tooltip of the add operation action
+  ///
+  /// In en, this message translates to:
+  /// **'Add operation'**
+  String get transactionsAddTransactionTooltip;
+
+  /// Title of the empty operations journal
+  ///
+  /// In en, this message translates to:
+  /// **'No operations yet'**
+  String get transactionsEmptyTitle;
+
+  /// Invitation to add the first operation
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first operation to fill the book history.'**
+  String get transactionsEmptyMessage;
+
+  /// Action leading to operation creation
+  ///
+  /// In en, this message translates to:
+  /// **'Add operation'**
+  String get transactionsEmptyAction;
+
+  /// Error message of the journal loading
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the operation history. Please try again.'**
+  String get transactionsLoadErrorMessage;
+
+  /// Action reloading the journal
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get transactionsRetryAction;
+
+  /// Action opening the operation editing form
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get transactionsEditAction;
+
+  /// Action deleting the operation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get transactionsDeleteAction;
+
+  /// Title of the operation deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the operation?'**
+  String get transactionsDeleteDialogTitle;
+
+  /// Message of the operation deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Deletion is irreversible: the operation disappears from the history and the account balances are recalculated.'**
+  String get transactionsDeleteDialogMessage;
+
+  /// Action declining the operation deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get transactionsDeleteDialogCancelAction;
+
+  /// Error message of the operation deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the operation. Please try again.'**
+  String get transactionsDeleteErrorMessage;
+
+  /// Confirmation after a successful operation creation
+  ///
+  /// In en, this message translates to:
+  /// **'Operation added.'**
+  String get transactionsCreatedMessage;
+
+  /// Confirmation after a successful operation update
+  ///
+  /// In en, this message translates to:
+  /// **'Operation changes saved.'**
+  String get transactionsUpdatedMessage;
+
+  /// Confirmation after a successful operation deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Operation deleted.'**
+  String get transactionsDeletedMessage;
+
+  /// Label of the income operation kind
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get transactionKindIncomeLabel;
+
+  /// Label of the expense operation kind
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get transactionKindExpenseLabel;
+
+  /// Label of the transfer operation kind
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get transactionKindTransferLabel;
+
+  /// Title of the operation creation form
+  ///
+  /// In en, this message translates to:
+  /// **'New operation'**
+  String get transactionFormCreateTitle;
+
+  /// Title of the operation editing form
+  ///
+  /// In en, this message translates to:
+  /// **'Edit operation'**
+  String get transactionFormEditTitle;
+
+  /// Label of the operation kind step
+  ///
+  /// In en, this message translates to:
+  /// **'Operation kind'**
+  String get transactionFormKindLabel;
+
+  /// Label of the operation account field
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get transactionFormAccountLabel;
+
+  /// Label of the transfer destination account field
+  ///
+  /// In en, this message translates to:
+  /// **'Destination account'**
+  String get transactionFormToAccountLabel;
+
+  /// Label of the operation amount field
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get transactionFormAmountLabel;
+
+  /// Label of the transfer destination amount field
+  ///
+  /// In en, this message translates to:
+  /// **'Destination amount'**
+  String get transactionFormToAmountLabel;
+
+  /// Label of the operation category field
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get transactionFormCategoryLabel;
+
+  /// Label of the operation date field
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get transactionFormDateLabel;
+
+  /// Label of the optional operation note field
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get transactionFormNoteLabel;
+
+  /// Label of the computed cross-currency transfer rate
+  ///
+  /// In en, this message translates to:
+  /// **'Effective rate'**
+  String get transactionFormRateLabel;
+
+  /// Action saving the operation
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get transactionFormSaveAction;
+
+  /// Title of the operation account picker
+  ///
+  /// In en, this message translates to:
+  /// **'Choose account'**
+  String get accountPickerTitle;
+
+  /// Hint of the account search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search account'**
+  String get accountPickerSearchHint;
+
+  /// Message of the empty account search result
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts match the query.'**
+  String get accountPickerEmptyMessage;
+
+  /// Error message of the account list loading
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the accounts. Please try again.'**
+  String get accountPickerLoadErrorMessage;
+
+  /// Title of the operation category picker
+  ///
+  /// In en, this message translates to:
+  /// **'Choose category'**
+  String get categoryPickerTitle;
+
+  /// Hint of the category search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search category'**
+  String get categoryPickerSearchHint;
+
+  /// Message of the empty category search result
+  ///
+  /// In en, this message translates to:
+  /// **'No categories match the query.'**
+  String get categoryPickerEmptyMessage;
+
+  /// Error message of the category list loading
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the categories. Please try again.'**
+  String get categoryPickerLoadErrorMessage;
+
+  /// Validation error of the missing operation account
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the operation account.'**
+  String get transactionFormAccountRequiredError;
+
+  /// Validation error of the missing destination account
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the transfer destination account.'**
+  String get transactionFormToAccountRequiredError;
+
+  /// Validation error of the same transfer accounts
+  ///
+  /// In en, this message translates to:
+  /// **'The transfer accounts must differ.'**
+  String get transactionFormSameAccountError;
+
+  /// Validation error of the empty operation amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the operation amount.'**
+  String get transactionFormAmountRequiredError;
+
+  /// Parsing error of the entered operation amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount, for example 1,234.56.'**
+  String get transactionFormAmountInvalidError;
+
+  /// Validation error of the missing transfer destination amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the transfer destination amount.'**
+  String get transactionFormToAmountRequiredError;
+
+  /// Parsing error of the entered destination amount
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid destination amount.'**
+  String get transactionFormToAmountInvalidError;
+
+  /// Validation error of the destination amount on a same-currency transfer
+  ///
+  /// In en, this message translates to:
+  /// **'A transfer between accounts of the same currency has no separate destination amount.'**
+  String get transactionFormToAmountNotAllowedError;
+
+  /// Validation error of the missing operation category
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the operation category.'**
+  String get transactionFormCategoryRequiredError;
+
+  /// Rejection of the operation kind change
+  ///
+  /// In en, this message translates to:
+  /// **'The operation kind cannot change. Delete the operation and create a new one.'**
+  String get transactionFormKindChangeRejectedError;
+
+  /// Error message of the operation saving
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save the operation. Please try again.'**
+  String get transactionFormSaveErrorMessage;
 }
 
 class _AppLocalizationsDelegate

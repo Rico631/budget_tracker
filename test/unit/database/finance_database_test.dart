@@ -70,6 +70,87 @@ const List<String> _version2Schema = <String>[
   ''',
 ];
 
+/// Схема версии 3: без колонки суммы зачисления в таблице операций.
+const List<String> _version3Schema = <String>[
+  '''
+  CREATE TABLE books (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE banks (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    display_name TEXT,
+    display_details TEXT,
+    color_hex TEXT,
+    icon_domain TEXT,
+    is_preset INTEGER NOT NULL DEFAULT 0,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE accounts (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    bank_id TEXT REFERENCES banks (id),
+    name TEXT NOT NULL,
+    currency_code TEXT NOT NULL,
+    initial_balance_minor INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE categories (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    parent_id TEXT REFERENCES categories (id),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    is_archived INTEGER NOT NULL DEFAULT 0
+  )
+  ''',
+  '''
+  CREATE TABLE transactions (
+    id TEXT NOT NULL PRIMARY KEY,
+    book_id TEXT NOT NULL REFERENCES books (id),
+    account_id TEXT NOT NULL REFERENCES accounts (id),
+    to_account_id TEXT REFERENCES accounts (id),
+    category_id TEXT REFERENCES categories (id),
+    kind TEXT NOT NULL,
+    amount_minor INTEGER NOT NULL,
+    occurred_at INTEGER NOT NULL,
+    note TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )
+  ''',
+  '''
+  CREATE TABLE currencies (
+    code TEXT NOT NULL PRIMARY KEY,
+    numeric_code TEXT NOT NULL,
+    symbol TEXT,
+    name_ru TEXT NOT NULL,
+    name_en TEXT NOT NULL
+  )
+  ''',
+  '''
+  CREATE TABLE app_settings (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )
+  ''',
+];
+
 void main() {
   group('Finance database schema', () {
     test('creates finance tables and required indexes in memory', () async {
@@ -103,7 +184,7 @@ void main() {
       expect(indexes, isNotEmpty);
     });
 
-    test('upgrades an existing version 1 database to version 3', () async {
+    test('upgrades an existing version 1 database to version 4', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -128,10 +209,10 @@ void main() {
           .get();
 
       expect(tables, hasLength(7));
-      expect(database.schemaVersion, 3);
+      expect(database.schemaVersion, 4);
     });
 
-    test('upgrades an existing version 2 database to version 3', () async {
+    test('upgrades an existing version 2 database to version 4', () async {
       final directory = await Directory.systemTemp.createTemp(
         'budget_tracker_',
       );
@@ -155,7 +236,7 @@ void main() {
         await directory.delete(recursive: true);
       });
 
-      expect(database.schemaVersion, 3);
+      expect(database.schemaVersion, 4);
 
       final tables = await database
           .customSelect(
@@ -180,6 +261,15 @@ void main() {
         containsAll(<String>['color_hex', 'icon_domain', 'is_preset']),
       );
 
+      final transactionColumns = await database
+          .customSelect('PRAGMA table_info(transactions)')
+          .get();
+
+      expect(
+        transactionColumns.map((row) => row.data['name']),
+        contains('to_amount_minor'),
+      );
+
       final banks = await database.select(database.banks).get();
 
       expect(banks, hasLength(1));
@@ -188,6 +278,57 @@ void main() {
       expect(banks.single.colorHex, isNull);
       expect(banks.single.iconDomain, isNull);
       expect(banks.single.isPreset, isFalse);
+    });
+
+    test('upgrades an existing version 3 database to version 4', () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'budget_tracker_',
+      );
+      final file = File.fromUri(directory.uri.resolve('finance.sqlite'));
+      final database = AppDatabase.forTesting(
+        NativeDatabase(
+          file,
+          setup: (connection) {
+            for (final statement in _version3Schema) {
+              connection.execute(statement);
+            }
+            connection.execute(
+              "INSERT INTO books (id, name, created_at, updated_at, is_archived) VALUES ('book-1', 'Personal', 1, 1, 0)",
+            );
+            connection.execute(
+              "INSERT INTO accounts (id, book_id, bank_id, name, currency_code, initial_balance_minor, created_at, updated_at, is_archived) VALUES ('account-1', 'book-1', NULL, 'Wallet', 'RUB', 1000, 1, 1, 0)",
+            );
+            connection.execute(
+              "INSERT INTO categories (id, book_id, name, kind, parent_id, created_at, updated_at, is_archived) VALUES ('category-1', 'book-1', 'Food', 'expense', NULL, 1, 1, 0)",
+            );
+            connection.execute(
+              "INSERT INTO transactions (id, book_id, account_id, to_account_id, category_id, kind, amount_minor, occurred_at, note, created_at, updated_at) VALUES ('transaction-1', 'book-1', 'account-1', NULL, 'category-1', 'expense', 250, 1000, NULL, 1, 1)",
+            );
+            connection.execute('PRAGMA user_version = 3');
+          },
+        ),
+      );
+      addTearDown(() async {
+        await database.close();
+        await directory.delete(recursive: true);
+      });
+
+      expect(database.schemaVersion, 4);
+
+      final books = await database.select(database.books).get();
+      final accounts = await database.select(database.accounts).get();
+      final categories = await database.select(database.categories).get();
+      final transactions = await database.select(database.transactions).get();
+
+      expect(books.single.id, 'book-1');
+      expect(accounts.single.id, 'account-1');
+      expect(accounts.single.initialBalanceMinor, 1000);
+      expect(categories.single.id, 'category-1');
+      expect(categories.single.kind, 'expense');
+      expect(transactions, hasLength(1));
+      expect(transactions.single.id, 'transaction-1');
+      expect(transactions.single.amountMinor, 250);
+      expect(transactions.single.toAmountMinor, isNull);
     });
   });
 

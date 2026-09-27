@@ -3,6 +3,18 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/services/account_balance_rule.dart';
+import 'package:budget_tracker/domain/services/transactions_journal_rule.dart';
+import 'package:budget_tracker/domain/usecases/account_usecases.dart';
+
+/// Код ошибки домена: для перевода между счетами разных валют обязательна сумма
+/// зачисления.
+const String transferToAmountRequiredError =
+    'toAmountMinor is required when transfer accounts use different currencies.';
+
+/// Код ошибки домена: перевод между счетами одной валюты не задает сумму
+/// зачисления отдельно.
+const String transferToAmountNotAllowedError =
+    'toAmountMinor is not allowed when transfer accounts use the same currency.';
 
 class FinanceTransactionUseCases {
   FinanceTransactionUseCases({
@@ -32,16 +44,25 @@ class FinanceTransactionUseCases {
       occurredAt: occurredAt,
       toAccountId: input.toAccountId,
       categoryId: input.categoryId,
+      toAmountMinor: input.toAmountMinor,
       note: input.note,
     );
     return ValidationResult.valid(created);
   }
 
+  /// Сохраняет сумму, счета, категорию, дату и заметку операции.
+  ///
+  /// Тип операции неизменяем: попытка сохранить операцию с другим типом
+  /// отклоняется с [transactionKindChangeRejectedError] без записи в базу.
   Future<ValidationResult<FinanceTransaction>> update(
     FinanceTransaction existing,
     FinanceTransactionInput input, {
     required DateTime occurredAt,
   }) async {
+    if (input.kind != existing.kind) {
+      return ValidationResult.invalid([transactionKindChangeRejectedError]);
+    }
+
     final validation = await _validateInput(input);
     if (validation case Invalid(errors: final errors)) {
       return ValidationResult.invalid(errors);
@@ -55,6 +76,7 @@ class FinanceTransactionUseCases {
       categoryId: input.categoryId,
       kind: input.kind,
       amountMinor: input.amountMinor,
+      toAmountMinor: input.toAmountMinor,
       occurredAt: occurredAt,
       note: input.note,
       createdAt: existing.createdAt,
@@ -64,7 +86,14 @@ class FinanceTransactionUseCases {
     return ValidationResult.valid(updated);
   }
 
+  /// Безвозвратно удаляет операцию: ее влияние на остатки исчезает.
   Future<void> delete(String id) => transactions.delete(id);
+
+  /// Журнал операций книги: операции читаются один раз и группируются по дням.
+  Future<TransactionsJournal> loadJournal(String bookId) async {
+    final bookTransactions = await transactions.listByBook(bookId);
+    return groupJournalByDay(bookTransactions);
+  }
 
   Future<int> calculateAccountBalance(String accountId) async {
     final account = await accounts.getById(accountId);
@@ -119,10 +148,13 @@ class FinanceTransactionUseCases {
       if (targetAccount == null || targetAccount.bookId != input.bookId) {
         return ValidationResult.invalid(['toAccountId must belong to bookId.']);
       }
-      if (targetAccount.currencyCode != sourceAccount.currencyCode) {
-        return ValidationResult.invalid([
-          'Transfer accounts must use the same currency.',
-        ]);
+      final isCrossCurrency =
+          targetAccount.currencyCode != sourceAccount.currencyCode;
+      if (isCrossCurrency && input.toAmountMinor == null) {
+        return ValidationResult.invalid([transferToAmountRequiredError]);
+      }
+      if (!isCrossCurrency && input.toAmountMinor != null) {
+        return ValidationResult.invalid([transferToAmountNotAllowedError]);
       }
     }
 

@@ -2,6 +2,8 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/core/router/app_destination.dart';
 import 'package:budget_tracker/presentation/features/accounts/account_form_page.dart';
 import 'package:budget_tracker/presentation/features/accounts/accounts_page.dart';
+import 'package:budget_tracker/presentation/features/transactions/transaction_form_page.dart';
+import 'package:budget_tracker/presentation/features/transactions/transactions_page.dart';
 import 'package:budget_tracker/presentation/shared/empty_states/section_in_development_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,9 +25,10 @@ final activeDestinationProvider =
 /// Навигационная оболочка приложения: плоская навигация из четырех разделов и
 /// содержимое активного раздела.
 ///
-/// Действие добавления показывается только на разделе «Счета»: пользователь
-/// вводит операции и счета там, а на «Аналитике», «Настройках» и на разделах
-/// без содержимого действие добавления отсутствует.
+/// Действие добавления операции показывается на разделах «Счета» и «Операции»,
+/// действие добавления счета — только на «Счетах», а на «Аналитике» и
+/// «Настройках» действий добавления нет. Правило видимости задается одним
+/// предикатом, чтобы оболочка не расходилась с местом размещения действий.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key});
 
@@ -36,13 +39,9 @@ class AppShell extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          destination == AppDestination.accounts
-              ? localizations.accountsTitle
-              : appDestinationLabel(localizations, destination),
-        ),
+        title: Text(_titleFor(localizations, destination)),
         actions: [
-          if (destination == AppDestination.accounts)
+          if (showsAddAccountAction(destination))
             IconButton(
               onPressed: () => AccountFormPage.open(context),
               tooltip: localizations.accountsAddAccountTooltip,
@@ -52,10 +51,17 @@ class AppShell extends ConsumerWidget {
       ),
       body: switch (destination) {
         AppDestination.accounts => const AccountsPage(),
-        AppDestination.operations ||
+        AppDestination.operations => const TransactionsPage(),
         AppDestination.analytics ||
         AppDestination.settings => const SectionInDevelopmentPage(),
       },
+      floatingActionButton: showsAddTransactionAction(destination)
+          ? FloatingActionButton.large(
+              onPressed: () => TransactionFormPage.open(context),
+              tooltip: localizations.transactionsAddTransactionTooltip,
+              child: const Icon(Icons.add),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: destination.index,
         onDestinationSelected: (index) => ref
@@ -72,4 +78,30 @@ class AppShell extends ConsumerWidget {
       ),
     );
   }
+
+  String _titleFor(AppLocalizations localizations, AppDestination destination) =>
+      switch (destination) {
+        AppDestination.accounts => localizations.accountsTitle,
+        AppDestination.operations => localizations.transactionsTitle,
+        AppDestination.analytics ||
+        AppDestination.settings => appDestinationLabel(
+          localizations,
+          destination,
+        ),
+      };
 }
+
+/// Доступно ли на разделе действие добавления операции.
+///
+/// Операция вводится на разделах «Счета» и «Операции»: «Счета» показывают
+/// остатки, которые меняют операции, а «Операции» — историю этих операций.
+bool showsAddTransactionAction(AppDestination destination) =>
+    destination == AppDestination.accounts ||
+    destination == AppDestination.operations;
+
+/// Доступно ли на разделе действие добавления счета.
+///
+/// Счет добавляется только на «Счетах»: на «Операциях» история показывает уже
+/// созданные счета.
+bool showsAddAccountAction(AppDestination destination) =>
+    destination == AppDestination.accounts;

@@ -65,4 +65,49 @@ void main() {
       '0,00 ₽',
     );
   });
+
+  test('курс округляется до четырех знаков', () {
+    expect(
+      formatTransferRateForLocale(
+        'ru',
+        9.1523456,
+        sourceCurrencyCode: 'USD',
+        targetCurrencyCode: 'RUB',
+      ),
+      '1 USD = 9,1523 RUB',
+    );
+    expect(
+      formatTransferRateForLocale(
+        'ru',
+        91.5,
+        sourceCurrencyCode: 'USD',
+        targetCurrencyCode: 'RUB',
+      ),
+      '1 USD = 91,5 RUB',
+    );
+  });
+
+  test('большое отношение не теряет целую часть', () {
+    expect(
+      formatTransferRateForLocale(
+        'ru',
+        1830.4567,
+        sourceCurrencyCode: 'USD',
+        targetCurrencyCode: 'KZT',
+      ),
+      '1 USD = 1\u00A0830,4567 KZT',
+    );
+  });
+
+  test('разделители курса соответствуют локали', () {
+    expect(
+      formatTransferRateForLocale(
+        'en',
+        1523.4567,
+        sourceCurrencyCode: 'USD',
+        targetCurrencyCode: 'KZT',
+      ),
+      '1 USD = 1,523.4567 KZT',
+    );
+  });
 }

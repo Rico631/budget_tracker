@@ -22,6 +22,7 @@ void main() {
     required TransactionKind kind,
     required int amountMinor,
     String? toAccountId,
+    int? toAmountMinor,
   }) => FinanceTransaction(
     id: id,
     bookId: 'book',
@@ -29,6 +30,7 @@ void main() {
     toAccountId: toAccountId,
     kind: kind,
     amountMinor: amountMinor,
+    toAmountMinor: toAmountMinor,
     occurredAt: createdAt,
     createdAt: createdAt,
     updatedAt: createdAt,
@@ -89,6 +91,49 @@ void main() {
     expect(
       accountBalanceMinor(account('target', initialBalanceMinor: 200), transactions),
       500,
+    );
+  });
+
+  test('перевод одной валюты без суммы зачисления зачисляется по сумме списания', () {
+    final transactions = [
+      transaction(
+        id: 'transfer',
+        accountId: 'source',
+        toAccountId: 'target',
+        kind: TransactionKind.transfer,
+        amountMinor: 300,
+      ),
+    ];
+
+    expect(
+      accountBalanceMinor(account('source', initialBalanceMinor: 1000), transactions),
+      700,
+    );
+    expect(
+      accountBalanceMinor(account('target', initialBalanceMinor: 200), transactions),
+      500,
+    );
+  });
+
+  test('перевод разных валют: списание по своей сумме, зачисление по своей', () {
+    final transactions = [
+      transaction(
+        id: 'transfer',
+        accountId: 'dollars',
+        toAccountId: 'rubles',
+        kind: TransactionKind.transfer,
+        amountMinor: 10000,
+        toAmountMinor: 915000,
+      ),
+    ];
+
+    expect(
+      accountBalanceMinor(account('dollars', initialBalanceMinor: 50000), transactions),
+      40000,
+    );
+    expect(
+      accountBalanceMinor(account('rubles', initialBalanceMinor: 1000), transactions),
+      916000,
     );
   });
 

@@ -57,6 +57,52 @@ void main() {
     expect((await categories.getById(category.id))!.parentId, isNull);
     expect((await transactions.getById(transaction.id))!.toAccountId, isNull);
     expect((await transactions.getById(transaction.id))!.note, isNull);
+    expect(
+      (await transactions.getById(transaction.id))!.toAmountMinor,
+      isNull,
+    );
+  });
+
+  test('keeps the destination amount of a cross-currency transfer', () async {
+    final book = await books.create(name: 'Cross currency');
+    final source = await accounts.create(
+      bookId: book.id,
+      name: 'Dollars',
+      currencyCode: 'USD',
+      initialBalanceMinor: 0,
+    );
+    final target = await accounts.create(
+      bookId: book.id,
+      name: 'Rubles',
+      currencyCode: 'RUB',
+      initialBalanceMinor: 0,
+    );
+
+    final stored = await database
+        .into(database.transactions)
+        .insertReturning(
+          transactionToCompanion(
+            FinanceTransaction(
+              id: '018f8d2e-3f2d-7e2a-9b3a-9e6c2c3b7d8b',
+              bookId: book.id,
+              accountId: source.id,
+              toAccountId: target.id,
+              kind: TransactionKind.transfer,
+              amountMinor: 10000,
+              toAmountMinor: 915000,
+              occurredAt: DateTime(2026, 9, 24),
+              createdAt: DateTime(2026, 9, 24),
+              updatedAt: DateTime(2026, 9, 24),
+            ),
+          ),
+        );
+
+    final domain = stored.toDomain();
+
+    expect(domain.kind, TransactionKind.transfer);
+    expect(domain.amountMinor, 10000);
+    expect(domain.toAmountMinor, 915000);
+    expect(domain.bookId, book.id);
   });
 
   test('round-trips preset bank fields and currency catalog rows', () async {

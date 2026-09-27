@@ -112,6 +112,7 @@ class FinanceTransaction {
     required this.updatedAt,
     this.toAccountId,
     this.categoryId,
+    this.toAmountMinor,
     this.note,
   });
 
@@ -121,7 +122,18 @@ class FinanceTransaction {
   final String? toAccountId;
   final String? categoryId;
   final TransactionKind kind;
+
+  /// Сумма списания в валюте счета [accountId].
   final int amountMinor;
+
+  /// Сумма зачисления в валюте счета [toAccountId].
+  ///
+  /// Задается только у перевода между счетами разных валют. У дохода, расхода
+  /// и перевода между счетами одной валюты равна `null`, а зачисление считается
+  /// равным [amountMinor]. Курс перевода не хранится: он вычисляется из двух
+  /// сумм.
+  final int? toAmountMinor;
+
   final DateTime occurredAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -170,4 +182,31 @@ class AccountsOverview {
 
   /// В книге есть хотя бы один активный счет.
   bool get hasActiveAccounts => !isEmpty;
+}
+
+/// Операции одного дня журнала.
+///
+/// Днем считается календарная дата операции без времени: по ней же строится
+/// заголовок группы в истории.
+class JournalDayGroup {
+  JournalDayGroup({required this.day, required this.transactions});
+
+  /// Календарный день без времени.
+  final DateTime day;
+
+  /// Операции этого дня в порядке от новых к старым.
+  final List<FinanceTransaction> transactions;
+}
+
+/// Журнал операций книги: группы дней в порядке от нового дня к старому.
+class TransactionsJournal {
+  TransactionsJournal({required this.days});
+
+  final List<JournalDayGroup> days;
+
+  /// В книге нет ни одной операции.
+  bool get isEmpty => days.every((group) => group.transactions.isEmpty);
+
+  /// В книге есть хотя бы одна операция.
+  bool get hasTransactions => !isEmpty;
 }

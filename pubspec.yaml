@@ -35,6 +35,14 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.3
+
+  # flutter_slidable: действия строки истории операций («Редактировать» и
+  # «Удалить») доступны свайпом и не занимают места в самой строке, а жест
+  # привычен для Android. `Dismissible` из ядра Flutter такого поведения не
+  # дает, а собственная реализация жеста и анимации без необходимости увеличивает
+  # объем кода и тестов (обоснование — раздел «Действия над операцией» в
+  # openspec/changes/2026-09-26-add-transactions-and-transfers/design.md).
+  flutter_slidable: 4.0.3
   intl: ^0.20.3
   path_provider: ^2.1.5
 

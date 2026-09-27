@@ -3,6 +3,7 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/presentation/features/accounts/account_form_page.dart';
 import 'package:budget_tracker/presentation/features/accounts/widgets/bank_avatar.dart';
+import 'package:budget_tracker/presentation/features/transactions/transactions_page.dart';
 import 'package:budget_tracker/presentation/providers/accounts_controller.dart';
 import 'package:budget_tracker/presentation/shared/utils/money_formatter.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,14 @@ class _AccountsGroupsView extends ConsumerWidget {
     final banksById = {for (final bank in banks) bank.id: bank};
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      // Нижний отступ с запасом под крупную кнопку добавления операции, чтобы
+      // последний счет не перекрывался кнопкой.
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        16,
+        16,
+        16 + transactionsListBottomPadding,
+      ),
       children: [
         for (final group in overview.groups) ...[
           _GroupHeader(group: group),
