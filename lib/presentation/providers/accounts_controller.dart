@@ -5,6 +5,7 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
 import 'package:budget_tracker/presentation/providers/finance_transaction_controller.dart';
+import 'package:budget_tracker/presentation/providers/transactions_journal_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Активные счета книги с текущими остатками и итогами по валютам.
@@ -50,8 +51,10 @@ final firstAccountPromptDismissedProvider =
 
 /// Создание, изменение, архивирование и удаление счетов.
 ///
-/// После успешной мутации обзор книги инвалидируется, поэтому список счетов,
-/// итоги по валютам и признак наличия активных счетов пересчитываются.
+/// После успешной мутации обзор книги, список счетов книги и выбор счета
+/// инвалидируются, поэтому список счетов, итоги по валютам, признак наличия
+/// активных счетов, история и аналитика пересчитываются без перезапуска
+/// приложения.
 class AccountsController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
@@ -70,7 +73,7 @@ class AccountsController extends AsyncNotifier<void> {
       switch (result) {
         case Valid(value: final account):
           state = const AsyncData(null);
-          _invalidateOverview(account.bookId);
+          _invalidateAccounts(account.bookId);
         case Invalid(errors: final errors):
           state = AsyncError(
             FinanceValidationException(errors),
@@ -93,7 +96,7 @@ class AccountsController extends AsyncNotifier<void> {
           .deleteOrArchive(accountId);
       state = const AsyncData(null);
       if (outcome != AccountRemovalOutcome.archivingRequired) {
-        _invalidateOverview(bookId);
+        _invalidateAccounts(bookId);
       }
       return outcome;
     } catch (error, stackTrace) {
@@ -108,16 +111,23 @@ class AccountsController extends AsyncNotifier<void> {
     try {
       await ref.read(accountUseCasesProvider).archive(accountId);
       state = const AsyncData(null);
-      _invalidateOverview(bookId);
+      _invalidateAccounts(bookId);
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
       rethrow;
     }
   }
 
-  void _invalidateOverview(String bookId) {
+  void _invalidateAccounts(String bookId) {
     ref.invalidate(accountsOverviewProvider(bookId));
     ref.invalidate(hasActiveAccountsProvider);
+    // Список счетов книги и выбор счета читаются отдельно от обзора. Без их
+    // инвалидации новый, измененный или архивированный счет не попадает в
+    // историю, в фильтр аналитики и в выбор счета до перезапуска приложения, а
+    // операции нового счета выпадают из среза: правило среза исключает операции
+    // без найденного счета.
+    ref.invalidate(bookAccountsProvider(bookId));
+    ref.invalidate(activeBookAccountsProvider(bookId));
   }
 }
 

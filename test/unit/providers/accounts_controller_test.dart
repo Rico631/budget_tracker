@@ -6,6 +6,7 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
 import 'package:budget_tracker/presentation/providers/accounts_controller.dart';
+import 'package:budget_tracker/presentation/providers/transactions_journal_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -86,6 +87,58 @@ void main() {
       expect(
         (await container.read(accountsOverviewProvider(book.id).future)).groups,
         isEmpty,
+      );
+    },
+  );
+
+  test(
+    'обновляет список счетов книги и выбор счета после создания счета',
+    () async {
+      final database = AppDatabase.forTesting();
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
+      addTearDown(() async {
+        container.dispose();
+        await database.close();
+      });
+
+      const request = (languageCode: 'ru', defaultBookName: 'Личная книга');
+      await container.read(firstRunBootstrapProvider(request).future);
+      final book = (await container.read(activeBookProvider.future))!;
+
+      // Первое чтение книги: счетов еще нет, поэтому списки кешируются пустыми.
+      expect(await container.read(bookAccountsProvider(book.id).future), isEmpty);
+      expect(
+        await container.read(activeBookAccountsProvider(book.id).future),
+        isEmpty,
+      );
+
+      await container
+          .read(accountsControllerProvider.notifier)
+          .save(
+            FinanceAccountInput.tryCreate(
+              bookId: book.id,
+              name: 'Долларовый',
+              currencyCode: 'USD',
+              initialBalanceMinor: 0,
+            ).valueOrFail(),
+          );
+
+      // Список счетов книги и выбор счета читаются историей, аналитикой, фильтром
+      // аналитики и формой операции: новый счет должен попадать в них сразу, иначе
+      // его операции выпадают из среза аналитики.
+      expect(
+        (await container.read(bookAccountsProvider(book.id).future)).map(
+          (account) => account.currencyCode,
+        ),
+        ['USD'],
+      );
+      expect(
+        (await container.read(activeBookAccountsProvider(book.id).future)).map(
+          (account) => account.currencyCode,
+        ),
+        ['USD'],
       );
     },
   );
