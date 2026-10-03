@@ -51,8 +51,8 @@ lib/
   [ADR-0001](docs/adr/0001-budget-tracker-concept-and-ux.md).
 - Справочные данные (банки, категории, валюты) —
   [docs/reference-data/](docs/reference-data/).
-- План рефакторинга, приведший к текущей структуре, —
-  [docs/architecture-refactoring-plan.md](docs/architecture-refactoring-plan.md).
+- Фактическое состояние архитектуры (C4) —
+  [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md).
 
 ## Разработка
 

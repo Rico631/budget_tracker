@@ -3,7 +3,7 @@
 - **Статус:** Accepted
 - **Дата:** 2026-10-03
 - **Область:** архитектура, структура кода, организация слоев
-- **Связанные артефакты:** `docs/architecture-refactoring-plan.md`, `README.md`
+- **Связанные артефакты:** `docs/architecture/ARCHITECTURE.md` (актуальное состояние), `docs/adr/0008-c4-architecture-documentation.md`, `README.md`; исторический план `docs/architecture-refactoring-plan.md` заменен и удален (см. ADR-0008)
 
 ## Контекст
 
