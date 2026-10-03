@@ -96,7 +96,10 @@ abstract interface class CategoriesRepository {
   /// Переносит операции категории [categoryId] на базовую категорию
   /// [fallbackCategoryId] и удаляет категорию одной транзакцией: частично
   /// измененное состояние не сохраняется (ADR-0004, решение 4.1).
-  Future<void> deleteWithReassignment(String categoryId, String fallbackCategoryId);
+  Future<void> deleteWithReassignment(
+    String categoryId,
+    String fallbackCategoryId,
+  );
 
   Future<void> delete(String id);
 }

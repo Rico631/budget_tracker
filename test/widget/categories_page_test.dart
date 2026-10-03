@@ -1,13 +1,13 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
-import 'package:budget_tracker/presentation/features/settings/categories_page.dart';
-import 'package:budget_tracker/presentation/features/settings/category_form_page.dart';
+import 'package:budget_tracker/ui/features/settings/views/categories_page.dart';
+import 'package:budget_tracker/ui/features/settings/views/category_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

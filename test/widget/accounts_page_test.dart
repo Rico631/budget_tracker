@@ -1,13 +1,13 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-import 'package:budget_tracker/presentation/features/accounts/accounts_page.dart';
-import 'package:budget_tracker/presentation/features/accounts/widgets/bank_avatar.dart';
+import 'package:budget_tracker/ui/features/accounts/views/accounts_page.dart';
+import 'package:budget_tracker/ui/features/accounts/widgets/bank_avatar.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -164,17 +164,18 @@ void main() {
     );
   });
 
-  testWidgets('не показывает маркер банка и пустую подпись для счета без банка', (
-    WidgetTester tester,
-  ) async {
-    await createAccount(name: 'Без банка', initialBalanceMinor: 100);
+  testWidgets(
+    'не показывает маркер банка и пустую подпись для счета без банка',
+    (WidgetTester tester) async {
+      await createAccount(name: 'Без банка', initialBalanceMinor: 100);
 
-    await pumpAccountsPage(tester);
+      await pumpAccountsPage(tester);
 
-    expect(find.text('Без банка'), findsOneWidget);
-    expect(find.byType(BankAvatar), findsNothing);
-    expect(find.text(''), findsNothing);
-  });
+      expect(find.text('Без банка'), findsOneWidget);
+      expect(find.byType(BankAvatar), findsNothing);
+      expect(find.text(''), findsNothing);
+    },
+  );
 
   testWidgets('растягивает данные счета по краям строки', (
     WidgetTester tester,

@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -9,8 +9,8 @@ import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
-import 'package:budget_tracker/presentation/features/analytics/analytics_page.dart';
-import 'package:budget_tracker/presentation/features/analytics/category_operations_page.dart';
+import 'package:budget_tracker/ui/features/analytics/views/analytics_page.dart';
+import 'package:budget_tracker/ui/features/analytics/views/category_operations_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -216,7 +216,10 @@ void main() {
     expect(find.text('-20,00 \$'), findsNothing);
     // Действий добавления операции и счета в подэкране нет.
     expect(find.byType(FloatingActionButton), findsNothing);
-    expect(find.widgetWithText(FilledButton, 'Добавить операцию'), findsNothing);
+    expect(
+      find.widgetWithText(FilledButton, 'Добавить операцию'),
+      findsNothing,
+    );
     expect(find.byIcon(Icons.add), findsNothing);
   });
 

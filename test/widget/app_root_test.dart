@@ -8,7 +8,7 @@ import 'package:budget_tracker/domain/models/database_registry_models.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/first_run_bootstrap_repository.dart';
-import 'package:budget_tracker/presentation/features/bootstrap/app_root.dart';
+import 'package:budget_tracker/ui/features/bootstrap/views/app_root.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

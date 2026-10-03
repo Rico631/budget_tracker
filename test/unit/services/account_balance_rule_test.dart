@@ -68,91 +68,127 @@ void main() {
     ];
 
     expect(
-      accountBalanceMinor(account('account', initialBalanceMinor: 1000), transactions),
+      accountBalanceMinor(
+        account('account', initialBalanceMinor: 1000),
+        transactions,
+      ),
       1350,
     );
   });
 
-  test('перевод уменьшает остаток источника и увеличивает остаток получателя', () {
-    final transactions = [
-      transaction(
-        id: 'transfer',
-        accountId: 'source',
-        toAccountId: 'target',
-        kind: TransactionKind.transfer,
-        amountMinor: 300,
-      ),
-    ];
+  test(
+    'перевод уменьшает остаток источника и увеличивает остаток получателя',
+    () {
+      final transactions = [
+        transaction(
+          id: 'transfer',
+          accountId: 'source',
+          toAccountId: 'target',
+          kind: TransactionKind.transfer,
+          amountMinor: 300,
+        ),
+      ];
 
-    expect(
-      accountBalanceMinor(account('source', initialBalanceMinor: 1000), transactions),
-      700,
-    );
-    expect(
-      accountBalanceMinor(account('target', initialBalanceMinor: 200), transactions),
-      500,
-    );
-  });
+      expect(
+        accountBalanceMinor(
+          account('source', initialBalanceMinor: 1000),
+          transactions,
+        ),
+        700,
+      );
+      expect(
+        accountBalanceMinor(
+          account('target', initialBalanceMinor: 200),
+          transactions,
+        ),
+        500,
+      );
+    },
+  );
 
-  test('перевод одной валюты без суммы зачисления зачисляется по сумме списания', () {
-    final transactions = [
-      transaction(
-        id: 'transfer',
-        accountId: 'source',
-        toAccountId: 'target',
-        kind: TransactionKind.transfer,
-        amountMinor: 300,
-      ),
-    ];
+  test(
+    'перевод одной валюты без суммы зачисления зачисляется по сумме списания',
+    () {
+      final transactions = [
+        transaction(
+          id: 'transfer',
+          accountId: 'source',
+          toAccountId: 'target',
+          kind: TransactionKind.transfer,
+          amountMinor: 300,
+        ),
+      ];
 
-    expect(
-      accountBalanceMinor(account('source', initialBalanceMinor: 1000), transactions),
-      700,
-    );
-    expect(
-      accountBalanceMinor(account('target', initialBalanceMinor: 200), transactions),
-      500,
-    );
-  });
+      expect(
+        accountBalanceMinor(
+          account('source', initialBalanceMinor: 1000),
+          transactions,
+        ),
+        700,
+      );
+      expect(
+        accountBalanceMinor(
+          account('target', initialBalanceMinor: 200),
+          transactions,
+        ),
+        500,
+      );
+    },
+  );
 
-  test('перевод разных валют: списание по своей сумме, зачисление по своей', () {
-    final transactions = [
-      transaction(
-        id: 'transfer',
-        accountId: 'dollars',
-        toAccountId: 'rubles',
-        kind: TransactionKind.transfer,
-        amountMinor: 10000,
-        toAmountMinor: 915000,
-      ),
-    ];
+  test(
+    'перевод разных валют: списание по своей сумме, зачисление по своей',
+    () {
+      final transactions = [
+        transaction(
+          id: 'transfer',
+          accountId: 'dollars',
+          toAccountId: 'rubles',
+          kind: TransactionKind.transfer,
+          amountMinor: 10000,
+          toAmountMinor: 915000,
+        ),
+      ];
 
-    expect(
-      accountBalanceMinor(account('dollars', initialBalanceMinor: 50000), transactions),
-      40000,
-    );
-    expect(
-      accountBalanceMinor(account('rubles', initialBalanceMinor: 1000), transactions),
-      916000,
-    );
-  });
+      expect(
+        accountBalanceMinor(
+          account('dollars', initialBalanceMinor: 50000),
+          transactions,
+        ),
+        40000,
+      );
+      expect(
+        accountBalanceMinor(
+          account('rubles', initialBalanceMinor: 1000),
+          transactions,
+        ),
+        916000,
+      );
+    },
+  );
 
   test('нулевой и отрицательный остаток возвращаются явно', () {
-    expect(accountBalanceMinor(account('zero', initialBalanceMinor: 400), [
-      transaction(
-        id: 'expense',
-        accountId: 'zero',
-        kind: TransactionKind.expense,
-        amountMinor: 400,
-      ),
-    ]), 0);
-    expect(accountBalanceMinor(account('negative', initialBalanceMinor: 100), [
-      transaction(
-        id: 'expense',
-        accountId: 'negative',
-        kind: TransactionKind.expense,
-        amountMinor: 600,
-      ),
-    ]), -500);
+    expect(
+      accountBalanceMinor(account('zero', initialBalanceMinor: 400), [
+        transaction(
+          id: 'expense',
+          accountId: 'zero',
+          kind: TransactionKind.expense,
+          amountMinor: 400,
+        ),
+      ]),
+      0,
+    );
+    expect(
+      accountBalanceMinor(account('negative', initialBalanceMinor: 100), [
+        transaction(
+          id: 'expense',
+          accountId: 'negative',
+          kind: TransactionKind.expense,
+          amountMinor: 600,
+        ),
+      ]),
+      -500,
+    );
   });
 }

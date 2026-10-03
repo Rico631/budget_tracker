@@ -76,7 +76,9 @@ void main() {
       source: DatabaseSource.imported,
     );
 
-    final switched = await registry.setActive(FileDatabaseRegistry.originalEntryId);
+    final switched = await registry.setActive(
+      FileDatabaseRegistry.originalEntryId,
+    );
 
     expect(switched.activeEntry.fileName, 'budget_tracker.sqlite');
     expect(persistedActiveId(), FileDatabaseRegistry.originalEntryId);

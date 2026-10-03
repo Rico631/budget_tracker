@@ -1,7 +1,7 @@
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-import 'package:budget_tracker/presentation/features/accounts/widgets/bank_picker_sheet.dart';
+import 'package:budget_tracker/ui/features/accounts/widgets/bank_picker_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

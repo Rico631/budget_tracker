@@ -1,7 +1,7 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/router/app_shell.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/router/app_shell.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -14,7 +14,7 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
-import 'package:budget_tracker/presentation/features/transactions/transaction_form_page.dart';
+import 'package:budget_tracker/ui/features/transactions/views/transaction_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -168,9 +168,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('выбор типа операции первым шагом', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('выбор типа операции первым шагом', (WidgetTester tester) async {
     await createAccount(name: 'Рубли');
 
     await pumpForm(tester);
@@ -244,10 +242,7 @@ void main() {
     await tester.tap(find.byKey(transactionFormSaveButtonKey));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Введите сумму зачисления перевода.'),
-      findsOneWidget,
-    );
+    expect(find.text('Введите сумму зачисления перевода.'), findsOneWidget);
     expect(await transactions.listByBook(book.id), isEmpty);
   });
 
@@ -271,10 +266,7 @@ void main() {
       name: 'Рубли',
     );
     await tester.enterText(find.byKey(transactionFormAmountFieldKey), '100');
-    await tester.enterText(
-      find.byKey(transactionFormToAmountFieldKey),
-      '9150',
-    );
+    await tester.enterText(find.byKey(transactionFormToAmountFieldKey), '9150');
     await tester.pumpAndSettle();
 
     expect(find.text('Фактический курс: 1 USD = 91,5 RUB'), findsOneWidget);
@@ -351,7 +343,10 @@ void main() {
   testWidgets('при редактировании тип показан, но изменить его нельзя', (
     WidgetTester tester,
   ) async {
-    final rubles = await createAccount(name: 'Рубли', initialBalanceMinor: 100000);
+    final rubles = await createAccount(
+      name: 'Рубли',
+      initialBalanceMinor: 100000,
+    );
     final cafe = await createCategory(TransactionKind.expense);
     final created = await transactions.create(
       bookId: book.id,
@@ -385,7 +380,10 @@ void main() {
   testWidgets('смена типа отклоняется доменом с сообщением причины', (
     WidgetTester tester,
   ) async {
-    final rubles = await createAccount(name: 'Рубли', initialBalanceMinor: 100000);
+    final rubles = await createAccount(
+      name: 'Рубли',
+      initialBalanceMinor: 100000,
+    );
     final cafe = await createCategory(TransactionKind.expense);
     final created = await transactions.create(
       bookId: book.id,
@@ -419,10 +417,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(transactionFormSaveButtonKey), findsOneWidget);
-    expect(
-      (await transactions.getById(created.id))!.amountMinor,
-      15000,
-    );
+    expect((await transactions.getById(created.id))!.amountMinor, 15000);
   });
 
   testWidgets('дата операции может быть изменена на прошедшую', (

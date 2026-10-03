@@ -1,6 +1,6 @@
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-import 'package:budget_tracker/presentation/features/accounts/widgets/bank_avatar.dart';
+import 'package:budget_tracker/ui/features/accounts/widgets/bank_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,7 +9,9 @@ void main() {
     return tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
-        home: Scaffold(body: Center(child: BankAvatar(bank: bank))),
+        home: Scaffold(
+          body: Center(child: BankAvatar(bank: bank)),
+        ),
       ),
     );
   }

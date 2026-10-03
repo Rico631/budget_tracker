@@ -225,52 +225,54 @@ void main() {
         ),
         [categoryFallbackRenameRejectedError],
       );
-      expect(
-        errorsOf(await categoryUseCases.delete(fallback)),
-        [categoryFallbackDeleteRejectedError],
-      );
+      expect(errorsOf(await categoryUseCases.delete(fallback)), [
+        categoryFallbackDeleteRejectedError,
+      ]);
       expect((await categories.getById(fallback.id))!.name, 'Прочие расходы');
     });
 
-    test('deletes a category moving its operations to the fallback one', () async {
-      await categoryUseCases.ensureFallbackCategories(
-        bookId: book.id,
-        languageCode: 'ru',
-      );
-      final fallback = (await categories.findFallback(
-        book.id,
-        TransactionKind.expense,
-      ))!;
-      final groceries = (await categoryUseCases.create(
-        bookId: book.id,
-        name: 'Продукты',
-        kind: TransactionKind.expense,
-      )).valueOrFail();
-      final account = await accounts.create(
-        bookId: book.id,
-        name: 'Кошелек',
-        currencyCode: 'RUB',
-        initialBalanceMinor: 0,
-      );
-      final transaction = await transactions.create(
-        bookId: book.id,
-        accountId: account.id,
-        kind: TransactionKind.expense,
-        amountMinor: 1500,
-        occurredAt: DateTime(2026, 9, 20),
-        categoryId: groceries.id,
-      );
+    test(
+      'deletes a category moving its operations to the fallback one',
+      () async {
+        await categoryUseCases.ensureFallbackCategories(
+          bookId: book.id,
+          languageCode: 'ru',
+        );
+        final fallback = (await categories.findFallback(
+          book.id,
+          TransactionKind.expense,
+        ))!;
+        final groceries = (await categoryUseCases.create(
+          bookId: book.id,
+          name: 'Продукты',
+          kind: TransactionKind.expense,
+        )).valueOrFail();
+        final account = await accounts.create(
+          bookId: book.id,
+          name: 'Кошелек',
+          currencyCode: 'RUB',
+          initialBalanceMinor: 0,
+        );
+        final transaction = await transactions.create(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 1500,
+          occurredAt: DateTime(2026, 9, 20),
+          categoryId: groceries.id,
+        );
 
-      expect(await categoryUseCases.delete(groceries), isA<Valid<void>>());
+        expect(await categoryUseCases.delete(groceries), isA<Valid<void>>());
 
-      expect(await categories.getById(groceries.id), isNull);
+        expect(await categories.getById(groceries.id), isNull);
 
-      final stored = (await transactions.getById(transaction.id))!;
+        final stored = (await transactions.getById(transaction.id))!;
 
-      expect(stored.categoryId, fallback.id);
-      expect(stored.amountMinor, 1500);
-      expect(stored.occurredAt, transaction.occurredAt);
-    });
+        expect(stored.categoryId, fallback.id);
+        expect(stored.amountMinor, 1500);
+        expect(stored.occurredAt, transaction.occurredAt);
+      },
+    );
 
     test('rejects deletion without a fallback category', () async {
       final groceries = (await categoryUseCases.create(
@@ -279,10 +281,9 @@ void main() {
         kind: TransactionKind.expense,
       )).valueOrFail();
 
-      expect(
-        errorsOf(await categoryUseCases.delete(groceries)),
-        [categoryFallbackMissingError],
-      );
+      expect(errorsOf(await categoryUseCases.delete(groceries)), [
+        categoryFallbackMissingError,
+      ]);
       expect(await categories.getById(groceries.id), isNotNull);
     });
 
@@ -326,18 +327,18 @@ void main() {
 
   group('BankUseCases', () {
     test('creates, renames and deletes a bank', () async {
-      final created = (await bankUseCases.create(name: '  Мой банк '))
-          .valueOrFail();
+      final created = (await bankUseCases.create(
+        name: '  Мой банк ',
+      )).valueOrFail();
 
       expect(created.name, 'Мой банк');
       expect(created.isPreset, isFalse);
 
-      final renamed =
-          (await bankUseCases.update(
-            created,
-            name: 'Новый банк',
-            colorHex: '#1e88e5',
-          )).valueOrFail();
+      final renamed = (await bankUseCases.update(
+        created,
+        name: 'Новый банк',
+        colorHex: '#1e88e5',
+      )).valueOrFail();
 
       expect(renamed.name, 'Новый банк');
       expect(renamed.colorHex, '#1E88E5');
@@ -358,12 +359,11 @@ void main() {
       expect(created.colorHex, '#1F1F1F');
       expect((await banks.getById(created.id))!.colorHex, '#1F1F1F');
 
-      final cleared =
-          (await bankUseCases.update(
-            created,
-            name: 'Мой банк',
-            colorHex: null,
-          )).valueOrFail();
+      final cleared = (await bankUseCases.update(
+        created,
+        name: 'Мой банк',
+        colorHex: null,
+      )).valueOrFail();
 
       expect(cleared.colorHex, isNull);
       expect((await banks.getById(created.id))!.colorHex, isNull);
@@ -382,11 +382,7 @@ void main() {
 
       expect(
         errorsOf(
-          await bankUseCases.update(
-            bank,
-            name: 'Мой банк',
-            colorHex: '#12',
-          ),
+          await bankUseCases.update(bank, name: 'Мой банк', colorHex: '#12'),
         ),
         [bankColorInvalidError],
       );
@@ -420,14 +416,12 @@ void main() {
     test('rejects duplicate bank names', () async {
       await bankUseCases.create(name: 'Мой банк');
 
-      expect(
-        errorsOf(await bankUseCases.create(name: ' мой БАНК ')),
-        [bankNameDuplicateError],
-      );
-      expect(
-        errorsOf(await bankUseCases.create(name: '   ')),
-        [catalogNameRequiredError],
-      );
+      expect(errorsOf(await bankUseCases.create(name: ' мой БАНК ')), [
+        bankNameDuplicateError,
+      ]);
+      expect(errorsOf(await bankUseCases.create(name: '   ')), [
+        catalogNameRequiredError,
+      ]);
       expect(await banks.list(), hasLength(1));
     });
 

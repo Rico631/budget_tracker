@@ -1,16 +1,16 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/router/app_shell.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/router/app_shell.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-import 'package:budget_tracker/presentation/features/analytics/widgets/period_control.dart';
-import 'package:budget_tracker/presentation/features/analytics/widgets/stream_switch.dart';
-import 'package:budget_tracker/presentation/features/settings/category_form_page.dart';
+import 'package:budget_tracker/ui/features/analytics/widgets/period_control.dart';
+import 'package:budget_tracker/ui/features/analytics/widgets/stream_switch.dart';
+import 'package:budget_tracker/ui/features/settings/views/category_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -105,9 +105,7 @@ void main() {
     );
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(
-      Theme.of(
-        tester.element(find.byType(NavigationBar)),
-      ).colorScheme.primary,
+      Theme.of(tester.element(find.byType(NavigationBar))).colorScheme.primary,
       AppTheme.light.colorScheme.primary,
     );
 
@@ -145,26 +143,27 @@ void main() {
     expect(find.text('Добавить счет'), findsNothing);
   });
 
-  testWidgets('не показывает действие добавления на «Аналитике» и «Настройках»', (
-    WidgetTester tester,
-  ) async {
-    await pumpShell(tester);
+  testWidgets(
+    'не показывает действие добавления на «Аналитике» и «Настройках»',
+    (WidgetTester tester) async {
+      await pumpShell(tester);
 
-    for (final label in ['Аналитика', 'Настройки']) {
-      await tester.tap(find.text(label));
-      await tester.pumpAndSettle();
+      for (final label in ['Аналитика', 'Настройки']) {
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.add), findsNothing);
-      expect(find.byType(FloatingActionButton), findsNothing);
-      expect(find.text('Добавить счет'), findsNothing);
-      expect(find.byType(NavigationBar), findsOneWidget);
-    }
+        expect(find.byIcon(Icons.add), findsNothing);
+        expect(find.byType(FloatingActionButton), findsNothing);
+        expect(find.text('Добавить счет'), findsNothing);
+        expect(find.byType(NavigationBar), findsOneWidget);
+      }
 
-    // Оболочка не показывает действий добавления и на «Настройках»: они
-    // размещаются в подэкранах справочников.
-    expect(find.text('Категории'), findsOneWidget);
-    expect(find.text('Банки'), findsOneWidget);
-  });
+      // Оболочка не показывает действий добавления и на «Настройках»: они
+      // размещаются в подэкранах справочников.
+      expect(find.text('Категории'), findsOneWidget);
+      expect(find.text('Банки'), findsOneWidget);
+    },
+  );
   testWidgets('удаление категории переносит операции в базовую категорию', (
     WidgetTester tester,
   ) async {
@@ -349,6 +348,4 @@ void main() {
     expect(accountsTotal(tester), contains('976,00'));
     expect(await transactions.listByBook(book.id), hasLength(2));
   });
-
-
 }

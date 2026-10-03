@@ -18,8 +18,7 @@ const String categoryKindChangeRejectedError =
     'kind cannot be changed for an existing category.';
 
 /// Код ошибки домена: категория может быть только доходом или расходом.
-const String categoryKindNotAllowedError =
-    'kind must be income or expense.';
+const String categoryKindNotAllowedError = 'kind must be income or expense.';
 
 /// Код ошибки домена: у книги нет базовой категории нужного типа.
 const String categoryFallbackMissingError =
@@ -54,7 +53,8 @@ class CategoryUseCases {
   /// Наименование базовой категории является данными (`docs/reference-data/
   /// categories.md`), а не строкой интерфейса, поэтому правило подставляет его
   /// вызывающая сторона: в приложении это стартовый набор категорий.
-  final String Function(TransactionKind kind, String languageCode) fallbackNameFor;
+  final String Function(TransactionKind kind, String languageCode)
+  fallbackNameFor;
 
   /// Создает категорию дохода или расхода.
   Future<ValidationResult<FinanceCategory>> create({

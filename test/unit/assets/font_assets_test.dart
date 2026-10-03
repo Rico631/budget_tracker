@@ -39,10 +39,7 @@ void main() {
     final license = File('assets/fonts/LICENSE-OpenSans.txt');
 
     expect(license.existsSync(), isTrue);
-    expect(
-      license.readAsStringSync(),
-      contains('SIL OPEN FONT LICENSE'),
-    );
+    expect(license.readAsStringSync(), contains('SIL OPEN FONT LICENSE'));
   });
 
   test('лицензия встроенного шрифта зарегистрирована в приложении', () async {

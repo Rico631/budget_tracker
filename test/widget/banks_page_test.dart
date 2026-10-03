@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -8,11 +8,11 @@ import 'package:budget_tracker/data/repositories/banks_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
-import 'package:budget_tracker/presentation/features/accounts/widgets/bank_avatar.dart';
-import 'package:budget_tracker/presentation/features/settings/bank_form_page.dart';
-import 'package:budget_tracker/presentation/features/settings/banks_page.dart';
-import 'package:budget_tracker/presentation/features/settings/widgets/bank_color_picker.dart';
-import 'package:budget_tracker/presentation/features/settings/widgets/bank_rgba_color_dialog.dart';
+import 'package:budget_tracker/ui/features/accounts/widgets/bank_avatar.dart';
+import 'package:budget_tracker/ui/features/settings/views/bank_form_page.dart';
+import 'package:budget_tracker/ui/features/settings/views/banks_page.dart';
+import 'package:budget_tracker/ui/features/settings/widgets/bank_color_picker.dart';
+import 'package:budget_tracker/ui/features/settings/widgets/bank_rgba_color_dialog.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -324,7 +324,10 @@ void main() {
 
     // Диалог остается открытым и сообщает причину отказа.
     expect(find.byKey(bankRgbaErrorKey), findsOneWidget);
-    expect(find.text('Введите код вида #RRGGBB или #AARRGGBB.'), findsOneWidget);
+    expect(
+      find.text('Введите код вида #RRGGBB или #AARRGGBB.'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(bankRgbaCancelButtonKey));
     await tester.pumpAndSettle();
@@ -333,5 +336,4 @@ void main() {
 
     expect(stored, isEmpty);
   });
-
 }

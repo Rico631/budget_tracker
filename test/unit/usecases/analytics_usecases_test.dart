@@ -55,58 +55,63 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('срез по книге с операциями в двух валютах содержит два блока', () async {
-    final book = await books.create(name: 'Бюджет');
-    final rubles = await accounts.create(
-      bookId: book.id,
-      name: 'Рубли',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 100000,
-    );
-    final dollars = await accounts.create(
-      bookId: book.id,
-      name: 'Доллары',
-      currencyCode: 'USD',
-      initialBalanceMinor: 0,
-    );
-    final food = await categories.create(
-      bookId: book.id,
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    await transactions.create(
-      bookId: book.id,
-      accountId: rubles.id,
-      categoryId: food.id,
-      kind: TransactionKind.expense,
-      amountMinor: 1500,
-      occurredAt: DateTime(2026, 9, 10),
-    );
-    await transactions.create(
-      bookId: book.id,
-      accountId: dollars.id,
-      categoryId: food.id,
-      kind: TransactionKind.expense,
-      amountMinor: 2000,
-      occurredAt: DateTime(2026, 9, 11),
-    );
+  test(
+    'срез по книге с операциями в двух валютах содержит два блока',
+    () async {
+      final book = await books.create(name: 'Бюджет');
+      final rubles = await accounts.create(
+        bookId: book.id,
+        name: 'Рубли',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 100000,
+      );
+      final dollars = await accounts.create(
+        bookId: book.id,
+        name: 'Доллары',
+        currencyCode: 'USD',
+        initialBalanceMinor: 0,
+      );
+      final food = await categories.create(
+        bookId: book.id,
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubles.id,
+        categoryId: food.id,
+        kind: TransactionKind.expense,
+        amountMinor: 1500,
+        occurredAt: DateTime(2026, 9, 10),
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: dollars.id,
+        categoryId: food.id,
+        kind: TransactionKind.expense,
+        amountMinor: 2000,
+        occurredAt: DateTime(2026, 9, 11),
+      );
 
-    final slice = useCases.loadSlice(
-      transactions: await useCases.loadBookTransactions(book.id),
-      accounts: await useCases.loadBookAccounts(book.id),
-      categories: await categories.listByBook(book.id, includeArchived: true),
-      period: september,
-      stream: TransactionKind.expense,
-    );
+      final slice = useCases.loadSlice(
+        transactions: await useCases.loadBookTransactions(book.id),
+        accounts: await useCases.loadBookAccounts(book.id),
+        categories: await categories.listByBook(book.id, includeArchived: true),
+        period: september,
+        stream: TransactionKind.expense,
+      );
 
-    expect(slice.blocks.map((block) => block.currencyCode), ['RUB', 'USD']);
-    expect(slice.blocks.map((block) => block.totalMinor), [1500, 2000]);
-    // Начальный остаток счета в срез не входит.
-    expect(
-      slice.blocks.singleWhere((block) => block.currencyCode == 'RUB').totalMinor,
-      1500,
-    );
-  });
+      expect(slice.blocks.map((block) => block.currencyCode), ['RUB', 'USD']);
+      expect(slice.blocks.map((block) => block.totalMinor), [1500, 2000]);
+      // Начальный остаток счета в срез не входит.
+      expect(
+        slice.blocks
+            .singleWhere((block) => block.currencyCode == 'RUB')
+            .totalMinor,
+        1500,
+      );
+    },
+  );
 
   test('операции другой книги в срез не попадают', () async {
     final book = await books.create(name: 'Бюджет');
@@ -153,10 +158,9 @@ void main() {
     await accounts.archive(archived.id);
 
     expect(await accounts.listByBook(book.id), isEmpty);
-    expect(
-      (await useCases.loadBookAccounts(book.id)).map((item) => item.id),
-      [archived.id],
-    );
+    expect((await useCases.loadBookAccounts(book.id)).map((item) => item.id), [
+      archived.id,
+    ]);
   });
 
   test('операции категории читаются за период в валюте блока', () async {
@@ -228,35 +232,38 @@ void main() {
     expect(operations.single.amountMinor, 1500);
   });
 
-  test('доступные периоды содержат периоды с операциями и текущий месяц', () async {
-    final book = await books.create(name: 'Бюджет');
-    final rubles = await accounts.create(
-      bookId: book.id,
-      name: 'Рубли',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 0,
-    );
-    final food = await categories.create(
-      bookId: book.id,
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    await transactions.create(
-      bookId: book.id,
-      accountId: rubles.id,
-      categoryId: food.id,
-      kind: TransactionKind.expense,
-      amountMinor: 1500,
-      occurredAt: DateTime(2026, 9, 10),
-    );
+  test(
+    'доступные периоды содержат периоды с операциями и текущий месяц',
+    () async {
+      final book = await books.create(name: 'Бюджет');
+      final rubles = await accounts.create(
+        bookId: book.id,
+        name: 'Рубли',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+      final food = await categories.create(
+        bookId: book.id,
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubles.id,
+        categoryId: food.id,
+        kind: TransactionKind.expense,
+        amountMinor: 1500,
+        occurredAt: DateTime(2026, 9, 10),
+      );
 
-    final available = useCases.loadAvailablePeriods(
-      transactions: await useCases.loadBookTransactions(book.id),
-      now: DateTime(2026, 9, 27),
-    );
+      final available = useCases.loadAvailablePeriods(
+        transactions: await useCases.loadBookTransactions(book.id),
+        now: DateTime(2026, 9, 27),
+      );
 
-    expect(available, contains(september));
-    expect(available, contains(AnalyticsPeriod.year(2026)));
-    expect(available, contains(AnalyticsPeriod.month(year: 2026, month: 9)));
-  });
+      expect(available, contains(september));
+      expect(available, contains(AnalyticsPeriod.year(2026)));
+      expect(available, contains(AnalyticsPeriod.month(year: 2026, month: 9)));
+    },
+  );
 }

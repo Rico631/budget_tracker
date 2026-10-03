@@ -1,14 +1,14 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-import 'package:budget_tracker/presentation/features/accounts/account_form_page.dart';
-import 'package:budget_tracker/presentation/features/accounts/widgets/bank_picker_sheet.dart';
+import 'package:budget_tracker/ui/features/accounts/views/account_form_page.dart';
+import 'package:budget_tracker/ui/features/accounts/widgets/bank_picker_sheet.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,7 +114,9 @@ void main() {
     await tester.tap(find.text('Сохранить'));
     await tester.pumpAndSettle();
 
-    final accounts = await DriftAccountsRepository(database).listByBook(book.id);
+    final accounts = await DriftAccountsRepository(
+      database,
+    ).listByBook(book.id);
     expect(accounts, hasLength(1));
     expect(accounts.single.name, 'Основной');
     expect(accounts.single.currencyCode, 'RUB');
@@ -131,7 +133,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Укажите название счета.'), findsOneWidget);
-    expect(await DriftAccountsRepository(database).listByBook(book.id), isEmpty);
+    expect(
+      await DriftAccountsRepository(database).listByBook(book.id),
+      isEmpty,
+    );
   });
 
   testWidgets('отказывает в смене валюты счета с операциями', (
@@ -181,7 +186,10 @@ void main() {
       database,
     ).getById(account.id))!;
     expect(stored.isArchived, isTrue);
-    expect(await DriftAccountsRepository(database).listByBook(book.id), isEmpty);
+    expect(
+      await DriftAccountsRepository(database).listByBook(book.id),
+      isEmpty,
+    );
     expect(find.byType(AccountFormPage), findsNothing);
   });
 
@@ -219,7 +227,9 @@ void main() {
     await tester.tap(find.text('Сохранить'));
     await tester.pumpAndSettle();
 
-    final accounts = await DriftAccountsRepository(database).listByBook(book.id);
+    final accounts = await DriftAccountsRepository(
+      database,
+    ).listByBook(book.id);
     expect(accounts.single.bankId, sberbankId);
   });
 
@@ -245,11 +255,7 @@ void main() {
       bankId: bankId,
     );
 
-    await openForm(
-      tester,
-      account: account,
-      size: const Size(360, 640),
-    );
+    await openForm(tester, account: account, size: const Size(360, 640));
 
     expect(tester.takeException(), isNull);
     expect(find.text(longName), findsOneWidget);

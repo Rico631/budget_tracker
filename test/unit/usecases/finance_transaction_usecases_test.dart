@@ -198,7 +198,9 @@ void main() {
 
     switch (transfer) {
       case Valid():
-        fail('Expected a transfer with a zero destination amount to be invalid');
+        fail(
+          'Expected a transfer with a zero destination amount to be invalid',
+        );
       case Invalid(errors: final errors):
         expect(errors, contains(transactionToAmountNotPositiveError));
     }
@@ -236,42 +238,44 @@ void main() {
     expect(await useCases.calculateAccountBalance(rubles.id), 916000);
   });
 
-  test('rejects a cross-currency transfer without a destination amount',
-      () async {
-    final book = await books.create(name: 'Cross currency');
-    final dollars = await accounts.create(
-      bookId: book.id,
-      name: 'Dollars',
-      currencyCode: 'USD',
-      initialBalanceMinor: 50000,
-    );
-    final rubles = await accounts.create(
-      bookId: book.id,
-      name: 'Rubles',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 1000,
-    );
-
-    final result = await useCases.create(
-      FinanceTransactionInput.tryCreate(
+  test(
+    'rejects a cross-currency transfer without a destination amount',
+    () async {
+      final book = await books.create(name: 'Cross currency');
+      final dollars = await accounts.create(
         bookId: book.id,
-        accountId: dollars.id,
-        toAccountId: rubles.id,
-        kind: TransactionKind.transfer,
-        amountMinor: 10000,
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 24),
-    );
+        name: 'Dollars',
+        currencyCode: 'USD',
+        initialBalanceMinor: 50000,
+      );
+      final rubles = await accounts.create(
+        bookId: book.id,
+        name: 'Rubles',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 1000,
+      );
 
-    switch (result) {
-      case Valid():
-        fail('Expected a cross-currency transfer without an amount to fail');
-      case Invalid(errors: final errors):
-        expect(errors, contains(transferToAmountRequiredError));
-    }
-    expect(await useCases.calculateAccountBalance(dollars.id), 50000);
-    expect(await useCases.calculateAccountBalance(rubles.id), 1000);
-  });
+      final result = await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: dollars.id,
+          toAccountId: rubles.id,
+          kind: TransactionKind.transfer,
+          amountMinor: 10000,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 9, 24),
+      );
+
+      switch (result) {
+        case Valid():
+          fail('Expected a cross-currency transfer without an amount to fail');
+        case Invalid(errors: final errors):
+          expect(errors, contains(transferToAmountRequiredError));
+      }
+      expect(await useCases.calculateAccountBalance(dollars.id), 50000);
+      expect(await useCases.calculateAccountBalance(rubles.id), 1000);
+    },
+  );
 
   test('rejects a destination amount on a same-currency transfer', () async {
     final book = await books.create(name: 'Same currency');
@@ -310,64 +314,66 @@ void main() {
     expect(await useCases.calculateAccountBalance(target.id), 0);
   });
 
-  test('updates fields of an operation keeping its identity and kind',
-      () async {
-    final book = await books.create(name: 'Update');
-    final account = await accounts.create(
-      bookId: book.id,
-      name: 'Main',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 1000,
-    );
-    final food = await categories.create(
-      bookId: book.id,
-      name: 'Food',
-      kind: TransactionKind.expense,
-    );
-    final transport = await categories.create(
-      bookId: book.id,
-      name: 'Transport',
-      kind: TransactionKind.expense,
-    );
-    final created = (await useCases.create(
-      FinanceTransactionInput.tryCreate(
+  test(
+    'updates fields of an operation keeping its identity and kind',
+    () async {
+      final book = await books.create(name: 'Update');
+      final account = await accounts.create(
         bookId: book.id,
-        accountId: account.id,
-        kind: TransactionKind.expense,
-        amountMinor: 150,
-        categoryId: food.id,
-        note: 'before',
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 24),
-    )).valueOrFail();
-    final storedBefore = (await transactions.getById(created.id))!;
-
-    final updated = (await useCases.update(
-      storedBefore,
-      FinanceTransactionInput.tryCreate(
+        name: 'Main',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 1000,
+      );
+      final food = await categories.create(
         bookId: book.id,
-        accountId: account.id,
+        name: 'Food',
         kind: TransactionKind.expense,
-        amountMinor: 250,
-        categoryId: transport.id,
-        note: 'after',
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 20),
-    )).valueOrFail();
+      );
+      final transport = await categories.create(
+        bookId: book.id,
+        name: 'Transport',
+        kind: TransactionKind.expense,
+      );
+      final created = (await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 150,
+          categoryId: food.id,
+          note: 'before',
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 9, 24),
+      )).valueOrFail();
+      final storedBefore = (await transactions.getById(created.id))!;
 
-    expect(updated.id, storedBefore.id);
-    expect(updated.kind, TransactionKind.expense);
-    expect(updated.amountMinor, 250);
-    expect(updated.categoryId, transport.id);
-    expect(updated.note, 'after');
-    expect(updated.occurredAt, DateTime(2026, 9, 20));
+      final updated = (await useCases.update(
+        storedBefore,
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 250,
+          categoryId: transport.id,
+          note: 'after',
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 9, 20),
+      )).valueOrFail();
 
-    final stored = (await transactions.getById(storedBefore.id))!;
-    expect(stored.amountMinor, 250);
-    expect(stored.note, 'after');
-    expect(stored.createdAt, storedBefore.createdAt);
-    expect(await useCases.calculateAccountBalance(account.id), 750);
-  });
+      expect(updated.id, storedBefore.id);
+      expect(updated.kind, TransactionKind.expense);
+      expect(updated.amountMinor, 250);
+      expect(updated.categoryId, transport.id);
+      expect(updated.note, 'after');
+      expect(updated.occurredAt, DateTime(2026, 9, 20));
+
+      final stored = (await transactions.getById(storedBefore.id))!;
+      expect(stored.amountMinor, 250);
+      expect(stored.note, 'after');
+      expect(stored.createdAt, storedBefore.createdAt);
+      expect(await useCases.calculateAccountBalance(account.id), 750);
+    },
+  );
 
   test('rejects a kind change keeping stored data of the operation', () async {
     final book = await books.create(name: 'Kind change');
@@ -423,103 +429,68 @@ void main() {
     expect(await useCases.calculateAccountBalance(account.id), 850);
   });
 
-  test('deleting an operation removes it from the book and from balances',
-      () async {
-    final book = await books.create(name: 'Delete');
-    final account = await accounts.create(
-      bookId: book.id,
-      name: 'Main',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 1000,
-    );
-    final category = await categories.create(
-      bookId: book.id,
-      name: 'Food',
-      kind: TransactionKind.expense,
-    );
-    final created = (await useCases.create(
-      FinanceTransactionInput.tryCreate(
+  test(
+    'deleting an operation removes it from the book and from balances',
+    () async {
+      final book = await books.create(name: 'Delete');
+      final account = await accounts.create(
         bookId: book.id,
-        accountId: account.id,
-        kind: TransactionKind.expense,
-        amountMinor: 300,
-        categoryId: category.id,
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 24),
-    )).valueOrFail();
-
-    expect(await useCases.calculateAccountBalance(account.id), 700);
-
-    await useCases.delete(created.id);
-
-    expect(await transactions.getById(created.id), isNull);
-    expect(await transactions.listByBook(book.id), isEmpty);
-    expect(await useCases.calculateAccountBalance(account.id), 1000);
-  });
-
-  test('deleting an operation keeps the book, accounts and categories',
-      () async {
-    final book = await books.create(name: 'Keep');
-    final account = await accounts.create(
-      bookId: book.id,
-      name: 'Main',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 1000,
-    );
-    final category = await categories.create(
-      bookId: book.id,
-      name: 'Food',
-      kind: TransactionKind.expense,
-    );
-    final removed = (await useCases.create(
-      FinanceTransactionInput.tryCreate(
+        name: 'Main',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 1000,
+      );
+      final category = await categories.create(
         bookId: book.id,
-        accountId: account.id,
+        name: 'Food',
         kind: TransactionKind.expense,
-        amountMinor: 300,
-        categoryId: category.id,
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 24),
-    )).valueOrFail();
-    final kept = (await useCases.create(
-      FinanceTransactionInput.tryCreate(
+      );
+      final created = (await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 300,
+          categoryId: category.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 9, 24),
+      )).valueOrFail();
+
+      expect(await useCases.calculateAccountBalance(account.id), 700);
+
+      await useCases.delete(created.id);
+
+      expect(await transactions.getById(created.id), isNull);
+      expect(await transactions.listByBook(book.id), isEmpty);
+      expect(await useCases.calculateAccountBalance(account.id), 1000);
+    },
+  );
+
+  test(
+    'deleting an operation keeps the book, accounts and categories',
+    () async {
+      final book = await books.create(name: 'Keep');
+      final account = await accounts.create(
         bookId: book.id,
-        accountId: account.id,
+        name: 'Main',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 1000,
+      );
+      final category = await categories.create(
+        bookId: book.id,
+        name: 'Food',
         kind: TransactionKind.expense,
-        amountMinor: 100,
-        categoryId: category.id,
-      ).valueOrFail(),
-      occurredAt: DateTime(2026, 9, 25),
-    )).valueOrFail();
-
-    await useCases.delete(removed.id);
-
-    expect((await books.list()).single.id, book.id);
-    expect((await accounts.listByBook(book.id)).single.id, account.id);
-    expect((await categories.listByBook(book.id)).single.id, category.id);
-    expect((await transactions.listByBook(book.id)).single.id, kept.id);
-  });
-
-  test('journal of a book groups operations from newest day to oldest',
-      () async {
-    final book = await books.create(name: 'Journal');
-    final account = await accounts.create(
-      bookId: book.id,
-      name: 'Main',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 0,
-    );
-    final category = await categories.create(
-      bookId: book.id,
-      name: 'Food',
-      kind: TransactionKind.expense,
-    );
-    for (final occurredAt in [
-      DateTime(2026, 9, 26, 9),
-      DateTime(2026, 9, 26, 21),
-      DateTime(2026, 9, 22),
-    ]) {
-      await useCases.create(
+      );
+      final removed = (await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 300,
+          categoryId: category.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 9, 24),
+      )).valueOrFail();
+      final kept = (await useCases.create(
         FinanceTransactionInput.tryCreate(
           bookId: book.id,
           accountId: account.id,
@@ -527,19 +498,60 @@ void main() {
           amountMinor: 100,
           categoryId: category.id,
         ).valueOrFail(),
-        occurredAt: occurredAt,
+        occurredAt: DateTime(2026, 9, 25),
+      )).valueOrFail();
+
+      await useCases.delete(removed.id);
+
+      expect((await books.list()).single.id, book.id);
+      expect((await accounts.listByBook(book.id)).single.id, account.id);
+      expect((await categories.listByBook(book.id)).single.id, category.id);
+      expect((await transactions.listByBook(book.id)).single.id, kept.id);
+    },
+  );
+
+  test(
+    'journal of a book groups operations from newest day to oldest',
+    () async {
+      final book = await books.create(name: 'Journal');
+      final account = await accounts.create(
+        bookId: book.id,
+        name: 'Main',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
       );
-    }
+      final category = await categories.create(
+        bookId: book.id,
+        name: 'Food',
+        kind: TransactionKind.expense,
+      );
+      for (final occurredAt in [
+        DateTime(2026, 9, 26, 9),
+        DateTime(2026, 9, 26, 21),
+        DateTime(2026, 9, 22),
+      ]) {
+        await useCases.create(
+          FinanceTransactionInput.tryCreate(
+            bookId: book.id,
+            accountId: account.id,
+            kind: TransactionKind.expense,
+            amountMinor: 100,
+            categoryId: category.id,
+          ).valueOrFail(),
+          occurredAt: occurredAt,
+        );
+      }
 
-    final journal = await useCases.loadJournal(book.id);
+      final journal = await useCases.loadJournal(book.id);
 
-    expect(journal.hasTransactions, isTrue);
-    expect(journal.days.map((group) => group.day), [
-      DateTime(2026, 9, 26),
-      DateTime(2026, 9, 22),
-    ]);
-    expect(journal.days.first.transactions, hasLength(2));
-  });
+      expect(journal.hasTransactions, isTrue);
+      expect(journal.days.map((group) => group.day), [
+        DateTime(2026, 9, 26),
+        DateTime(2026, 9, 22),
+      ]);
+      expect(journal.days.first.transactions, hasLength(2));
+    },
+  );
 
   test('journal of an empty book has no days', () async {
     final book = await books.create(name: 'Empty journal');

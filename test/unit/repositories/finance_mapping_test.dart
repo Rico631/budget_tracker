@@ -58,10 +58,7 @@ void main() {
     expect((await categories.getById(category.id))!.isFallback, isFalse);
     expect((await transactions.getById(transaction.id))!.toAccountId, isNull);
     expect((await transactions.getById(transaction.id))!.note, isNull);
-    expect(
-      (await transactions.getById(transaction.id))!.toAmountMinor,
-      isNull,
-    );
+    expect((await transactions.getById(transaction.id))!.toAmountMinor, isNull);
   });
 
   test('keeps the fallback category flag through repositories', () async {

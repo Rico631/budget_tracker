@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -10,9 +10,9 @@ import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
-import 'package:budget_tracker/presentation/features/transactions/transaction_form_page.dart';
-import 'package:budget_tracker/presentation/features/transactions/transactions_page.dart';
-import 'package:budget_tracker/presentation/features/transactions/widgets/transaction_tile.dart';
+import 'package:budget_tracker/ui/features/transactions/views/transaction_form_page.dart';
+import 'package:budget_tracker/ui/features/transactions/views/transactions_page.dart';
+import 'package:budget_tracker/ui/features/transactions/widgets/transaction_tile.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -258,7 +258,10 @@ void main() {
   testWidgets('показывает перевод одной валюты без категории', (
     WidgetTester tester,
   ) async {
-    final rubles = await createAccount(name: 'Рубли', initialBalanceMinor: 100000);
+    final rubles = await createAccount(
+      name: 'Рубли',
+      initialBalanceMinor: 100000,
+    );
     final savings = await createAccount(name: 'Копилка');
     await transactions.create(
       bookId: book.id,
@@ -277,31 +280,32 @@ void main() {
     expect(find.textContaining('·'), findsNothing);
   });
 
-  testWidgets('показывает мультивалютный перевод с суммой зачисления и курсом', (
-    WidgetTester tester,
-  ) async {
-    final dollars = await createAccount(
-      name: 'Доллары',
-      currencyCode: 'USD',
-      initialBalanceMinor: 100000,
-    );
-    final rubles = await createAccount(name: 'Рубли');
-    await transactions.create(
-      bookId: book.id,
-      accountId: dollars.id,
-      toAccountId: rubles.id,
-      kind: TransactionKind.transfer,
-      amountMinor: 10000,
-      toAmountMinor: 91500,
-      occurredAt: DateTime(2026, 9, 24),
-    );
+  testWidgets(
+    'показывает мультивалютный перевод с суммой зачисления и курсом',
+    (WidgetTester tester) async {
+      final dollars = await createAccount(
+        name: 'Доллары',
+        currencyCode: 'USD',
+        initialBalanceMinor: 100000,
+      );
+      final rubles = await createAccount(name: 'Рубли');
+      await transactions.create(
+        bookId: book.id,
+        accountId: dollars.id,
+        toAccountId: rubles.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 10000,
+        toAmountMinor: 91500,
+        occurredAt: DateTime(2026, 9, 24),
+      );
 
-    await pumpPage(tester);
+      await pumpPage(tester);
 
-    expect(find.text('Доллары → Рубли'), findsOneWidget);
-    expect(find.text('100,00 \$'), findsOneWidget);
-    expect(find.text('915,00 ₽ · 1 USD = 9,15 RUB'), findsOneWidget);
-  });
+      expect(find.text('Доллары → Рубли'), findsOneWidget);
+      expect(find.text('100,00 \$'), findsOneWidget);
+      expect(find.text('915,00 ₽ · 1 USD = 9,15 RUB'), findsOneWidget);
+    },
+  );
 
   testWidgets('операция без заметки не показывает пустую заметку', (
     WidgetTester tester,

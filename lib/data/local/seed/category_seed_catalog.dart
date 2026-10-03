@@ -188,8 +188,8 @@ const List<CategorySeed> categorySeedCatalog = <CategorySeed>[
 ///
 /// Базовая категория гарантирует, что операции удаляемой категории можно
 /// перенести в категорию того же типа (ADR-0004, решения 4.1-4.3).
-CategorySeed fallbackCategorySeed(TransactionKind kind) =>
-    categorySeedCatalog.firstWhere((seed) => seed.isFallback && seed.kind == kind);
+CategorySeed fallbackCategorySeed(TransactionKind kind) => categorySeedCatalog
+    .firstWhere((seed) => seed.isFallback && seed.kind == kind);
 
 /// Наименование базовой категории типа [kind] на языке [languageCode].
 ///

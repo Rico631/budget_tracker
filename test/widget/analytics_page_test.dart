@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -13,13 +13,13 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/analytics_usecases.dart';
-import 'package:budget_tracker/presentation/features/analytics/analytics_page.dart';
-import 'package:budget_tracker/presentation/features/analytics/widgets/account_filter_chip.dart';
-import 'package:budget_tracker/presentation/features/analytics/widgets/period_control.dart';
-import 'package:budget_tracker/presentation/features/analytics/widgets/stream_switch.dart';
-import 'package:budget_tracker/presentation/providers/accounts_controller.dart';
-import 'package:budget_tracker/presentation/providers/analytics_controller.dart';
-import 'package:budget_tracker/presentation/providers/finance_transaction_controller.dart';
+import 'package:budget_tracker/ui/features/analytics/views/analytics_page.dart';
+import 'package:budget_tracker/ui/features/analytics/widgets/account_filter_chip.dart';
+import 'package:budget_tracker/ui/features/analytics/widgets/period_control.dart';
+import 'package:budget_tracker/ui/features/analytics/widgets/stream_switch.dart';
+import 'package:budget_tracker/ui/features/accounts/view_models/accounts_controller.dart';
+import 'package:budget_tracker/ui/features/analytics/view_models/analytics_controller.dart';
+import 'package:budget_tracker/ui/features/transactions/view_models/finance_transaction_controller.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -177,10 +177,8 @@ void main() {
       .toList();
 
   /// Элемент открытой шторки выбора: подпись внутри шторки, а не в разделе.
-  Finder sheetItem(String text) => find.descendant(
-    of: find.byType(BottomSheet),
-    matching: find.text(text),
-  );
+  Finder sheetItem(String text) =>
+      find.descendant(of: find.byType(BottomSheet), matching: find.text(text));
 
   /// Открывает фильтр по счетам, выбирает счета [names] и применяет выбор.
   Future<void> selectAccounts(WidgetTester tester, List<String> names) async {
@@ -263,7 +261,10 @@ void main() {
       name: 'Продукты',
       kind: TransactionKind.expense,
     );
-    final cafe = await createCategory(name: 'Кафе', kind: TransactionKind.expense);
+    final cafe = await createCategory(
+      name: 'Кафе',
+      kind: TransactionKind.expense,
+    );
     await createTransaction(
       account: rubles,
       category: food,
@@ -400,69 +401,75 @@ void main() {
     );
   });
 
-  testWidgets('две валюты дают два блока без общего итога, категории по убыванию', (
-    WidgetTester tester,
-  ) async {
-    final rubles = await createAccount(name: 'Рубли');
-    final dollars = await createAccount(name: 'Доллары', currencyCode: 'USD');
-    final food = await createCategory(
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    final rent = await createCategory(
-      name: 'Аренда',
-      kind: TransactionKind.expense,
-    );
-    final cafe = await createCategory(name: 'Кафе', kind: TransactionKind.expense);
-    final salary = await createCategory(
-      name: 'Зарплата',
-      kind: TransactionKind.income,
-    );
-    await createTransaction(
-      account: rubles,
-      category: food,
-      amountMinor: 1500,
-      occurredAt: currentMonth,
-    );
-    await createTransaction(
-      account: rubles,
-      category: rent,
-      amountMinor: 40000,
-      occurredAt: currentMonth,
-    );
-    await createTransaction(
-      account: dollars,
-      category: cafe,
-      amountMinor: 2000,
-      occurredAt: currentMonth,
-    );
-    await createTransaction(
-      account: rubles,
-      category: salary,
-      amountMinor: 50000,
-      occurredAt: currentMonth,
-      kind: TransactionKind.income,
-    );
+  testWidgets(
+    'две валюты дают два блока без общего итога, категории по убыванию',
+    (WidgetTester tester) async {
+      final rubles = await createAccount(name: 'Рубли');
+      final dollars = await createAccount(name: 'Доллары', currencyCode: 'USD');
+      final food = await createCategory(
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      final rent = await createCategory(
+        name: 'Аренда',
+        kind: TransactionKind.expense,
+      );
+      final cafe = await createCategory(
+        name: 'Кафе',
+        kind: TransactionKind.expense,
+      );
+      final salary = await createCategory(
+        name: 'Зарплата',
+        kind: TransactionKind.income,
+      );
+      await createTransaction(
+        account: rubles,
+        category: food,
+        amountMinor: 1500,
+        occurredAt: currentMonth,
+      );
+      await createTransaction(
+        account: rubles,
+        category: rent,
+        amountMinor: 40000,
+        occurredAt: currentMonth,
+      );
+      await createTransaction(
+        account: dollars,
+        category: cafe,
+        amountMinor: 2000,
+        occurredAt: currentMonth,
+      );
+      await createTransaction(
+        account: rubles,
+        category: salary,
+        amountMinor: 50000,
+        occurredAt: currentMonth,
+        kind: TransactionKind.income,
+      );
 
-    await pumpPage(tester);
+      await pumpPage(tester);
 
-    expect(find.text('RUB'), findsOneWidget);
-    expect(find.text('USD'), findsOneWidget);
-    expect(find.text('Итого: 415,00 ₽'), findsOneWidget);
-    expect(find.text('Итого: 20,00 \$'), findsOneWidget);
-    // Второй поток одновременно с выбранным не показывается.
-    expect(find.text('Зарплата'), findsNothing);
-    expect(find.text('Итого: 500,00 ₽'), findsNothing);
+      expect(find.text('RUB'), findsOneWidget);
+      expect(find.text('USD'), findsOneWidget);
+      expect(find.text('Итого: 415,00 ₽'), findsOneWidget);
+      expect(find.text('Итого: 20,00 \$'), findsOneWidget);
+      // Второй поток одновременно с выбранным не показывается.
+      expect(find.text('Зарплата'), findsNothing);
+      expect(find.text('Итого: 500,00 ₽'), findsNothing);
 
-    // Общего числа, объединяющего разные валюты, нет.
-    expect(texts(tester).where((value) => value.contains('435')), isEmpty);
+      // Общего числа, объединяющего разные валюты, нет.
+      expect(texts(tester).where((value) => value.contains('435')), isEmpty);
 
-    // Категории упорядочены по убыванию суммы.
-    expect(
-      texts(tester).where((value) => value == 'Аренда' || value == 'Продукты'),
-      ['Аренда', 'Продукты'],
-    );
-  });
+      // Категории упорядочены по убыванию суммы.
+      expect(
+        texts(
+          tester,
+        ).where((value) => value == 'Аренда' || value == 'Продукты'),
+        ['Аренда', 'Продукты'],
+      );
+    },
+  );
 
   testWidgets('режим «Год» показывает помесячный тренд вместо категорий', (
     WidgetTester tester,
@@ -541,10 +548,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(
-      texts(tester).where((value) => value.startsWith('Итого:')),
-      isEmpty,
-    );
+    expect(texts(tester).where((value) => value.startsWith('Итого:')), isEmpty);
     expect(find.text('0,00 ₽'), findsNothing);
     expect(find.text('Продукты'), findsNothing);
   });
@@ -578,10 +582,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('RUB'), findsNothing);
-    expect(
-      texts(tester).where((value) => value.startsWith('Итого:')),
-      isEmpty,
-    );
+    expect(texts(tester).where((value) => value.startsWith('Итого:')), isEmpty);
   });
 
   testWidgets('ошибка чтения дает повторную загрузку и сохраняет выбор', (
@@ -639,45 +640,46 @@ void main() {
     );
   });
 
-  testWidgets('нажатие на категорию открывает подэкран, возврат сохраняет выбор', (
-    WidgetTester tester,
-  ) async {
-    final rubles = await createAccount(name: 'Рубли');
-    final food = await createCategory(
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    await createTransaction(
-      account: rubles,
-      category: food,
-      amountMinor: 1500,
-      occurredAt: currentMonth,
-    );
+  testWidgets(
+    'нажатие на категорию открывает подэкран, возврат сохраняет выбор',
+    (WidgetTester tester) async {
+      final rubles = await createAccount(name: 'Рубли');
+      final food = await createCategory(
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      await createTransaction(
+        account: rubles,
+        category: food,
+        amountMinor: 1500,
+        occurredAt: currentMonth,
+      );
 
-    await pumpPage(tester);
+      await pumpPage(tester);
 
-    await tester.tap(find.text('Продукты'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Продукты'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Операции категории'), findsOneWidget);
-    expect(find.text('Итого по категории: 15,00 ₽'), findsOneWidget);
+      expect(find.text('Операции категории'), findsOneWidget);
+      expect(find.text('Итого по категории: 15,00 ₽'), findsOneWidget);
 
-    await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
 
-    // Возврат из подэкрана сохраняет период, поток и фильтр раздела.
-    expect(periodLabelText(tester), monthLabel(currentMonth));
-    expect(
-      tester
-          .widget<SegmentedButton<TransactionKind>>(
-            find.byKey(analyticsStreamSwitchKey),
-          )
-          .selected,
-      {TransactionKind.expense},
-    );
-    expect(find.text('Продукты'), findsOneWidget);
-    expect(find.text('Все счета'), findsOneWidget);
-  });
+      // Возврат из подэкрана сохраняет период, поток и фильтр раздела.
+      expect(periodLabelText(tester), monthLabel(currentMonth));
+      expect(
+        tester
+            .widget<SegmentedButton<TransactionKind>>(
+              find.byKey(analyticsStreamSwitchKey),
+            )
+            .selected,
+        {TransactionKind.expense},
+      );
+      expect(find.text('Продукты'), findsOneWidget);
+      expect(find.text('Все счета'), findsOneWidget);
+    },
+  );
 
   testWidgets('счет, созданный в текущей сессии, попадает в срез аналитики', (
     WidgetTester tester,
@@ -713,8 +715,10 @@ void main() {
             initialBalanceMinor: 0,
           ).valueOrFail(),
         );
-    final dollars = (await accounts.listByBook(book.id, includeArchived: true))
-        .singleWhere((account) => account.name == 'Доллары');
+    final dollars = (await accounts.listByBook(
+      book.id,
+      includeArchived: true,
+    )).singleWhere((account) => account.name == 'Доллары');
     await container
         .read(financeTransactionControllerProvider.notifier)
         .save(
@@ -746,59 +750,63 @@ void main() {
     expect(find.text('Итого: 20,00 \$'), findsOneWidget);
   });
 
-  testWidgets('операции архивного счета входят в свою валюту и доступны в фильтре', (
-    WidgetTester tester,
-  ) async {
-    final rubles = await createAccount(name: 'Рубли');
-    final archived = await createAccount(
-      name: 'Заграничный',
-      currencyCode: 'USD',
-      archived: true,
-    );
-    final food = await createCategory(
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    final cafe = await createCategory(name: 'Кафе', kind: TransactionKind.expense);
-    await createTransaction(
-      account: rubles,
-      category: food,
-      amountMinor: 1500,
-      occurredAt: currentMonth,
-    );
-    await createTransaction(
-      account: archived,
-      category: cafe,
-      amountMinor: 2000,
-      occurredAt: currentMonth,
-    );
+  testWidgets(
+    'операции архивного счета входят в свою валюту и доступны в фильтре',
+    (WidgetTester tester) async {
+      final rubles = await createAccount(name: 'Рубли');
+      final archived = await createAccount(
+        name: 'Заграничный',
+        currencyCode: 'USD',
+        archived: true,
+      );
+      final food = await createCategory(
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      final cafe = await createCategory(
+        name: 'Кафе',
+        kind: TransactionKind.expense,
+      );
+      await createTransaction(
+        account: rubles,
+        category: food,
+        amountMinor: 1500,
+        occurredAt: currentMonth,
+      );
+      await createTransaction(
+        account: archived,
+        category: cafe,
+        amountMinor: 2000,
+        occurredAt: currentMonth,
+      );
 
-    await pumpPage(tester);
+      await pumpPage(tester);
 
-    expect(find.text('RUB'), findsOneWidget);
-    expect(find.text('USD'), findsOneWidget);
-    expect(find.text('Итого: 15,00 ₽'), findsOneWidget);
-    expect(find.text('Итого: 20,00 \$'), findsOneWidget);
-    // Общего числа по двум валютам нет.
-    expect(texts(tester).where((value) => value.contains('35,00')), isEmpty);
+      expect(find.text('RUB'), findsOneWidget);
+      expect(find.text('USD'), findsOneWidget);
+      expect(find.text('Итого: 15,00 ₽'), findsOneWidget);
+      expect(find.text('Итого: 20,00 \$'), findsOneWidget);
+      // Общего числа по двум валютам нет.
+      expect(texts(tester).where((value) => value.contains('35,00')), isEmpty);
 
-    await tester.tap(find.byKey(analyticsAccountFilterChipKey));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(analyticsAccountFilterChipKey));
+      await tester.pumpAndSettle();
 
-    // Список фильтра содержит счета книги вместе с архивными.
-    expect(find.text('Заграничный'), findsOneWidget);
-    expect(find.textContaining('Архивный'), findsWidgets);
+      // Список фильтра содержит счета книги вместе с архивными.
+      expect(find.text('Заграничный'), findsOneWidget);
+      expect(find.textContaining('Архивный'), findsWidgets);
 
-    await tester.tap(find.text('Заграничный'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(analyticsAccountFilterApplyKey));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Заграничный'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(analyticsAccountFilterApplyKey));
+      await tester.pumpAndSettle();
 
-    expect(find.text('USD'), findsOneWidget);
-    expect(find.text('RUB'), findsNothing);
-    expect(find.text('Кафе'), findsOneWidget);
-    expect(find.text('Итого: 20,00 \$'), findsOneWidget);
-  });
+      expect(find.text('USD'), findsOneWidget);
+      expect(find.text('RUB'), findsNothing);
+      expect(find.text('Кафе'), findsOneWidget);
+      expect(find.text('Итого: 20,00 \$'), findsOneWidget);
+    },
+  );
 
   testWidgets('фильтр по нескольким счетам сужает срез по их валютам', (
     WidgetTester tester,
@@ -856,89 +864,91 @@ void main() {
     expect(find.text('USD'), findsOneWidget);
   });
 
-  testWidgets('выбранные счета без операций дают сообщение по выбранным счетам', (
-    WidgetTester tester,
-  ) async {
-    final rubles = await createAccount(name: 'Рубли');
-    await createAccount(name: 'Копилка');
-    await createAccount(name: 'На отпуск');
-    final food = await createCategory(
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    await createTransaction(
-      account: rubles,
-      category: food,
-      amountMinor: 1500,
-      occurredAt: currentMonth,
-    );
+  testWidgets(
+    'выбранные счета без операций дают сообщение по выбранным счетам',
+    (WidgetTester tester) async {
+      final rubles = await createAccount(name: 'Рубли');
+      await createAccount(name: 'Копилка');
+      await createAccount(name: 'На отпуск');
+      final food = await createCategory(
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      await createTransaction(
+        account: rubles,
+        category: food,
+        amountMinor: 1500,
+        occurredAt: currentMonth,
+      );
 
-    await pumpPage(tester);
-    await selectAccounts(tester, ['Копилка', 'На отпуск']);
+      await pumpPage(tester);
+      await selectAccounts(tester, ['Копилка', 'На отпуск']);
 
-    expect(
-      find.text(
-        'За ${monthLabel(currentMonth)} по выбранным счетам операций '
-        'выбранного потока нет.',
-      ),
-      findsOneWidget,
-    );
-    expect(
-      texts(tester).where((value) => value.startsWith('Итого:')),
-      isEmpty,
-    );
+      expect(
+        find.text(
+          'За ${monthLabel(currentMonth)} по выбранным счетам операций '
+          'выбранного потока нет.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        texts(tester).where((value) => value.startsWith('Итого:')),
+        isEmpty,
+      );
 
-    // Один выбранный счет сообщение называет по имени.
-    await selectAllAccounts(tester);
-    await selectAccounts(tester, ['Копилка']);
+      // Один выбранный счет сообщение называет по имени.
+      await selectAllAccounts(tester);
+      await selectAccounts(tester, ['Копилка']);
 
-    expect(
-      find.text(
-        'По счету «Копилка» за ${monthLabel(currentMonth)} операций '
-        'выбранного потока нет.',
-      ),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text(
+          'По счету «Копилка» за ${monthLabel(currentMonth)} операций '
+          'выбранного потока нет.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('подэкран при фильтре по нескольким счетам суммирует их операции', (
-    WidgetTester tester,
-  ) async {
-    final rubles = await createAccount(name: 'Рубли');
-    final cash = await createAccount(name: 'Наличные');
-    final food = await createCategory(
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    await createTransaction(
-      account: rubles,
-      category: food,
-      amountMinor: 1500,
-      occurredAt: currentMonth,
-    );
-    await createTransaction(
-      account: cash,
-      category: food,
-      amountMinor: 500,
-      occurredAt: DateTime(now.year, now.month, 25),
-    );
+  testWidgets(
+    'подэкран при фильтре по нескольким счетам суммирует их операции',
+    (WidgetTester tester) async {
+      final rubles = await createAccount(name: 'Рубли');
+      final cash = await createAccount(name: 'Наличные');
+      final food = await createCategory(
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      await createTransaction(
+        account: rubles,
+        category: food,
+        amountMinor: 1500,
+        occurredAt: currentMonth,
+      );
+      await createTransaction(
+        account: cash,
+        category: food,
+        amountMinor: 500,
+        occurredAt: DateTime(now.year, now.month, 25),
+      );
 
-    await pumpPage(tester);
-    await selectAccounts(tester, ['Рубли', 'Наличные']);
+      await pumpPage(tester);
+      await selectAccounts(tester, ['Рубли', 'Наличные']);
 
-    expect(find.text('20,00 ₽'), findsOneWidget);
+      expect(find.text('20,00 ₽'), findsOneWidget);
 
-    await tester.tap(find.text('Продукты'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Продукты'));
+      await tester.pumpAndSettle();
 
-    // Итог подэкрана равен сумме показанных операций всех выбранных счетов,
-    // а сами операции идут от новых к старым.
-    expect(find.text('Итого по категории: 20,00 ₽'), findsOneWidget);
-    expect(texts(tester).where((value) => value.startsWith('-')), [
-      '-5,00 ₽',
-      '-15,00 ₽',
-    ]);
-  });
+      // Итог подэкрана равен сумме показанных операций всех выбранных счетов,
+      // а сами операции идут от новых к старым.
+      expect(find.text('Итого по категории: 20,00 ₽'), findsOneWidget);
+      expect(texts(tester).where((value) => value.startsWith('-')), [
+        '-5,00 ₽',
+        '-15,00 ₽',
+      ]);
+    },
+  );
 
   testWidgets('поток и фильтр по счетам стоят в одной строке и не сдвигаются', (
     WidgetTester tester,

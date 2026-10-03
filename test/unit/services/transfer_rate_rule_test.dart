@@ -39,7 +39,10 @@ void main() {
 
   test('доход и расход: курса нет', () {
     final income = transaction(kind: TransactionKind.income, toAccountId: null);
-    final expense = transaction(kind: TransactionKind.expense, toAccountId: null);
+    final expense = transaction(
+      kind: TransactionKind.expense,
+      toAccountId: null,
+    );
 
     expect(isCrossCurrencyTransfer(income), isFalse);
     expect(transferRate(income), isNull);

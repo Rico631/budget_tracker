@@ -42,58 +42,61 @@ void main() {
     return (book, account, fallback);
   }
 
-  test('moves category transactions to the fallback category and deletes it', () async {
-    final (book, account, fallback) = await prepareBook();
-    final groceries = await categories.create(
-      bookId: book.id,
-      name: 'Продукты',
-      kind: TransactionKind.expense,
-    );
-    final first = await transactions.create(
-      bookId: book.id,
-      accountId: account.id,
-      kind: TransactionKind.expense,
-      amountMinor: 1500,
-      occurredAt: DateTime(2026, 9, 20),
-      categoryId: groceries.id,
-      note: 'Хлеб',
-    );
-    final second = await transactions.create(
-      bookId: book.id,
-      accountId: account.id,
-      kind: TransactionKind.expense,
-      amountMinor: 5600,
-      occurredAt: DateTime(2026, 9, 21),
-      categoryId: groceries.id,
-    );
+  test(
+    'moves category transactions to the fallback category and deletes it',
+    () async {
+      final (book, account, fallback) = await prepareBook();
+      final groceries = await categories.create(
+        bookId: book.id,
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      );
+      final first = await transactions.create(
+        bookId: book.id,
+        accountId: account.id,
+        kind: TransactionKind.expense,
+        amountMinor: 1500,
+        occurredAt: DateTime(2026, 9, 20),
+        categoryId: groceries.id,
+        note: 'Хлеб',
+      );
+      final second = await transactions.create(
+        bookId: book.id,
+        accountId: account.id,
+        kind: TransactionKind.expense,
+        amountMinor: 5600,
+        occurredAt: DateTime(2026, 9, 21),
+        categoryId: groceries.id,
+      );
 
-    await categories.deleteWithReassignment(groceries.id, fallback.id);
+      await categories.deleteWithReassignment(groceries.id, fallback.id);
 
-    expect(await categories.getById(groceries.id), isNull);
-    expect((await categories.listByBook(book.id)).map((item) => item.id), [
-      fallback.id,
-    ]);
+      expect(await categories.getById(groceries.id), isNull);
+      expect((await categories.listByBook(book.id)).map((item) => item.id), [
+        fallback.id,
+      ]);
 
-    final stored = await transactions.listByBook(book.id);
+      final stored = await transactions.listByBook(book.id);
 
-    expect(stored, hasLength(2));
-    expect(
-      stored.every((transaction) => transaction.categoryId == fallback.id),
-      isTrue,
-    );
+      expect(stored, hasLength(2));
+      expect(
+        stored.every((transaction) => transaction.categoryId == fallback.id),
+        isTrue,
+      );
 
-    // Суммы, счета, даты и заметки операций не изменились.
-    final storedFirst = stored.where((item) => item.id == first.id).single;
-    final storedSecond = stored.where((item) => item.id == second.id).single;
+      // Суммы, счета, даты и заметки операций не изменились.
+      final storedFirst = stored.where((item) => item.id == first.id).single;
+      final storedSecond = stored.where((item) => item.id == second.id).single;
 
-    expect(storedFirst.amountMinor, 1500);
-    expect(storedFirst.accountId, account.id);
-    expect(storedFirst.occurredAt, first.occurredAt);
-    expect(storedFirst.note, 'Хлеб');
-    expect(storedSecond.amountMinor, 5600);
-    expect(storedSecond.accountId, account.id);
-    expect(storedSecond.occurredAt, second.occurredAt);
-  });
+      expect(storedFirst.amountMinor, 1500);
+      expect(storedFirst.accountId, account.id);
+      expect(storedFirst.occurredAt, first.occurredAt);
+      expect(storedFirst.note, 'Хлеб');
+      expect(storedSecond.amountMinor, 5600);
+      expect(storedSecond.accountId, account.id);
+      expect(storedSecond.occurredAt, second.occurredAt);
+    },
+  );
 
   test('deletes a category without transactions on its own', () async {
     final (book, _, _) = await prepareBook();
@@ -175,7 +178,10 @@ void main() {
       (await categories.findFallback(book.id, TransactionKind.expense))!.id,
       fallback.id,
     );
-    expect(await categories.findFallback(book.id, TransactionKind.income), isNull);
+    expect(
+      await categories.findFallback(book.id, TransactionKind.income),
+      isNull,
+    );
 
     // Сравнение не учитывает регистр и краевые пробелы и не выходит за тип.
     expect(

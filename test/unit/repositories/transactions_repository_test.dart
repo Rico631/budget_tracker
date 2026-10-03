@@ -152,55 +152,57 @@ void main() {
     expect(stored.toAmountMinor, 915000);
   });
 
-  test('updates the destination amount and keeps identity of a transaction',
-      () async {
-    final book = await books.create(name: 'Update');
-    final source = await accounts.create(
-      bookId: book.id,
-      name: 'Source',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 0,
-    );
-    final target = await accounts.create(
-      bookId: book.id,
-      name: 'Target',
-      currencyCode: 'USD',
-      initialBalanceMinor: 0,
-    );
-    final transfer = await transactions.create(
-      bookId: book.id,
-      accountId: source.id,
-      toAccountId: target.id,
-      kind: TransactionKind.transfer,
-      amountMinor: 90000,
-      toAmountMinor: 1000,
-      occurredAt: DateTime(2026, 9, 24),
-    );
+  test(
+    'updates the destination amount and keeps identity of a transaction',
+    () async {
+      final book = await books.create(name: 'Update');
+      final source = await accounts.create(
+        bookId: book.id,
+        name: 'Source',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+      final target = await accounts.create(
+        bookId: book.id,
+        name: 'Target',
+        currencyCode: 'USD',
+        initialBalanceMinor: 0,
+      );
+      final transfer = await transactions.create(
+        bookId: book.id,
+        accountId: source.id,
+        toAccountId: target.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 90000,
+        toAmountMinor: 1000,
+        occurredAt: DateTime(2026, 9, 24),
+      );
 
-    final storedBeforeUpdate = await transactions.getById(transfer.id);
+      final storedBeforeUpdate = await transactions.getById(transfer.id);
 
-    await transactions.update(
-      FinanceTransaction(
-        id: transfer.id,
-        bookId: transfer.bookId,
-        accountId: transfer.accountId,
-        toAccountId: transfer.toAccountId,
-        kind: transfer.kind,
-        amountMinor: transfer.amountMinor,
-        toAmountMinor: 1150,
-        occurredAt: transfer.occurredAt,
-        createdAt: transfer.createdAt,
-        updatedAt: DateTime.now(),
-      ),
-    );
+      await transactions.update(
+        FinanceTransaction(
+          id: transfer.id,
+          bookId: transfer.bookId,
+          accountId: transfer.accountId,
+          toAccountId: transfer.toAccountId,
+          kind: transfer.kind,
+          amountMinor: transfer.amountMinor,
+          toAmountMinor: 1150,
+          occurredAt: transfer.occurredAt,
+          createdAt: transfer.createdAt,
+          updatedAt: DateTime.now(),
+        ),
+      );
 
-    final stored = await transactions.getById(transfer.id);
+      final stored = await transactions.getById(transfer.id);
 
-    expect((await transactions.listByBook(book.id)), hasLength(1));
-    expect(stored!.id, transfer.id);
-    expect(stored.createdAt, storedBeforeUpdate!.createdAt);
-    expect(stored.toAmountMinor, 1150);
-  });
+      expect((await transactions.listByBook(book.id)), hasLength(1));
+      expect(stored!.id, transfer.id);
+      expect(stored.createdAt, storedBeforeUpdate!.createdAt);
+      expect(stored.toAmountMinor, 1150);
+    },
+  );
 
   test('deletes only the requested transaction', () async {
     final book = await books.create(name: 'Delete');
@@ -257,10 +259,7 @@ void main() {
 
     final ordered = await transactions.listByBook(book.id);
 
-    expect(ordered.map((transaction) => transaction.id), [
-      newer.id,
-      older.id,
-    ]);
+    expect(ordered.map((transaction) => transaction.id), [newer.id, older.id]);
   });
 
   test('reads same-day transactions from newest to oldest', () async {
@@ -288,8 +287,7 @@ void main() {
         kind: TransactionKind.income,
         amountMinor: 100,
         occurredAt: occurredAt,
-      ))
-          .id,
+      )).id,
     );
     orderedIds.add(
       (await orderedTransactions.create(
@@ -298,8 +296,7 @@ void main() {
         kind: TransactionKind.expense,
         amountMinor: 200,
         occurredAt: occurredAt,
-      ))
-          .id,
+      )).id,
     );
 
     final stored = await transactions.listByBook(book.id);

@@ -5,7 +5,7 @@ import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/repositories/bootstrap_repositories.dart';
 import 'package:budget_tracker/main.dart';
-import 'package:budget_tracker/presentation/features/accounts/account_form_page.dart';
+import 'package:budget_tracker/ui/features/accounts/views/account_form_page.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -117,10 +117,7 @@ void main() {
   testWidgets('ошибка инициализации не показывает предложение первого счета', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
-      tester,
-      bootstrap: _FailingBootstrapRepository(),
-    );
+    await pumpApp(tester, bootstrap: _FailingBootstrapRepository());
 
     expect(
       find.text(
@@ -145,7 +142,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(await database.select(database.books).get(), hasLength(books.length));
+    expect(
+      await database.select(database.books).get(),
+      hasLength(books.length),
+    );
     expect(
       await database.select(database.categories).get(),
       hasLength(categories.length),
@@ -158,7 +158,10 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await pumpApp(tester);
 
-    expect(await database.select(database.books).get(), hasLength(books.length));
+    expect(
+      await database.select(database.books).get(),
+      hasLength(books.length),
+    );
     expect(
       await database.select(database.categories).get(),
       hasLength(categories.length),

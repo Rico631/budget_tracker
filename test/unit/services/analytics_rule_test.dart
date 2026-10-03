@@ -58,21 +58,27 @@ void main() {
   final september = AnalyticsPeriod.month(year: 2026, month: 9);
 
   group('Период среза считается по локальному календарю', () {
-    test('операция 1-го числа и последнего дня месяца попадает в свой месяц', () {
-      expect(analyticsPeriodContains(september, DateTime(2026, 9, 1)), isTrue);
-      expect(
-        analyticsPeriodContains(september, DateTime(2026, 9, 30, 23, 59)),
-        isTrue,
-      );
-      expect(
-        analyticsPeriodContains(september, DateTime(2026, 8, 31, 23, 59)),
-        isFalse,
-      );
-      expect(
-        analyticsPeriodContains(september, DateTime(2026, 10, 1)),
-        isFalse,
-      );
-    });
+    test(
+      'операция 1-го числа и последнего дня месяца попадает в свой месяц',
+      () {
+        expect(
+          analyticsPeriodContains(september, DateTime(2026, 9, 1)),
+          isTrue,
+        );
+        expect(
+          analyticsPeriodContains(september, DateTime(2026, 9, 30, 23, 59)),
+          isTrue,
+        );
+        expect(
+          analyticsPeriodContains(september, DateTime(2026, 8, 31, 23, 59)),
+          isFalse,
+        );
+        expect(
+          analyticsPeriodContains(september, DateTime(2026, 10, 1)),
+          isFalse,
+        );
+      },
+    );
 
     test('полночь не попадает сразу в два соседних периода', () {
       final october = AnalyticsPeriod.month(year: 2026, month: 10);
@@ -109,14 +115,8 @@ void main() {
     test('период операции и текущий период определяются по времени', () {
       final now = DateTime(2026, 9, 27, 10);
 
-      expect(
-        analyticsPeriodOf(DateTime(2026, 9, 24, 21, 30)),
-        september,
-      );
-      expect(
-        currentAnalyticsPeriod(AnalyticsPeriodMode.month, now),
-        september,
-      );
+      expect(analyticsPeriodOf(DateTime(2026, 9, 24, 21, 30)), september);
+      expect(currentAnalyticsPeriod(AnalyticsPeriodMode.month, now), september);
       expect(
         currentAnalyticsPeriod(AnalyticsPeriodMode.year, now),
         AnalyticsPeriod.year(2026),
@@ -143,7 +143,10 @@ void main() {
     });
 
     test('текущий месяц и текущий год присутствуют без операций', () {
-      final available = availableAnalyticsPeriods(const [], DateTime(2026, 9, 27));
+      final available = availableAnalyticsPeriods(
+        const [],
+        DateTime(2026, 9, 27),
+      );
 
       expect(available, hasLength(2));
       expect(available, contains(september));
@@ -271,10 +274,9 @@ void main() {
         ['food'],
       );
       expect(expenses.blocks.single.totalMinor, 1500);
-      expect(
-        incomes.blocks.single.categories.map((item) => item.category.id),
-        ['salary'],
-      );
+      expect(incomes.blocks.single.categories.map((item) => item.category.id), [
+        'salary',
+      ]);
       expect(incomes.blocks.single.totalMinor, 5000);
     });
 
@@ -609,10 +611,10 @@ void main() {
         stream: TransactionKind.expense,
       );
 
-      expect(
-        slice.blocks.single.categories.map((item) => item.category.name),
-        ['Аренда', 'Продукты'],
-      );
+      expect(slice.blocks.single.categories.map((item) => item.category.name), [
+        'Аренда',
+        'Продукты',
+      ]);
       expect(slice.blocks.single.categories.first.amountMinor, 40000);
       // Нулевая полоса вместо категории без операций не рисуется.
       expect(
@@ -645,10 +647,10 @@ void main() {
         stream: TransactionKind.expense,
       );
 
-      expect(
-        slice.blocks.single.categories.map((item) => item.category.name),
-        ['Аренда', 'Продукты'],
-      );
+      expect(slice.blocks.single.categories.map((item) => item.category.name), [
+        'Аренда',
+        'Продукты',
+      ]);
     });
 
     test('операции одной категории складываются в одну полосу', () {
@@ -681,51 +683,57 @@ void main() {
   });
 
   group('Итог периода показывает сумму только выбранного потока', () {
-    test('итог блока равен сумме категорийных сумм, валюта берется из справочника', () {
-      final rubles = account(id: 'rubles');
-      final slice = buildAnalyticsSlice(
-        transactions: [
-          transaction(
-            id: 'food',
-            accountId: 'rubles',
-            categoryId: 'food',
-            amountMinor: 1500,
-            occurredAt: DateTime(2026, 9, 10),
-          ),
-          transaction(
-            id: 'rent',
-            accountId: 'rubles',
-            categoryId: 'rent',
-            amountMinor: 40000,
-            occurredAt: DateTime(2026, 9, 5),
-          ),
-        ],
-        accounts: [rubles],
-        categories: [
-          category(id: 'food', name: 'Продукты'),
-          category(id: 'rent', name: 'Аренда'),
-        ],
-        period: september,
-        stream: TransactionKind.expense,
-        currencyCatalog: {
-          'RUB': FinanceCurrency(
-            code: 'RUB',
-            numericCode: '643',
-            symbol: '₽',
-            nameRu: 'Российский рубль',
-            nameEn: 'Russian Ruble',
-          ),
-        },
-      );
+    test(
+      'итог блока равен сумме категорийных сумм, валюта берется из справочника',
+      () {
+        final rubles = account(id: 'rubles');
+        final slice = buildAnalyticsSlice(
+          transactions: [
+            transaction(
+              id: 'food',
+              accountId: 'rubles',
+              categoryId: 'food',
+              amountMinor: 1500,
+              occurredAt: DateTime(2026, 9, 10),
+            ),
+            transaction(
+              id: 'rent',
+              accountId: 'rubles',
+              categoryId: 'rent',
+              amountMinor: 40000,
+              occurredAt: DateTime(2026, 9, 5),
+            ),
+          ],
+          accounts: [rubles],
+          categories: [
+            category(id: 'food', name: 'Продукты'),
+            category(id: 'rent', name: 'Аренда'),
+          ],
+          period: september,
+          stream: TransactionKind.expense,
+          currencyCatalog: {
+            'RUB': FinanceCurrency(
+              code: 'RUB',
+              numericCode: '643',
+              symbol: '₽',
+              nameRu: 'Российский рубль',
+              nameEn: 'Russian Ruble',
+            ),
+          },
+        );
 
-      final block = slice.blocks.single;
-      expect(block.currency?.symbol, '₽');
-      expect(
-        block.totalMinor,
-        block.categories.fold<int>(0, (total, item) => total + item.amountMinor),
-      );
-      expect(block.totalMinor, 41500);
-    });
+        final block = slice.blocks.single;
+        expect(block.currency?.symbol, '₽');
+        expect(
+          block.totalMinor,
+          block.categories.fold<int>(
+            0,
+            (total, item) => total + item.amountMinor,
+          ),
+        );
+        expect(block.totalMinor, 41500);
+      },
+    );
 
     test('доходы при выбранном расходе в итог не попадают', () {
       final rubles = account(id: 'rubles');
@@ -749,7 +757,11 @@ void main() {
         ],
         accounts: [rubles],
         categories: [
-          category(id: 'salary', name: 'Зарплата', kind: TransactionKind.income),
+          category(
+            id: 'salary',
+            name: 'Зарплата',
+            kind: TransactionKind.income,
+          ),
           category(id: 'food', name: 'Продукты'),
         ],
         period: september,
@@ -791,7 +803,18 @@ void main() {
       final block = trend.blocks.single;
       expect(block.months, hasLength(12));
       expect(block.months.map((item) => item.month), [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
       ]);
       expect(block.months.first.amountMinor, 1000);
       expect(block.months[5].amountMinor, 0);
@@ -962,14 +985,17 @@ void main() {
         categoryId: 'food',
         currencyCode: 'RUB',
       );
-      final bar = buildAnalyticsSlice(
-        transactions: transactions,
-        accounts: [rubles, dollars],
-        categories: categories,
-        period: september,
-        stream: TransactionKind.expense,
-      ).blocks.singleWhere((block) => block.currencyCode == 'RUB').categories
-          .singleWhere((item) => item.category.id == 'food');
+      final bar =
+          buildAnalyticsSlice(
+                transactions: transactions,
+                accounts: [rubles, dollars],
+                categories: categories,
+                period: september,
+                stream: TransactionKind.expense,
+              ).blocks
+              .singleWhere((block) => block.currencyCode == 'RUB')
+              .categories
+              .singleWhere((item) => item.category.id == 'food');
 
       expect(
         operations.fold<int>(0, (total, item) => total + item.amountMinor),

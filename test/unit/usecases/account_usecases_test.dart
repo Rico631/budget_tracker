@@ -95,33 +95,41 @@ void main() {
     expect(group.accounts, hasLength(2));
     expect(group.totalMinor, 10000 - 1500 + 2500);
     expect(
-      group.accounts.singleWhere((item) => item.account.id == main.id).balanceMinor,
+      group.accounts
+          .singleWhere((item) => item.account.id == main.id)
+          .balanceMinor,
       8500,
     );
   });
 
-  test('счета разных валют образуют отдельные группы без общего итога', () async {
-    final book = await books.create(name: 'Бюджет');
-    await addAccount(
-      book.id,
-      name: 'Рубли',
-      currencyCode: 'RUB',
-      initialBalanceMinor: 1000,
-    );
-    await addAccount(
-      book.id,
-      name: 'Доллары',
-      currencyCode: 'USD',
-      initialBalanceMinor: 200,
-    );
+  test(
+    'счета разных валют образуют отдельные группы без общего итога',
+    () async {
+      final book = await books.create(name: 'Бюджет');
+      await addAccount(
+        book.id,
+        name: 'Рубли',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 1000,
+      );
+      await addAccount(
+        book.id,
+        name: 'Доллары',
+        currencyCode: 'USD',
+        initialBalanceMinor: 200,
+      );
 
-    final overview = await useCases.loadOverview(book.id);
+      final overview = await useCases.loadOverview(book.id);
 
-    expect(overview.groups.map((group) => group.currencyCode), ['RUB', 'USD']);
-    expect(overview.groups[0].totalMinor, 1000);
-    expect(overview.groups[1].totalMinor, 200);
-    expect(overview.groups[1].currency?.code, 'USD');
-  });
+      expect(overview.groups.map((group) => group.currencyCode), [
+        'RUB',
+        'USD',
+      ]);
+      expect(overview.groups[0].totalMinor, 1000);
+      expect(overview.groups[1].totalMinor, 200);
+      expect(overview.groups[1].currency?.code, 'USD');
+    },
+  );
 
   test('архивный счет не влияет на список и итог', () async {
     final book = await books.create(name: 'Бюджет');
@@ -141,10 +149,9 @@ void main() {
 
     expect(overview.groups, hasLength(1));
     expect(overview.groups.single.totalMinor, 700);
-    expect(
-      overview.groups.single.accounts.map((item) => item.account.id),
-      [active.id],
-    );
+    expect(overview.groups.single.accounts.map((item) => item.account.id), [
+      active.id,
+    ]);
   });
 
   test('пустая книга возвращает обзор без активных счетов', () async {
@@ -176,42 +183,39 @@ void main() {
     expect(countingTransactions.listByBookCalls, 1);
   });
 
-  test(
-    'валидирует ввод счета: пустое название, код валюты не из трех букв '
-    'и допустимый отрицательный остаток',
-    () {
-      final emptyName = FinanceAccountInput.tryCreate(
-        bookId: 'book',
-        name: '   ',
-        currencyCode: 'RUB',
-        initialBalanceMinor: 0,
-      );
-      expect(emptyName, isA<Invalid<FinanceAccountInput>>());
-      expect(emptyName.errorsOrFail(), contains(accountNameRequiredError));
+  test('валидирует ввод счета: пустое название, код валюты не из трех букв '
+      'и допустимый отрицательный остаток', () {
+    final emptyName = FinanceAccountInput.tryCreate(
+      bookId: 'book',
+      name: '   ',
+      currencyCode: 'RUB',
+      initialBalanceMinor: 0,
+    );
+    expect(emptyName, isA<Invalid<FinanceAccountInput>>());
+    expect(emptyName.errorsOrFail(), contains(accountNameRequiredError));
 
-      final shortCurrencyCode = FinanceAccountInput.tryCreate(
-        bookId: 'book',
-        name: 'Счет',
-        currencyCode: 'RU',
-        initialBalanceMinor: 0,
-      );
-      expect(
-        shortCurrencyCode.errorsOrFail(),
-        contains(accountCurrencyCodeInvalidError),
-      );
+    final shortCurrencyCode = FinanceAccountInput.tryCreate(
+      bookId: 'book',
+      name: 'Счет',
+      currencyCode: 'RU',
+      initialBalanceMinor: 0,
+    );
+    expect(
+      shortCurrencyCode.errorsOrFail(),
+      contains(accountCurrencyCodeInvalidError),
+    );
 
-      final negativeBalance = FinanceAccountInput.tryCreate(
-        bookId: 'book',
-        name: '  Счет  ',
-        currencyCode: 'rub',
-        initialBalanceMinor: -500,
-      );
-      final input = negativeBalance.valueOrFail();
-      expect(input.name, 'Счет');
-      expect(input.currencyCode, 'RUB');
-      expect(input.initialBalanceMinor, -500);
-    },
-  );
+    final negativeBalance = FinanceAccountInput.tryCreate(
+      bookId: 'book',
+      name: '  Счет  ',
+      currencyCode: 'rub',
+      initialBalanceMinor: -500,
+    );
+    final input = negativeBalance.valueOrFail();
+    expect(input.name, 'Счет');
+    expect(input.currencyCode, 'RUB');
+    expect(input.initialBalanceMinor, -500);
+  });
 
   test('создает счет и не создает его при незаполненном названии', () async {
     final book = await books.create(name: 'Бюджет');
@@ -263,12 +267,9 @@ void main() {
 
     expect(updated.valueOrFail().name, 'Переименованный');
     expect(
-      (await useCases.loadOverview(book.id))
-          .groups
-          .single
-          .accounts
-          .single
-          .balanceMinor,
+      (await useCases.loadOverview(
+        book.id,
+      )).groups.single.accounts.single.balanceMinor,
       2500,
     );
     expect((await transactions.listByBook(book.id)).single.amountMinor, 500);
@@ -317,7 +318,10 @@ void main() {
     );
 
     expect(updated, isA<Invalid<FinanceAccount>>());
-    expect(updated.errorsOrFail(), contains(accountCurrencyChangeRejectedError));
+    expect(
+      updated.errorsOrFail(),
+      contains(accountCurrencyChangeRejectedError),
+    );
     final stored = (await accounts.getById(account.id))!;
     expect(stored.currencyCode, 'RUB');
     expect(stored.name, account.name);
@@ -362,10 +366,9 @@ void main() {
     );
 
     expect(await accounts.getById(removable.id), isNull);
-    expect(
-      (await accounts.listByBook(book.id)).map((item) => item.id),
-      [remaining.id],
-    );
+    expect((await accounts.listByBook(book.id)).map((item) => item.id), [
+      remaining.id,
+    ]);
   });
 
   test('выбирает валюту по умолчанию по локали интерфейса', () {

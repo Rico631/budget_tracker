@@ -62,10 +62,9 @@ void main() {
     expect(storedLinked.currencyCode, 'RUB');
     expect(storedLinked.initialBalanceMinor, 250000);
     expect(
-      (await accounts.listByBook(book.id))
-          .where((account) => account.id == linked.id)
-          .single
-          .bankId,
+      (await accounts.listByBook(
+        book.id,
+      )).where((account) => account.id == linked.id).single.bankId,
       isNull,
     );
     expect((await accounts.getById(untouched.id))!.bankId, otherBank.id);

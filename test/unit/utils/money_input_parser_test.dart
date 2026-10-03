@@ -1,4 +1,4 @@
-import 'package:budget_tracker/presentation/shared/utils/money_input_parser.dart';
+import 'package:budget_tracker/ui/core/utils/money_input_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

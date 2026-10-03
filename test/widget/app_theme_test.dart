@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
-import 'package:budget_tracker/core/theme/app_semantic_colors.dart';
-import 'package:budget_tracker/core/theme/app_theme.dart';
+import 'package:budget_tracker/ui/core/theme/app_semantic_colors.dart';
+import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/main.dart';
@@ -65,10 +65,7 @@ void main() {
       AppTheme.fontFamily,
     );
     expect(
-      tester
-          .widget<Text>(find.text('Добавьте первый счет'))
-          .style
-          ?.fontFamily,
+      tester.widget<Text>(find.text('Добавьте первый счет')).style?.fontFamily,
       AppTheme.fontFamily,
     );
   });
