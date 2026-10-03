@@ -138,6 +138,36 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Выбирает [date] в календаре и подтверждает выбор.
+  ///
+  /// Календарь открывается на текущем месяце ([today]), поэтому дату из
+  /// предыдущего месяца нужно дополнительно пролистать назад.
+  Future<void> selectDate(
+    WidgetTester tester,
+    DateTime date, {
+    required DateTime today,
+  }) async {
+    await tester.tap(find.byKey(transactionFormDateFieldKey));
+    await tester.pumpAndSettle();
+
+    if (date.year != today.year || date.month != today.month) {
+      await tester.tap(find.byIcon(Icons.chevron_left));
+      await tester.pumpAndSettle();
+    }
+
+    // День ищем только в сетке календаря: в заголовке диалога дата тоже
+    // отрисована отдельными виджетами.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(CalendarDatePicker),
+        matching: find.text('${date.day}'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'ОК'));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('выбор типа операции первым шагом', (
     WidgetTester tester,
   ) async {
@@ -401,21 +431,16 @@ void main() {
     await createAccount(name: 'Рубли');
     await createCategory(TransactionKind.expense);
     final now = DateTime.now();
-    final pastDay = now.day == 15 ? 14 : 15;
-    final expectedDate = DateTime(now.year, now.month, pastDay);
+    final today = DateTime(now.year, now.month, now.day);
+    // Вчерашний день доступен всегда: календарь не позволяет выбрать будущее.
+    final pastDate = DateTime(today.year, today.month, today.day - 1);
 
     await pumpForm(tester);
-    expect(
-      find.text(DateFormat.yMMMMd('ru').format(now)),
-      findsOneWidget,
-    );
+    expect(find.text(DateFormat.yMMMMd('ru').format(today)), findsOneWidget);
 
-    await tester.tap(find.byKey(transactionFormDateFieldKey));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('$pastDay').first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('ОК'));
-    await tester.pumpAndSettle();
+    await selectDate(tester, pastDate, today: today);
+
+    expect(find.text(DateFormat.yMMMMd('ru').format(pastDate)), findsOneWidget);
 
     await selectAccount(
       tester,
@@ -428,9 +453,9 @@ void main() {
     await tester.pumpAndSettle();
 
     final stored = (await transactions.listByBook(book.id)).single;
-    expect(stored.occurredAt.year, expectedDate.year);
-    expect(stored.occurredAt.month, expectedDate.month);
-    expect(stored.occurredAt.day, expectedDate.day);
+    expect(stored.occurredAt.year, pastDate.year);
+    expect(stored.occurredAt.month, pastDate.month);
+    expect(stored.occurredAt.day, pastDate.day);
   });
 
   testWidgets('после создания операции журнал и остатки обновляются', (
