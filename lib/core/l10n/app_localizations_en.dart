@@ -413,6 +413,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The book has no base category of this type.';
 
   @override
+  String get categoryFormDebtDeleteRejectedError =>
+      'A debt category cannot be deleted. Renaming is available.';
+
+  @override
   String get categoryFormKindNotAllowedError =>
       'A category can be income or expense only.';
 
@@ -710,6 +714,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journalExportColumnCategory => 'Category';
 
   @override
+  String get journalExportColumnCounterparty => 'Counterparty';
+
+  @override
   String get journalExportColumnNote => 'Note';
 
   @override
@@ -771,4 +778,229 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get databaseListDeleteFailureMessage =>
       'Failed to delete the database.';
+
+  @override
+  String get accountsSectionAccountsLabel => 'Accounts';
+
+  @override
+  String get accountsSectionDebtsLabel => 'Debts';
+
+  @override
+  String get debtsLoadErrorMessage => 'Failed to load debts. Try again.';
+
+  @override
+  String get debtsRetryAction => 'Retry';
+
+  @override
+  String get debtsReceivableTitle => 'Owed to me';
+
+  @override
+  String get debtsPayableTitle => 'I owe';
+
+  @override
+  String get debtsTotalLabel => 'Total';
+
+  @override
+  String get debtsArchiveAction => 'Archive';
+
+  @override
+  String get debtsArchiveTitle => 'Debt archive';
+
+  @override
+  String get debtsArchiveEmptyMessage => 'The archive has no closed debts.';
+
+  @override
+  String get debtsEmptyTitle => 'No debts';
+
+  @override
+  String get debtsEmptyMessage =>
+      'Add a counterparty and enter the debt amount.';
+
+  @override
+  String get debtsEmptyAction => 'Add counterparty';
+
+  @override
+  String get debtsOperationsTitle => 'Counterparty operations';
+
+  @override
+  String get debtsOperationsEmptyMessage =>
+      'The counterparty has no operations.';
+
+  @override
+  String get debtsOperationsLoadErrorMessage =>
+      'Failed to load operations. Try again.';
+
+  @override
+  String get debtsEditAction => 'Edit';
+
+  @override
+  String get debtsActionsTooltip => 'Debt actions';
+
+  @override
+  String get debtsCloseAction => 'Close the debt';
+
+  @override
+  String get debtsCloseDialogTitle => 'Close the debt?';
+
+  @override
+  String get debtsCloseDialogMessage =>
+      'The counterparty moves to the archive with its current balance.';
+
+  @override
+  String get debtsReopenAction => 'Return to active';
+
+  @override
+  String get debtsDeleteAction => 'Delete';
+
+  @override
+  String get debtsDeleteDialogTitle => 'Delete the counterparty?';
+
+  @override
+  String get debtsDeleteDialogMessage =>
+      'The counterparty is deleted permanently.';
+
+  @override
+  String get debtsDeleteDialogConfirmAction => 'Delete';
+
+  @override
+  String get debtsDialogCancelAction => 'Cancel';
+
+  @override
+  String get debtsCloseOfferMessage =>
+      'A counterparty with operations cannot be deleted. Close the debt.';
+
+  @override
+  String get debtsSavedMessage => 'Debt saved.';
+
+  @override
+  String get debtsDeletedMessage => 'Counterparty deleted.';
+
+  @override
+  String get debtsMutationFailureMessage => 'Failed to save the debt changes.';
+
+  @override
+  String get counterpartyFormCreateTitle => 'New counterparty';
+
+  @override
+  String get counterpartyFormEditTitle => 'Counterparty';
+
+  @override
+  String get counterpartyFormNameLabel => 'Name';
+
+  @override
+  String get counterpartyFormCurrencyLabel => 'Currency';
+
+  @override
+  String get counterpartyFormDirectionLabel => 'Direction';
+
+  @override
+  String get counterpartyFormDirectionLentLabel => 'I lent';
+
+  @override
+  String get counterpartyFormDirectionBorrowedLabel => 'I borrowed';
+
+  @override
+  String get counterpartyFormAccountLabel => 'Account';
+
+  @override
+  String get counterpartyFormAmountLabel => 'Amount';
+
+  @override
+  String get counterpartyFormSaveAction => 'Save';
+
+  @override
+  String get counterpartyFormCurrencyLockedMessage =>
+      'The currency of a counterparty with operations cannot be changed.';
+
+  @override
+  String get counterpartyFormNoAccountMessage =>
+      'The book has no active account with the counterparty currency.';
+
+  @override
+  String get counterpartyFormAmountError => 'Enter a positive amount.';
+
+  @override
+  String get counterpartyFormNameRequiredError =>
+      'Enter the counterparty name.';
+
+  @override
+  String get counterpartyFormNameDuplicateError =>
+      'A counterparty with the same name already exists in the book.';
+
+  @override
+  String get counterpartyFormCurrencyCodeError =>
+      'Choose the counterparty currency.';
+
+  @override
+  String get counterpartyFormAccountError =>
+      'Choose the account of the first operation.';
+
+  @override
+  String get counterpartyFormAccountCurrencyError =>
+      'Choose an account with the counterparty currency.';
+
+  @override
+  String get counterpartyFormCurrencyChangeError =>
+      'The currency of a counterparty with operations cannot be changed.';
+
+  @override
+  String get counterpartyFormDebtCategoryError =>
+      'The book has no debt category for this direction.';
+
+  @override
+  String get counterpartyFormDeleteError =>
+      'A counterparty with operations cannot be deleted. Close the debt.';
+
+  @override
+  String get counterpartyFormSaveErrorMessage =>
+      'Failed to save the counterparty.';
+
+  @override
+  String get transactionFormCounterpartyLabel => 'Counterparty';
+
+  @override
+  String get transactionFormCounterpartyNoneLabel => 'No counterparty';
+
+  @override
+  String get transactionFormCounterpartyAddAction => 'New counterparty';
+
+  @override
+  String get transactionFormCounterpartyCreateTitle => 'New counterparty';
+
+  @override
+  String get transactionFormCounterpartyCreateMessage =>
+      'The counterparty is saved together with the operation.';
+
+  @override
+  String get transactionFormCounterpartyCreateConfirmAction => 'Create';
+
+  @override
+  String get transactionFormCounterpartyCreateCancelAction => 'Cancel';
+
+  @override
+  String get transactionFormCounterpartyNameError =>
+      'Enter the counterparty name.';
+
+  @override
+  String get transactionFormCounterpartyDuplicateError =>
+      'A counterparty with the same name already exists in the book.';
+
+  @override
+  String get transactionFormCounterpartyCurrencyError =>
+      'The counterparty currency differs from the account currency.';
+
+  @override
+  String get transactionFormCounterpartyBookError =>
+      'Choose a counterparty of this book.';
+
+  @override
+  String get transactionFormCounterpartyDebtRoleError =>
+      'A debt repayment is available only for a counterparty that owes in that direction.';
+
+  @override
+  String get transactionFormCounterpartyNotAllowedError =>
+      'A transfer cannot have a counterparty.';
+
+  @override
+  String get transactionTileCounterpartyLabel => 'Counterparty';
 }

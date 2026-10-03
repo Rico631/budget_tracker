@@ -58,12 +58,27 @@ void main() {
 
     final categories = await database.select(database.categories).get();
 
-    expect(categories, hasLength(37));
-    expect(categories.where((row) => row.kind == 'income'), hasLength(11));
-    expect(categories.where((row) => row.kind == 'expense'), hasLength(26));
+    expect(categories, hasLength(40));
+    expect(categories.where((row) => row.kind == 'income'), hasLength(12));
+    expect(categories.where((row) => row.kind == 'expense'), hasLength(28));
     expect(categories.every((row) => row.bookId == result.book!.id), isTrue);
     expect(categories.every((row) => row.parentId == null), isTrue);
     expect(categories.map((row) => row.name), contains('Зарплата'));
+
+    // Долговые категории создаются с сохраненным признаком роли
+    // (ADR-0009, решение 9.5).
+    expect(
+      categories
+          .where((row) => row.debtRole != null)
+          .map((row) => (row.name, row.kind, row.debtRole)),
+      containsAll(<(String, String, String?)>[
+        ('Заём', 'income', 'loanInflow'),
+        ('Возврат денег', 'income', 'refundInflow'),
+        ('Заём', 'expense', 'loanOutflow'),
+        ('Возврат денег', 'expense', 'refundOutflow'),
+      ]),
+    );
+    expect(categories.where((row) => row.debtRole != null), hasLength(4));
 
     final fallbackCategories = categories
         .where((row) => row.isFallback)
@@ -137,7 +152,7 @@ void main() {
     expect(second.status, FirstRunBootstrapStatus.alreadyInitialized);
     expect(second.book, isNotNull);
     expect(await countRows('books'), 1);
-    expect(await countRows('categories'), 37);
+    expect(await countRows('categories'), 40);
     expect(await countRows('banks'), 100);
     expect(await countRows('currencies'), 164);
 
@@ -173,7 +188,7 @@ void main() {
 
     expect(retry.status, FirstRunBootstrapStatus.created);
     expect(await countRows('books'), 1);
-    expect(await countRows('categories'), 37);
+    expect(await countRows('categories'), 40);
     expect(await countRows('banks'), 100);
     expect(await countRows('currencies'), 164);
   });
@@ -235,7 +250,7 @@ void main() {
 
     final bookCategories = await categories.listByBook(existingBook.id);
 
-    expect(bookCategories, hasLength(38));
+    expect(bookCategories, hasLength(41));
     expect(
       bookCategories.every((category) => category.bookId == existingBook.id),
       isTrue,

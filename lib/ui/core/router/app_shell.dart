@@ -1,8 +1,11 @@
+import 'package:budget_tracker/core/di/app_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/ui/core/router/app_destination.dart';
 import 'package:budget_tracker/ui/features/accounts/views/account_form_page.dart';
 import 'package:budget_tracker/ui/features/accounts/views/accounts_page.dart';
+import 'package:budget_tracker/ui/features/accounts/view_models/accounts_section.dart';
 import 'package:budget_tracker/ui/features/analytics/views/analytics_page.dart';
+import 'package:budget_tracker/ui/features/debts/views/counterparty_form_page.dart';
 import 'package:budget_tracker/ui/features/settings/views/settings_page.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transaction_form_page.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transactions_page.dart';
@@ -23,13 +26,22 @@ class ActiveDestination extends Notifier<AppDestination> {
 final activeDestinationProvider =
     NotifierProvider<ActiveDestination, AppDestination>(ActiveDestination.new);
 
+/// Ключ действия добавления контрагента части «Долги».
+const Key shellAddCounterpartyActionKey = Key('shellAddCounterpartyAction');
+
+/// Ключ действия добавления счета части «Счета».
+const Key shellAddAccountActionKey = Key('shellAddAccountAction');
+
 /// Навигационная оболочка приложения: плоская навигация из четырех разделов и
 /// содержимое активного раздела.
 ///
 /// Действие добавления операции показывается на разделах «Счета» и «Операции»,
-/// действие добавления счета — только на «Счетах», а на «Аналитике» и
-/// «Настройках» действий добавления нет. Правило видимости задается одним
-/// предикатом, чтобы оболочка не расходилась с местом размещения действий.
+/// действие добавления счета — на части «Счета», действие добавления
+/// контрагента — на части «Долги», а на «Аналитике» и «Настройках» действий
+/// добавления нет. Правило видимости задается одним предикатом, чтобы оболочка
+/// не расходилась с местом размещения действий. Подэкраны (архив долгов,
+/// операции контрагента и категории, справочники настроек) показывают действия
+/// сами и действий добавления от оболочки не получают.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key});
 
@@ -37,13 +49,25 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = AppLocalizations.of(context);
     final destination = ref.watch(activeDestinationProvider);
+    final section = ref.watch(accountsSectionProvider);
+    final bookId = ref.watch(activeBookProvider).value?.id;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_titleFor(localizations, destination)),
         actions: [
-          if (showsAddAccountAction(destination))
+          if (showsAddCounterpartyAction(destination, section) &&
+              bookId != null)
             IconButton(
+              key: shellAddCounterpartyActionKey,
+              onPressed: () =>
+                  CounterpartyFormPage.open(context, bookId: bookId),
+              tooltip: localizations.debtsEmptyAction,
+              icon: const Icon(Icons.person_add_alt),
+            ),
+          if (showsAddAccountAction(destination, section))
+            IconButton(
+              key: shellAddAccountActionKey,
               onPressed: () => AccountFormPage.open(context),
               tooltip: localizations.accountsAddAccountTooltip,
               icon: const Icon(Icons.add),
@@ -65,9 +89,18 @@ class AppShell extends ConsumerWidget {
           : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: destination.index,
-        onDestinationSelected: (index) => ref
-            .read(activeDestinationProvider.notifier)
-            .select(AppDestination.values[index]),
+        onDestinationSelected: (index) {
+          final selected = AppDestination.values[index];
+          if (selected == AppDestination.accounts) {
+            // Раздел открывается частью «Счета»: возврат в раздел и повторное
+            // нажатие на него показывают счета, а выбор части «Долги» действует
+            // в пределах текущего захода в раздел (ADR-0009, решение 9.12).
+            ref
+                .read(accountsSectionProvider.notifier)
+                .select(AccountsSection.accounts);
+          }
+          ref.read(activeDestinationProvider.notifier).select(selected);
+        },
         destinations: [
           for (final item in AppDestination.values)
             NavigationDestination(
@@ -101,7 +134,22 @@ bool showsAddTransactionAction(AppDestination destination) =>
 
 /// Доступно ли на разделе действие добавления счета.
 ///
-/// Счет добавляется только на «Счетах»: на «Операциях» история показывает уже
-/// созданные счета.
-bool showsAddAccountAction(AppDestination destination) =>
-    destination == AppDestination.accounts;
+/// Счет добавляется только на части «Счета»: на «Операциях» история показывает
+/// уже созданные счета, а на части «Долги» — контрагентов (ADR-0009,
+/// решение 9.12).
+bool showsAddAccountAction(
+  AppDestination destination,
+  AccountsSection section,
+) =>
+    destination == AppDestination.accounts &&
+    section == AccountsSection.accounts;
+
+/// Доступно ли на разделе действие добавления контрагента.
+///
+/// Контрагент добавляется только на части «Долги» раздела «Счета»: на экране
+/// архива долгов и в подэкране операций контрагента действий добавления нет
+/// (ADR-0009, решение 9.12).
+bool showsAddCounterpartyAction(
+  AppDestination destination,
+  AccountsSection section,
+) => destination == AppDestination.accounts && section == AccountsSection.debts;

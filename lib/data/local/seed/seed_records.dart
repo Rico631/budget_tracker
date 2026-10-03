@@ -37,6 +37,7 @@ class CategorySeed {
     required this.nameEn,
     required this.kind,
     this.isFallback = false,
+    this.debtRole,
   });
 
   final String nameRu;
@@ -46,4 +47,8 @@ class CategorySeed {
   /// Базовая категория типа [kind]: такая запись помечается признаком при
   /// создании стартового набора (ADR-0004, решение 4.2).
   final bool isFallback;
+
+  /// Долговая роль категории или `null`, если категория не является долговой
+  /// (ADR-0009, решение 9.5).
+  final CategoryDebtRole? debtRole;
 }

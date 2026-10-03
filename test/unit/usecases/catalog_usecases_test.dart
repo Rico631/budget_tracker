@@ -10,6 +10,7 @@ import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
+import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:budget_tracker/domain/usecases/catalog_usecases.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter_test/flutter_test.dart';
@@ -231,6 +232,82 @@ void main() {
       expect((await categories.getById(fallback.id))!.name, 'Прочие расходы');
     });
 
+    test('creates a category without a debt role', () async {
+      final created = (await categoryUseCases.create(
+        bookId: book.id,
+        name: 'Продукты',
+        kind: TransactionKind.expense,
+      )).valueOrFail();
+
+      expect(created.debtRole, isNull);
+      expect((await categories.getById(created.id))!.debtRole, isNull);
+    });
+
+    test('keeps the debt role when a debt category is renamed', () async {
+      final debtCategory = await _insertDebtCategory(
+        database,
+        bookId: book.id,
+        name: 'Заём',
+        kind: TransactionKind.expense,
+        debtRole: CategoryDebtRole.loanOutflow,
+      );
+
+      final renamed = await categoryUseCases.update(
+        debtCategory,
+        name: 'Одолжил другу',
+        kind: TransactionKind.expense,
+      );
+
+      expect(renamed.valueOrFail().name, 'Одолжил другу');
+      expect(renamed.valueOrFail().debtRole, CategoryDebtRole.loanOutflow);
+
+      final stored = (await categories.getById(debtCategory.id))!;
+
+      expect(stored.name, 'Одолжил другу');
+      expect(stored.debtRole, CategoryDebtRole.loanOutflow);
+    });
+
+    test(
+      'rejects deleting a debt category without moving its operations',
+      () async {
+        await categoryUseCases.ensureFallbackCategories(
+          bookId: book.id,
+          languageCode: 'ru',
+        );
+        final debtCategory = await _insertDebtCategory(
+          database,
+          bookId: book.id,
+          name: 'Заём',
+          kind: TransactionKind.expense,
+          debtRole: CategoryDebtRole.loanOutflow,
+        );
+        final account = await accounts.create(
+          bookId: book.id,
+          name: 'Кошелек',
+          currencyCode: 'RUB',
+          initialBalanceMinor: 0,
+        );
+        final transaction = await transactions.create(
+          bookId: book.id,
+          accountId: account.id,
+          kind: TransactionKind.expense,
+          amountMinor: 500,
+          occurredAt: DateTime(2026, 10, 3),
+          categoryId: debtCategory.id,
+        );
+
+        expect(errorsOf(await categoryUseCases.delete(debtCategory)), [
+          categoryDebtDeleteRejectedError,
+        ]);
+        expect(await categories.getById(debtCategory.id), isNotNull);
+        // Операции не переносятся в базовую категорию.
+        expect(
+          (await transactions.getById(transaction.id))!.categoryId,
+          debtCategory.id,
+        );
+      },
+    );
+
     test(
       'deletes a category moving its operations to the fallback one',
       () async {
@@ -451,6 +528,32 @@ extension on ValidationResult<FinanceCategory> {
     Valid(value: final value) => value,
     Invalid(errors: final errors) => fail('Ожидалась категория: $errors'),
   };
+}
+
+/// Записывает долговую категорию так, как это делает миграция схемы: роль
+/// назначается вместе с категорией и недоступна управлению категориями
+/// (ADR-0009, решение 9.5).
+Future<FinanceCategory> _insertDebtCategory(
+  AppDatabase database, {
+  required String bookId,
+  required String name,
+  required TransactionKind kind,
+  required CategoryDebtRole debtRole,
+}) async {
+  final now = DateTime(2026, 10, 3);
+  final category = FinanceCategory(
+    id: const FinanceIdGenerator().generateV7(),
+    bookId: bookId,
+    name: name,
+    kind: kind,
+    createdAt: now,
+    updatedAt: now,
+    debtRole: debtRole,
+  );
+  await database
+      .into(database.categories)
+      .insert(categoryToCompanion(category));
+  return category;
 }
 
 extension on ValidationResult<FinanceBank> {

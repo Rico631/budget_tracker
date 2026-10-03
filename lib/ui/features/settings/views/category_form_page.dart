@@ -242,6 +242,8 @@ class _CategoryFormPageState extends ConsumerState<CategoryFormPage> {
           localizations.categoryFormFallbackDeleteRejectedError,
         categoryFallbackMissingError =>
           localizations.categoryFormFallbackMissingError,
+        categoryDebtDeleteRejectedError =>
+          localizations.categoryFormDebtDeleteRejectedError,
         categoryKindChangeRejectedError || categoryKindNotAllowedError =>
           localizations.categoryFormKindNotAllowedError,
         _kindRequiredError => localizations.categoryFormKindRequiredError,

@@ -30,6 +30,7 @@ class TransactionTile extends StatelessWidget {
     required this.account,
     this.toAccount,
     this.category,
+    this.counterparty,
     this.currencySymbol,
     this.toCurrencySymbol,
     this.onTap,
@@ -45,6 +46,10 @@ class TransactionTile extends StatelessWidget {
 
   /// Категория дохода или расхода; у перевода ее нет.
   final FinanceCategory? category;
+
+  /// Контрагент долга у операции с привязкой; у перевода и операции без привязки
+  /// его нет, и строка не показывает пустое значение (ADR-0009, решение 9.4).
+  final FinanceCounterparty? counterparty;
 
   final String? currencySymbol;
   final String? toCurrencySymbol;
@@ -106,6 +111,14 @@ class TransactionTile extends StatelessWidget {
           ),
           if (_crossCurrencyText(context) case final line?)
             Text(line, maxLines: 2, style: theme.textTheme.bodySmall),
+          if (counterparty case final counterparty?)
+            Text(
+              '${localizations.transactionTileCounterpartyLabel}: '
+              '${counterparty.name}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall,
+            ),
           if (transaction.note case final note? when note.isNotEmpty)
             Text(
               note,

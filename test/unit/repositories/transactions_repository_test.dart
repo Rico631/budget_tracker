@@ -4,8 +4,10 @@ import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
+import 'package:budget_tracker/data/repositories/counterparties_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/domain/models/journal_export_row.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:drift/native.dart';
@@ -404,6 +406,267 @@ void main() {
       expect(incomeRow.toAccountName, isNull);
     },
   );
+
+  group('Counterparty binding', () {
+    late BooksRepository books;
+    late CategoriesRepository categories;
+    late CounterpartiesRepository counterparties;
+    late FinanceBook book;
+    late FinanceAccount rubleAccount;
+    late FinanceAccount dollarAccount;
+    late FinanceCategory category;
+    late FinanceCounterparty counterparty;
+
+    setUp(() async {
+      books = DriftBooksRepository(database);
+      categories = DriftCategoriesRepository(database);
+      counterparties = DriftCounterpartiesRepository(database);
+      book = await books.create(name: 'Долги');
+      rubleAccount = await accounts.create(
+        bookId: book.id,
+        name: 'Рубли',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+      dollarAccount = await accounts.create(
+        bookId: book.id,
+        name: 'Доллары',
+        currencyCode: 'USD',
+        initialBalanceMinor: 0,
+      );
+      category = await categories.create(
+        bookId: book.id,
+        name: 'Заём',
+        kind: TransactionKind.expense,
+      );
+      counterparty = FinanceCounterparty(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        name: 'Иван',
+        currencyCode: 'RUB',
+        createdAt: DateTime(2026, 10, 3),
+        updatedAt: DateTime(2026, 10, 3),
+      );
+      await counterparties.createWithTransaction(
+        counterparty: counterparty,
+        transaction: FinanceTransaction(
+          id: const FinanceIdGenerator().generateV7(),
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          categoryId: category.id,
+          counterpartyId: counterparty.id,
+          kind: TransactionKind.expense,
+          amountMinor: 1000,
+          occurredAt: DateTime(2026, 10, 3),
+          createdAt: DateTime(2026, 10, 3),
+          updatedAt: DateTime(2026, 10, 3),
+        ),
+      );
+    });
+
+    test('saves the binding of an operation', () async {
+      final created = await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 250,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect(created.counterpartyId, counterparty.id);
+      expect(
+        (await transactions.getById(created.id))!.counterpartyId,
+        counterparty.id,
+      );
+    });
+
+    test('keeps the binding when the account keeps its currency', () async {
+      final created = await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 250,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+      final updated = FinanceTransaction(
+        id: created.id,
+        bookId: created.bookId,
+        accountId: rubleAccount.id,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        kind: created.kind,
+        amountMinor: 400,
+        occurredAt: created.occurredAt,
+        createdAt: created.createdAt,
+        updatedAt: DateTime.now(),
+      );
+
+      await transactions.update(updated);
+
+      expect(
+        (await transactions.getById(created.id))!.counterpartyId,
+        counterparty.id,
+      );
+    });
+
+    test('drops the binding when the account changes its currency', () async {
+      final created = await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 250,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+      // Смена счета на счет другой валюты снимает привязку: форму и домен
+      // дополняет сохранение операции без ссылки на контрагента (ADR-0009,
+      // решение 9.9).
+      final updated = FinanceTransaction(
+        id: created.id,
+        bookId: created.bookId,
+        accountId: dollarAccount.id,
+        categoryId: category.id,
+        kind: created.kind,
+        amountMinor: 250,
+        occurredAt: created.occurredAt,
+        createdAt: created.createdAt,
+        updatedAt: DateTime.now(),
+      );
+
+      await transactions.update(updated);
+
+      final stored = (await transactions.getById(created.id))!;
+
+      expect(stored.accountId, dollarAccount.id);
+      expect(stored.counterpartyId, isNull);
+      expect(await counterparties.getById(counterparty.id), isNotNull);
+    });
+
+    test('does not bind a transfer', () async {
+      final transfer = await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        toAccountId: dollarAccount.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 300,
+        toAmountMinor: 4,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect(transfer.counterpartyId, isNull);
+      expect((await transactions.getById(transfer.id))!.counterpartyId, isNull);
+      expect(
+        (await counterparties.listTransactions(counterparty.id)).length,
+        1,
+      );
+    });
+
+    test('reopens a closed counterparty on a new bound operation', () async {
+      final closed = FinanceCounterparty(
+        id: counterparty.id,
+        bookId: counterparty.bookId,
+        name: counterparty.name,
+        currencyCode: counterparty.currencyCode,
+        isClosed: true,
+        createdAt: counterparty.createdAt,
+        updatedAt: DateTime(2026, 10, 4),
+      );
+
+      await counterparties.update(closed);
+      expect((await counterparties.getById(counterparty.id))!.isClosed, isTrue);
+
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 100,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        occurredAt: DateTime(2026, 10, 5),
+      );
+
+      expect(
+        (await counterparties.getById(counterparty.id))!.isClosed,
+        isFalse,
+      );
+    });
+
+    test(
+      'recalculates the debt balance after a bound operation is deleted',
+      () async {
+        final created = await transactions.create(
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          kind: TransactionKind.expense,
+          amountMinor: 500,
+          categoryId: category.id,
+          counterpartyId: counterparty.id,
+          occurredAt: DateTime(2026, 10, 4),
+        );
+
+        expect(
+          (await counterparties.listWithBalances(book.id)).single.balanceMinor,
+          1500,
+        );
+
+        await transactions.delete(created.id);
+
+        expect(
+          (await counterparties.listWithBalances(book.id)).single.balanceMinor,
+          1000,
+        );
+        expect(await counterparties.getById(counterparty.id), isNotNull);
+      },
+    );
+
+    test('reads the counterparty name into the export journal', () async {
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 500,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        occurredAt: DateTime(2026, 10, 5),
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 300,
+        categoryId: category.id,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        toAccountId: dollarAccount.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 200,
+        toAmountMinor: 2,
+        occurredAt: DateTime(2026, 10, 3),
+      );
+
+      final rows = await transactions.listJournalForExport(book.id);
+      final byKind = <String, List<JournalExportRow>>{};
+      for (final row in rows) {
+        byKind
+            .putIfAbsent('${row.kind.name}-${row.amountMinor}', () => [])
+            .add(row);
+      }
+
+      // Операция с привязкой несет наименование контрагента.
+      expect(byKind['expense-500']!.single.counterpartyName, 'Иван');
+      // Операция без привязки и перевод оставляют колонку пустой.
+      expect(byKind['expense-300']!.single.counterpartyName, isNull);
+      expect(byKind['transfer-200']!.single.counterpartyName, isNull);
+    });
+  });
 }
 
 /// Генератор идентификаторов с заданной последовательностью значений.

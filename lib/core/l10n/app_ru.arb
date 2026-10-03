@@ -489,6 +489,10 @@
   "@categoryFormFallbackMissingError": {
     "description": "Отказ в удалении без базовой категории того же типа"
   },
+  "categoryFormDebtDeleteRejectedError": "Долговую категорию нельзя удалить. Переименование доступно.",
+  "@categoryFormDebtDeleteRejectedError": {
+    "description": "Отказ в удалении категории с признаком долговой роли"
+  },
   "categoryFormKindNotAllowedError": "Категория может быть только доходом или расходом.",
   "@categoryFormKindNotAllowedError": {
     "description": "Отказ в типе перевода для категории"
@@ -901,6 +905,10 @@
   "@journalExportColumnCategory": {
     "description": "Заголовок колонки категории в CSV-файле"
   },
+  "journalExportColumnCounterparty": "Контрагент",
+  "@journalExportColumnCounterparty": {
+    "description": "Заголовок колонки контрагента в CSV-файле"
+  },
   "journalExportColumnNote": "Заметка",
   "@journalExportColumnNote": {
     "description": "Заголовок колонки заметки в CSV-файле"
@@ -982,5 +990,273 @@
   "databaseListDeleteFailureMessage": "Не удалось удалить базу.",
   "@databaseListDeleteFailureMessage": {
     "description": "Сообщение об ошибке удаления базы"
+  },
+  "accountsSectionAccountsLabel": "Счета",
+  "@accountsSectionAccountsLabel": {
+    "description": "Часть «Счета» переключателя раздела «Счета»"
+  },
+  "accountsSectionDebtsLabel": "Долги",
+  "@accountsSectionDebtsLabel": {
+    "description": "Часть «Долги» переключателя раздела «Счета»"
+  },
+  "debtsLoadErrorMessage": "Не удалось загрузить долги. Повторите попытку.",
+  "@debtsLoadErrorMessage": {
+    "description": "Сообщение об ошибке загрузки списка долгов"
+  },
+  "debtsRetryAction": "Повторить",
+  "@debtsRetryAction": {
+    "description": "Действие повторной загрузки долгов"
+  },
+  "debtsReceivableTitle": "Мне должны",
+  "@debtsReceivableTitle": {
+    "description": "Часть списка долгов с положительным остатком"
+  },
+  "debtsPayableTitle": "Я должен",
+  "@debtsPayableTitle": {
+    "description": "Часть списка долгов с отрицательным остатком"
+  },
+  "debtsTotalLabel": "Итого",
+  "@debtsTotalLabel": {
+    "description": "Подпись итога долгов по валюте"
+  },
+  "debtsArchiveAction": "Архив",
+  "@debtsArchiveAction": {
+    "description": "Действие открытия архива долгов"
+  },
+  "debtsArchiveTitle": "Архив долгов",
+  "@debtsArchiveTitle": {
+    "description": "Заголовок экрана архива долгов"
+  },
+  "debtsArchiveEmptyMessage": "В архиве нет закрытых долгов.",
+  "@debtsArchiveEmptyMessage": {
+    "description": "Пустое состояние архива долгов"
+  },
+  "debtsEmptyTitle": "Долгов нет",
+  "@debtsEmptyTitle": {
+    "description": "Заголовок пустого состояния раздела долгов"
+  },
+  "debtsEmptyMessage": "Добавьте контрагента и укажите сумму долга.",
+  "@debtsEmptyMessage": {
+    "description": "Приглашение добавить первого контрагента"
+  },
+  "debtsEmptyAction": "Добавить контрагента",
+  "@debtsEmptyAction": {
+    "description": "Действие создания первого контрагента"
+  },
+  "debtsOperationsTitle": "Операции контрагента",
+  "@debtsOperationsTitle": {
+    "description": "Заголовок подэкрана операций контрагента"
+  },
+  "debtsOperationsEmptyMessage": "У контрагента нет операций.",
+  "@debtsOperationsEmptyMessage": {
+    "description": "Пустое состояние списка операций контрагента"
+  },
+  "debtsOperationsLoadErrorMessage": "Не удалось загрузить операции. Повторите попытку.",
+  "@debtsOperationsLoadErrorMessage": {
+    "description": "Сообщение об ошибке загрузки операций контрагента"
+  },
+  "debtsEditAction": "Редактировать",
+  "@debtsEditAction": {
+    "description": "Действие изменения данных контрагента"
+  },
+  "debtsActionsTooltip": "Действия с долгом",
+  "@debtsActionsTooltip": {
+    "description": "Подсказка меню строки долга"
+  },
+  "debtsCloseAction": "Закрыть долг",
+  "@debtsCloseAction": {
+    "description": "Действие ручного закрытия долга"
+  },
+  "debtsCloseDialogTitle": "Закрыть долг?",
+  "@debtsCloseDialogTitle": {
+    "description": "Заголовок подтверждения ручного закрытия долга"
+  },
+  "debtsCloseDialogMessage": "Контрагент уйдет в архив вместе с текущим остатком.",
+  "@debtsCloseDialogMessage": {
+    "description": "Пояснение ручного закрытия долга"
+  },
+  "debtsReopenAction": "Вернуть в активные",
+  "@debtsReopenAction": {
+    "description": "Действие возврата контрагента из архива"
+  },
+  "debtsDeleteAction": "Удалить",
+  "@debtsDeleteAction": {
+    "description": "Действие безвозвратного удаления контрагента"
+  },
+  "debtsDeleteDialogTitle": "Удалить контрагента?",
+  "@debtsDeleteDialogTitle": {
+    "description": "Заголовок подтверждения удаления контрагента"
+  },
+  "debtsDeleteDialogMessage": "Контрагент удаляется безвозвратно.",
+  "@debtsDeleteDialogMessage": {
+    "description": "Пояснение удаления контрагента"
+  },
+  "debtsDeleteDialogConfirmAction": "Удалить",
+  "@debtsDeleteDialogConfirmAction": {
+    "description": "Подтверждение удаления контрагента"
+  },
+  "debtsDialogCancelAction": "Отмена",
+  "@debtsDialogCancelAction": {
+    "description": "Отмена диалога долгов"
+  },
+  "debtsCloseOfferMessage": "Контрагента с операциями нельзя удалить. Закройте долг.",
+  "@debtsCloseOfferMessage": {
+    "description": "Предложение закрыть долг вместо удаления"
+  },
+  "debtsSavedMessage": "Долг сохранен.",
+  "@debtsSavedMessage": {
+    "description": "Подтверждение сохранения контрагента"
+  },
+  "debtsDeletedMessage": "Контрагент удален.",
+  "@debtsDeletedMessage": {
+    "description": "Подтверждение удаления контрагента"
+  },
+  "debtsMutationFailureMessage": "Не удалось сохранить изменения долга.",
+  "@debtsMutationFailureMessage": {
+    "description": "Сообщение об ошибке изменения долга"
+  },
+  "counterpartyFormCreateTitle": "Новый контрагент",
+  "@counterpartyFormCreateTitle": {
+    "description": "Заголовок формы создания контрагента"
+  },
+  "counterpartyFormEditTitle": "Контрагент",
+  "@counterpartyFormEditTitle": {
+    "description": "Заголовок формы редактирования контрагента"
+  },
+  "counterpartyFormNameLabel": "Наименование",
+  "@counterpartyFormNameLabel": {
+    "description": "Поле наименования контрагента"
+  },
+  "counterpartyFormCurrencyLabel": "Валюта",
+  "@counterpartyFormCurrencyLabel": {
+    "description": "Поле валюты контрагента"
+  },
+  "counterpartyFormDirectionLabel": "Направление",
+  "@counterpartyFormDirectionLabel": {
+    "description": "Поле направления долга"
+  },
+  "counterpartyFormDirectionLentLabel": "Я дал в долг",
+  "@counterpartyFormDirectionLentLabel": {
+    "description": "Направление «я дал в долг»"
+  },
+  "counterpartyFormDirectionBorrowedLabel": "Я взял в долг",
+  "@counterpartyFormDirectionBorrowedLabel": {
+    "description": "Направление «я взял в долг»"
+  },
+  "counterpartyFormAccountLabel": "Счет",
+  "@counterpartyFormAccountLabel": {
+    "description": "Поле счета первой операции долга"
+  },
+  "counterpartyFormAmountLabel": "Сумма",
+  "@counterpartyFormAmountLabel": {
+    "description": "Поле суммы первой операции долга"
+  },
+  "counterpartyFormSaveAction": "Сохранить",
+  "@counterpartyFormSaveAction": {
+    "description": "Действие сохранения контрагента"
+  },
+  "counterpartyFormCurrencyLockedMessage": "Валюта контрагента с операциями не изменяется.",
+  "@counterpartyFormCurrencyLockedMessage": {
+    "description": "Пояснение неизменяемости валюты контрагента с операциями"
+  },
+  "counterpartyFormNoAccountMessage": "В книге нет активного счета с валютой контрагента.",
+  "@counterpartyFormNoAccountMessage": {
+    "description": "Отсутствие счета с валютой контрагента"
+  },
+  "counterpartyFormAmountError": "Укажите положительную сумму.",
+  "@counterpartyFormAmountError": {
+    "description": "Ошибка суммы первой операции долга"
+  },
+  "counterpartyFormNameRequiredError": "Укажите наименование контрагента.",
+  "@counterpartyFormNameRequiredError": {
+    "description": "Ошибка пустого наименования контрагента"
+  },
+  "counterpartyFormNameDuplicateError": "Контрагент с таким наименованием уже есть в книге.",
+  "@counterpartyFormNameDuplicateError": {
+    "description": "Ошибка дубликата наименования контрагента"
+  },
+  "counterpartyFormCurrencyCodeError": "Выберите валюту контрагента.",
+  "@counterpartyFormCurrencyCodeError": {
+    "description": "Ошибка кода валюты контрагента"
+  },
+  "counterpartyFormAccountError": "Выберите счет первой операции.",
+  "@counterpartyFormAccountError": {
+    "description": "Ошибка отсутствия счета первой операции"
+  },
+  "counterpartyFormAccountCurrencyError": "Выберите счет с валютой контрагента.",
+  "@counterpartyFormAccountCurrencyError": {
+    "description": "Ошибка несовпадения валюты счета и контрагента"
+  },
+  "counterpartyFormCurrencyChangeError": "Валюту контрагента с операциями изменить нельзя.",
+  "@counterpartyFormCurrencyChangeError": {
+    "description": "Ошибка смены валюты контрагента с операциями"
+  },
+  "counterpartyFormDebtCategoryError": "В книге нет долговой категории этого направления.",
+  "@counterpartyFormDebtCategoryError": {
+    "description": "Ошибка отсутствия долговой категории"
+  },
+  "counterpartyFormDeleteError": "Контрагента с операциями удалить нельзя. Закройте долг.",
+  "@counterpartyFormDeleteError": {
+    "description": "Ошибка удаления контрагента с операциями"
+  },
+  "counterpartyFormSaveErrorMessage": "Не удалось сохранить контрагента.",
+  "@counterpartyFormSaveErrorMessage": {
+    "description": "Сообщение об ошибке сохранения контрагента"
+  },
+  "transactionFormCounterpartyLabel": "Контрагент",
+  "@transactionFormCounterpartyLabel": {
+    "description": "Поле контрагента в форме операции"
+  },
+  "transactionFormCounterpartyNoneLabel": "Без контрагента",
+  "@transactionFormCounterpartyNoneLabel": {
+    "description": "Пустое значение поля контрагента"
+  },
+  "transactionFormCounterpartyAddAction": "Новый контрагент",
+  "@transactionFormCounterpartyAddAction": {
+    "description": "Действие создания контрагента из формы операции"
+  },
+  "transactionFormCounterpartyCreateTitle": "Новый контрагент",
+  "@transactionFormCounterpartyCreateTitle": {
+    "description": "Заголовок создания контрагента из формы операции"
+  },
+  "transactionFormCounterpartyCreateMessage": "Контрагент сохранится вместе с операцией.",
+  "@transactionFormCounterpartyCreateMessage": {
+    "description": "Пояснение создания контрагента вместе с операцией"
+  },
+  "transactionFormCounterpartyCreateConfirmAction": "Создать",
+  "@transactionFormCounterpartyCreateConfirmAction": {
+    "description": "Подтверждение создания контрагента из формы операции"
+  },
+  "transactionFormCounterpartyCreateCancelAction": "Отмена",
+  "@transactionFormCounterpartyCreateCancelAction": {
+    "description": "Отмена создания контрагента из формы операции"
+  },
+  "transactionFormCounterpartyNameError": "Укажите наименование контрагента.",
+  "@transactionFormCounterpartyNameError": {
+    "description": "Ошибка пустого наименования контрагента в форме операции"
+  },
+  "transactionFormCounterpartyDuplicateError": "Контрагент с таким наименованием уже есть в книге.",
+  "@transactionFormCounterpartyDuplicateError": {
+    "description": "Ошибка дубликата контрагента в форме операции"
+  },
+  "transactionFormCounterpartyCurrencyError": "Валюта контрагента не совпадает с валютой счета.",
+  "@transactionFormCounterpartyCurrencyError": {
+    "description": "Ошибка несовпадения валюты контрагента и счета операции"
+  },
+  "transactionFormCounterpartyBookError": "Выберите контрагента своей книги.",
+  "@transactionFormCounterpartyBookError": {
+    "description": "Ошибка контрагента другой книги"
+  },
+  "transactionFormCounterpartyDebtRoleError": "Возврат долга доступен только контрагенту с долгом этого направления.",
+  "@transactionFormCounterpartyDebtRoleError": {
+    "description": "Ошибка несовпадения направления долга контрагента и роли категории"
+  },
+  "transactionFormCounterpartyNotAllowedError": "Переводу контрагент недоступен.",
+  "@transactionFormCounterpartyNotAllowedError": {
+    "description": "Ошибка привязки контрагента к переводу"
+  },
+  "transactionTileCounterpartyLabel": "Контрагент",
+  "@transactionTileCounterpartyLabel": {
+    "description": "Подпись контрагента в строке операции"
   }
 }

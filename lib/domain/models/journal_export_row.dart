@@ -14,6 +14,7 @@ class JournalExportRow {
     required this.currencyCode,
     required this.amountMinor,
     this.categoryName,
+    this.counterpartyName,
     this.note,
     this.toAccountName,
     this.toCurrencyCode,
@@ -34,6 +35,10 @@ class JournalExportRow {
 
   /// Имя категории; у перевода категории нет.
   final String? categoryName;
+
+  /// Наименование контрагента у операции с привязкой; у перевода и операции без
+  /// привязки колонка пустая (ADR-0009, решение 9.13).
+  final String? counterpartyName;
 
   final String? note;
 

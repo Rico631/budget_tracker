@@ -4,50 +4,103 @@ import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/services/account_balance_rule.dart';
+import 'package:budget_tracker/domain/services/debt_balance_rule.dart';
+import 'package:budget_tracker/domain/services/debt_counterparty_rule.dart';
+import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:budget_tracker/domain/services/transactions_journal_rule.dart';
 
 class FinanceTransactionUseCases {
   FinanceTransactionUseCases({
     required this.accounts,
     required this.categories,
+    required this.counterparties,
     required this.transactions,
-  });
+    FinanceIdGenerator? idGenerator,
+  }) : idGenerator = idGenerator ?? const FinanceIdGenerator();
 
   final AccountsRepository accounts;
   final CategoriesRepository categories;
+  final CounterpartiesRepository counterparties;
   final TransactionsRepository transactions;
+  final FinanceIdGenerator idGenerator;
 
+  /// Создает операцию книги.
+  ///
+  /// Если задано [newCounterpartyName], контрагент создается вместе с операцией,
+  /// в которой он указан: обе записи сохраняются одной транзакцией, поэтому
+  /// отказ операции не оставляет записи контрагента (ADR-0009, решение 9.11).
   Future<ValidationResult<FinanceTransaction>> create(
     FinanceTransactionInput input, {
     required DateTime occurredAt,
+    String? newCounterpartyName,
   }) async {
     final validation = await _validateInput(input);
     if (validation case Invalid(errors: final errors)) {
       return ValidationResult.invalid(errors);
     }
 
-    final created = await transactions.create(
+    final newCounterparty = await _prepareNewCounterparty(
+      input: input,
+      name: newCounterpartyName,
+    );
+    if (newCounterparty case Invalid(errors: final errors)) {
+      return ValidationResult.invalid(errors);
+    }
+
+    final counterparty = switch (newCounterparty) {
+      Valid(value: final value) => value,
+      Invalid() => null,
+    };
+    if (counterparty == null) {
+      final created = await transactions.create(
+        bookId: input.bookId,
+        accountId: input.accountId,
+        kind: input.kind,
+        amountMinor: input.amountMinor,
+        occurredAt: occurredAt,
+        toAccountId: input.toAccountId,
+        categoryId: input.categoryId,
+        counterpartyId: input.counterpartyId,
+        toAmountMinor: input.toAmountMinor,
+        note: input.note,
+      );
+      return ValidationResult.valid(created);
+    }
+
+    final now = DateTime.now();
+    final created = FinanceTransaction(
+      id: idGenerator.generateV7(),
       bookId: input.bookId,
       accountId: input.accountId,
-      kind: input.kind,
-      amountMinor: input.amountMinor,
-      occurredAt: occurredAt,
       toAccountId: input.toAccountId,
       categoryId: input.categoryId,
+      counterpartyId: counterparty.id,
+      kind: input.kind,
+      amountMinor: input.amountMinor,
       toAmountMinor: input.toAmountMinor,
+      occurredAt: occurredAt,
       note: input.note,
+      createdAt: now,
+      updatedAt: now,
+    );
+    await counterparties.createWithTransaction(
+      counterparty: counterparty,
+      transaction: created,
     );
     return ValidationResult.valid(created);
   }
 
-  /// Сохраняет сумму, счета, категорию, дату и заметку операции.
+  /// Сохраняет сумму, счета, категорию, дату, заметку и привязку к контрагенту.
   ///
   /// Тип операции неизменяем: попытка сохранить операцию с другим типом
   /// отклоняется с [transactionKindChangeRejectedError] без записи в базу.
+  /// Новый контрагент из формы операции создается вместе с сохраняемой операцией
+  /// (ADR-0009, решение 9.11).
   Future<ValidationResult<FinanceTransaction>> update(
     FinanceTransaction existing,
     FinanceTransactionInput input, {
     required DateTime occurredAt,
+    String? newCounterpartyName,
   }) async {
     if (input.kind != existing.kind) {
       return ValidationResult.invalid([transactionKindChangeRejectedError]);
@@ -58,12 +111,25 @@ class FinanceTransactionUseCases {
       return ValidationResult.invalid(errors);
     }
 
+    final newCounterparty = await _prepareNewCounterparty(
+      input: input,
+      name: newCounterpartyName,
+    );
+    if (newCounterparty case Invalid(errors: final errors)) {
+      return ValidationResult.invalid(errors);
+    }
+
+    final counterparty = switch (newCounterparty) {
+      Valid(value: final value) => value,
+      Invalid() => null,
+    };
     final updated = FinanceTransaction(
       id: existing.id,
       bookId: input.bookId,
       accountId: input.accountId,
       toAccountId: input.toAccountId,
       categoryId: input.categoryId,
+      counterpartyId: counterparty?.id ?? input.counterpartyId,
       kind: input.kind,
       amountMinor: input.amountMinor,
       toAmountMinor: input.toAmountMinor,
@@ -72,7 +138,15 @@ class FinanceTransactionUseCases {
       createdAt: existing.createdAt,
       updatedAt: DateTime.now(),
     );
-    await transactions.update(updated);
+
+    if (counterparty == null) {
+      await transactions.update(updated);
+    } else {
+      await counterparties.createWithTransaction(
+        counterparty: counterparty,
+        transaction: updated,
+      );
+    }
     return ValidationResult.valid(updated);
   }
 
@@ -133,6 +207,32 @@ class FinanceTransactionUseCases {
       ]);
     }
 
+    if (input.counterpartyId case final counterpartyId?) {
+      final counterparty = await counterparties.getById(counterpartyId);
+      if (counterparty == null || counterparty.bookId != input.bookId) {
+        return ValidationResult.invalid([
+          transactionCounterpartyBookMismatchError,
+        ]);
+      }
+      if (counterparty.currencyCode != sourceAccount.currencyCode) {
+        return ValidationResult.invalid([
+          transactionCounterpartyCurrencyMismatchError,
+        ]);
+      }
+      // Роль займа подходит любому контрагенту, а роль возврата долга — только
+      // контрагенту с остатком своего направления (ADR-0009, решение 9.15).
+      final role = category?.debtRole;
+      if (role != null &&
+          !debtRoleAcceptsBalance(
+            role,
+            await _counterpartyBalanceMinor(counterpartyId),
+          )) {
+        return ValidationResult.invalid([
+          transactionCounterpartyDebtRoleMismatchError,
+        ]);
+      }
+    }
+
     if (input.kind == TransactionKind.transfer) {
       final targetAccount = await accounts.getById(input.toAccountId!);
       if (targetAccount == null || targetAccount.bookId != input.bookId) {
@@ -149,5 +249,54 @@ class FinanceTransactionUseCases {
     }
 
     return ValidationResult.valid(null);
+  }
+
+  /// Остаток долга контрагента по его привязанным операциям (ADR-0009, 9.2).
+  Future<int> _counterpartyBalanceMinor(String counterpartyId) async =>
+      debtBalanceMinor(
+        counterpartyId,
+        await counterparties.listTransactions(counterpartyId),
+      );
+
+  /// Готовит нового контрагента формы операции: `null`, если имя не задано.
+  ///
+  /// Валюта нового контрагента равна валюте счета операции, поэтому привязка
+  /// всегда допустима, а наименование проверяется на уникальность в книге
+  /// (ADR-0009, решения 9.9 и 9.11).
+  Future<ValidationResult<FinanceCounterparty?>> _prepareNewCounterparty({
+    required FinanceTransactionInput input,
+    required String? name,
+  }) async {
+    if (name == null) {
+      return ValidationResult.valid(null);
+    }
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) {
+      return ValidationResult.invalid([catalogNameRequiredError]);
+    }
+    if (await counterparties.findByName(
+          bookId: input.bookId,
+          name: trimmedName,
+        ) !=
+        null) {
+      return ValidationResult.invalid([counterpartyNameDuplicateError]);
+    }
+
+    final sourceAccount = await accounts.getById(input.accountId);
+    if (sourceAccount == null) {
+      return ValidationResult.invalid(['accountId must belong to bookId.']);
+    }
+
+    final now = DateTime.now();
+    return ValidationResult.valid(
+      FinanceCounterparty(
+        id: idGenerator.generateV7(),
+        bookId: input.bookId,
+        name: trimmedName,
+        currencyCode: sourceAccount.currencyCode,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
   }
 }

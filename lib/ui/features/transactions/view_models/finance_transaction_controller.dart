@@ -2,19 +2,12 @@ import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/ui/core/utils/finance_validation_exception.dart';
 import 'package:budget_tracker/ui/features/accounts/view_models/accounts_controller.dart';
 import 'package:budget_tracker/ui/features/analytics/view_models/analytics_controller.dart';
+import 'package:budget_tracker/ui/features/debts/view_models/debts_controller.dart';
 import 'package:budget_tracker/ui/features/transactions/view_models/transactions_journal_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-class FinanceValidationException implements Exception {
-  FinanceValidationException(this.errors);
-
-  final List<String> errors;
-
-  @override
-  String toString() => errors.join(' ');
-}
 
 /// Создание, изменение и удаление операций книги.
 ///
@@ -38,13 +31,23 @@ class FinanceTransactionController extends AsyncNotifier<FinanceTransaction?> {
     FinanceTransactionInput input, {
     required DateTime occurredAt,
     FinanceTransaction? existing,
+    String? newCounterpartyName,
   }) async {
     state = const AsyncLoading();
     try {
       final useCases = ref.read(financeTransactionUseCasesProvider);
       final result = existing == null
-          ? await useCases.create(input, occurredAt: occurredAt)
-          : await useCases.update(existing, input, occurredAt: occurredAt);
+          ? await useCases.create(
+              input,
+              occurredAt: occurredAt,
+              newCounterpartyName: newCounterpartyName,
+            )
+          : await useCases.update(
+              existing,
+              input,
+              occurredAt: occurredAt,
+              newCounterpartyName: newCounterpartyName,
+            );
       _applyResult(result, input.bookId);
       return result;
     } catch (error, stackTrace) {
@@ -94,6 +97,13 @@ class FinanceTransactionController extends AsyncNotifier<FinanceTransaction?> {
     ref.invalidate(analyticsYearTrendProvider(bookId));
     ref.invalidate(availableAnalyticsPeriodsProvider(bookId));
     ref.invalidate(categoryOperationsProvider);
+    // Остаток долга вычисляется из привязанных операций, поэтому долговая
+    // операция меняет обзор долгов и состав операций контрагента без отдельного
+    // действия пользователя (ADR-0009, решение 9.2).
+    ref.invalidate(debtOverviewProvider(bookId));
+    ref.invalidate(counterpartyOperationsProvider);
+    ref.invalidate(operationCounterpartiesProvider);
+    ref.invalidate(bookCounterpartiesProvider(bookId));
   }
 }
 

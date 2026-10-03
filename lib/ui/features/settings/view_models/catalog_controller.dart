@@ -2,7 +2,7 @@ import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/ui/features/accounts/view_models/accounts_controller.dart';
-import 'package:budget_tracker/ui/features/transactions/view_models/finance_transaction_controller.dart';
+import 'package:budget_tracker/ui/core/utils/finance_validation_exception.dart';
 import 'package:budget_tracker/ui/features/transactions/view_models/transactions_journal_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

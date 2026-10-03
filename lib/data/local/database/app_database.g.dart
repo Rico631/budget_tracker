@@ -1596,6 +1596,17 @@ class $CategoriesTable extends Categories
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _debtRoleMeta = const VerificationMeta(
+    'debtRole',
+  );
+  @override
+  late final GeneratedColumn<String> debtRole = GeneratedColumn<String>(
+    'debt_role',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1607,6 +1618,7 @@ class $CategoriesTable extends Categories
     updatedAt,
     isArchived,
     isFallback,
+    debtRole,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1679,6 +1691,12 @@ class $CategoriesTable extends Categories
         isFallback.isAcceptableOrUnknown(data['is_fallback']!, _isFallbackMeta),
       );
     }
+    if (data.containsKey('debt_role')) {
+      context.handle(
+        _debtRoleMeta,
+        debtRole.isAcceptableOrUnknown(data['debt_role']!, _debtRoleMeta),
+      );
+    }
     return context;
   }
 
@@ -1724,6 +1742,10 @@ class $CategoriesTable extends Categories
         DriftSqlType.bool,
         data['${effectivePrefix}is_fallback'],
       )!,
+      debtRole: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}debt_role'],
+      ),
     );
   }
 
@@ -1748,6 +1770,14 @@ class Category extends DataClass implements Insertable<Category> {
   /// категория не удаляется и не переименовывается, а при удалении другой
   /// категории операции переносятся в базовую категорию своего типа.
   final bool isFallback;
+
+  /// Долговая роль категории из закрытого перечня (`loanOutflow`, `loanInflow`,
+  /// `refundOutflow`, `refundInflow`) или `null`, если категория не является
+  /// долговой (ADR-0009, решение 9.5).
+  ///
+  /// Признак хранится и не зависит от наименования: долговую категорию можно
+  /// переименовать, но нельзя удалить.
+  final String? debtRole;
   const Category({
     required this.id,
     required this.bookId,
@@ -1758,6 +1788,7 @@ class Category extends DataClass implements Insertable<Category> {
     required this.updatedAt,
     required this.isArchived,
     required this.isFallback,
+    this.debtRole,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1773,6 +1804,9 @@ class Category extends DataClass implements Insertable<Category> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_archived'] = Variable<bool>(isArchived);
     map['is_fallback'] = Variable<bool>(isFallback);
+    if (!nullToAbsent || debtRole != null) {
+      map['debt_role'] = Variable<String>(debtRole);
+    }
     return map;
   }
 
@@ -1789,6 +1823,9 @@ class Category extends DataClass implements Insertable<Category> {
       updatedAt: Value(updatedAt),
       isArchived: Value(isArchived),
       isFallback: Value(isFallback),
+      debtRole: debtRole == null && nullToAbsent
+          ? const Value.absent()
+          : Value(debtRole),
     );
   }
 
@@ -1807,6 +1844,7 @@ class Category extends DataClass implements Insertable<Category> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       isFallback: serializer.fromJson<bool>(json['isFallback']),
+      debtRole: serializer.fromJson<String?>(json['debtRole']),
     );
   }
   @override
@@ -1822,6 +1860,7 @@ class Category extends DataClass implements Insertable<Category> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isArchived': serializer.toJson<bool>(isArchived),
       'isFallback': serializer.toJson<bool>(isFallback),
+      'debtRole': serializer.toJson<String?>(debtRole),
     };
   }
 
@@ -1835,6 +1874,7 @@ class Category extends DataClass implements Insertable<Category> {
     DateTime? updatedAt,
     bool? isArchived,
     bool? isFallback,
+    Value<String?> debtRole = const Value.absent(),
   }) => Category(
     id: id ?? this.id,
     bookId: bookId ?? this.bookId,
@@ -1845,6 +1885,7 @@ class Category extends DataClass implements Insertable<Category> {
     updatedAt: updatedAt ?? this.updatedAt,
     isArchived: isArchived ?? this.isArchived,
     isFallback: isFallback ?? this.isFallback,
+    debtRole: debtRole.present ? debtRole.value : this.debtRole,
   );
   Category copyWithCompanion(CategoriesCompanion data) {
     return Category(
@@ -1861,6 +1902,7 @@ class Category extends DataClass implements Insertable<Category> {
       isFallback: data.isFallback.present
           ? data.isFallback.value
           : this.isFallback,
+      debtRole: data.debtRole.present ? data.debtRole.value : this.debtRole,
     );
   }
 
@@ -1875,7 +1917,8 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isArchived: $isArchived, ')
-          ..write('isFallback: $isFallback')
+          ..write('isFallback: $isFallback, ')
+          ..write('debtRole: $debtRole')
           ..write(')'))
         .toString();
   }
@@ -1891,6 +1934,7 @@ class Category extends DataClass implements Insertable<Category> {
     updatedAt,
     isArchived,
     isFallback,
+    debtRole,
   );
   @override
   bool operator ==(Object other) =>
@@ -1904,7 +1948,8 @@ class Category extends DataClass implements Insertable<Category> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isArchived == this.isArchived &&
-          other.isFallback == this.isFallback);
+          other.isFallback == this.isFallback &&
+          other.debtRole == this.debtRole);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -1917,6 +1962,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<DateTime> updatedAt;
   final Value<bool> isArchived;
   final Value<bool> isFallback;
+  final Value<String?> debtRole;
   final Value<int> rowid;
   const CategoriesCompanion({
     this.id = const Value.absent(),
@@ -1928,6 +1974,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.isFallback = const Value.absent(),
+    this.debtRole = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CategoriesCompanion.insert({
@@ -1940,6 +1987,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     this.updatedAt = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.isFallback = const Value.absent(),
+    this.debtRole = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        bookId = Value(bookId),
@@ -1955,6 +2003,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Expression<DateTime>? updatedAt,
     Expression<bool>? isArchived,
     Expression<bool>? isFallback,
+    Expression<String>? debtRole,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1967,6 +2016,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isArchived != null) 'is_archived': isArchived,
       if (isFallback != null) 'is_fallback': isFallback,
+      if (debtRole != null) 'debt_role': debtRole,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1981,6 +2031,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Value<DateTime>? updatedAt,
     Value<bool>? isArchived,
     Value<bool>? isFallback,
+    Value<String?>? debtRole,
     Value<int>? rowid,
   }) {
     return CategoriesCompanion(
@@ -1993,6 +2044,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       updatedAt: updatedAt ?? this.updatedAt,
       isArchived: isArchived ?? this.isArchived,
       isFallback: isFallback ?? this.isFallback,
+      debtRole: debtRole ?? this.debtRole,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2027,6 +2079,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (isFallback.present) {
       map['is_fallback'] = Variable<bool>(isFallback.value);
     }
+    if (debtRole.present) {
+      map['debt_role'] = Variable<String>(debtRole.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2045,6 +2100,485 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('updatedAt: $updatedAt, ')
           ..write('isArchived: $isArchived, ')
           ..write('isFallback: $isFallback, ')
+          ..write('debtRole: $debtRole, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CounterpartiesTable extends Counterparties
+    with TableInfo<$CounterpartiesTable, Counterparty> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CounterpartiesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 36,
+      maxTextLength: 36,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bookIdMeta = const VerificationMeta('bookId');
+  @override
+  late final GeneratedColumn<String> bookId = GeneratedColumn<String>(
+    'book_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES books (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isClosedMeta = const VerificationMeta(
+    'isClosed',
+  );
+  @override
+  late final GeneratedColumn<bool> isClosed = GeneratedColumn<bool>(
+    'is_closed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_closed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    bookId,
+    name,
+    currencyCode,
+    isClosed,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'counterparties';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Counterparty> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('book_id')) {
+      context.handle(
+        _bookIdMeta,
+        bookId.isAcceptableOrUnknown(data['book_id']!, _bookIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currencyCodeMeta);
+    }
+    if (data.containsKey('is_closed')) {
+      context.handle(
+        _isClosedMeta,
+        isClosed.isAcceptableOrUnknown(data['is_closed']!, _isClosedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Counterparty map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Counterparty(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      bookId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      currencyCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_code'],
+      )!,
+      isClosed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_closed'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CounterpartiesTable createAlias(String alias) {
+    return $CounterpartiesTable(attachedDatabase, alias);
+  }
+}
+
+class Counterparty extends DataClass implements Insertable<Counterparty> {
+  final String id;
+  final String bookId;
+  final String name;
+  final String currencyCode;
+
+  /// Признак ручного закрытия долга (ADR-0009, решение 9.10).
+  ///
+  /// Активным считается контрагент со снятым признаком и ненулевым остатком;
+  /// любая новая привязанная операция снимает признак.
+  final bool isClosed;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const Counterparty({
+    required this.id,
+    required this.bookId,
+    required this.name,
+    required this.currencyCode,
+    required this.isClosed,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['book_id'] = Variable<String>(bookId);
+    map['name'] = Variable<String>(name);
+    map['currency_code'] = Variable<String>(currencyCode);
+    map['is_closed'] = Variable<bool>(isClosed);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CounterpartiesCompanion toCompanion(bool nullToAbsent) {
+    return CounterpartiesCompanion(
+      id: Value(id),
+      bookId: Value(bookId),
+      name: Value(name),
+      currencyCode: Value(currencyCode),
+      isClosed: Value(isClosed),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Counterparty.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Counterparty(
+      id: serializer.fromJson<String>(json['id']),
+      bookId: serializer.fromJson<String>(json['bookId']),
+      name: serializer.fromJson<String>(json['name']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      isClosed: serializer.fromJson<bool>(json['isClosed']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'bookId': serializer.toJson<String>(bookId),
+      'name': serializer.toJson<String>(name),
+      'currencyCode': serializer.toJson<String>(currencyCode),
+      'isClosed': serializer.toJson<bool>(isClosed),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Counterparty copyWith({
+    String? id,
+    String? bookId,
+    String? name,
+    String? currencyCode,
+    bool? isClosed,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => Counterparty(
+    id: id ?? this.id,
+    bookId: bookId ?? this.bookId,
+    name: name ?? this.name,
+    currencyCode: currencyCode ?? this.currencyCode,
+    isClosed: isClosed ?? this.isClosed,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  Counterparty copyWithCompanion(CounterpartiesCompanion data) {
+    return Counterparty(
+      id: data.id.present ? data.id.value : this.id,
+      bookId: data.bookId.present ? data.bookId.value : this.bookId,
+      name: data.name.present ? data.name.value : this.name,
+      currencyCode: data.currencyCode.present
+          ? data.currencyCode.value
+          : this.currencyCode,
+      isClosed: data.isClosed.present ? data.isClosed.value : this.isClosed,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Counterparty(')
+          ..write('id: $id, ')
+          ..write('bookId: $bookId, ')
+          ..write('name: $name, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('isClosed: $isClosed, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    bookId,
+    name,
+    currencyCode,
+    isClosed,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Counterparty &&
+          other.id == this.id &&
+          other.bookId == this.bookId &&
+          other.name == this.name &&
+          other.currencyCode == this.currencyCode &&
+          other.isClosed == this.isClosed &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CounterpartiesCompanion extends UpdateCompanion<Counterparty> {
+  final Value<String> id;
+  final Value<String> bookId;
+  final Value<String> name;
+  final Value<String> currencyCode;
+  final Value<bool> isClosed;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CounterpartiesCompanion({
+    this.id = const Value.absent(),
+    this.bookId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.isClosed = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CounterpartiesCompanion.insert({
+    required String id,
+    required String bookId,
+    required String name,
+    required String currencyCode,
+    this.isClosed = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       bookId = Value(bookId),
+       name = Value(name),
+       currencyCode = Value(currencyCode);
+  static Insertable<Counterparty> custom({
+    Expression<String>? id,
+    Expression<String>? bookId,
+    Expression<String>? name,
+    Expression<String>? currencyCode,
+    Expression<bool>? isClosed,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookId != null) 'book_id': bookId,
+      if (name != null) 'name': name,
+      if (currencyCode != null) 'currency_code': currencyCode,
+      if (isClosed != null) 'is_closed': isClosed,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CounterpartiesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? bookId,
+    Value<String>? name,
+    Value<String>? currencyCode,
+    Value<bool>? isClosed,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CounterpartiesCompanion(
+      id: id ?? this.id,
+      bookId: bookId ?? this.bookId,
+      name: name ?? this.name,
+      currencyCode: currencyCode ?? this.currencyCode,
+      isClosed: isClosed ?? this.isClosed,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (bookId.present) {
+      map['book_id'] = Variable<String>(bookId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
+    if (isClosed.present) {
+      map['is_closed'] = Variable<bool>(isClosed.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CounterpartiesCompanion(')
+          ..write('id: $id, ')
+          ..write('bookId: $bookId, ')
+          ..write('name: $name, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('isClosed: $isClosed, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2122,6 +2656,20 @@ class $TransactionsTable extends Transactions
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES categories (id)',
+    ),
+  );
+  static const VerificationMeta _counterpartyIdMeta = const VerificationMeta(
+    'counterpartyId',
+  );
+  @override
+  late final GeneratedColumn<String> counterpartyId = GeneratedColumn<String>(
+    'counterparty_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES counterparties (id)',
     ),
   );
   static const VerificationMeta _kindMeta = const VerificationMeta('kind');
@@ -2207,6 +2755,7 @@ class $TransactionsTable extends Transactions
     accountId,
     toAccountId,
     categoryId,
+    counterpartyId,
     kind,
     amountMinor,
     toAmountMinor,
@@ -2261,6 +2810,15 @@ class $TransactionsTable extends Transactions
       context.handle(
         _categoryIdMeta,
         categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
+    }
+    if (data.containsKey('counterparty_id')) {
+      context.handle(
+        _counterpartyIdMeta,
+        counterpartyId.isAcceptableOrUnknown(
+          data['counterparty_id']!,
+          _counterpartyIdMeta,
+        ),
       );
     }
     if (data.containsKey('kind')) {
@@ -2344,6 +2902,10 @@ class $TransactionsTable extends Transactions
         DriftSqlType.string,
         data['${effectivePrefix}category_id'],
       ),
+      counterpartyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}counterparty_id'],
+      ),
       kind: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}kind'],
@@ -2387,6 +2949,14 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String accountId;
   final String? toAccountId;
   final String? categoryId;
+
+  /// Контрагент долга, к которому привязана операция дохода или расхода
+  /// (ADR-0009, решение 9.4).
+  ///
+  /// `null` означает операцию без привязки и всегда задается у перевода: долг
+  /// выражается обычной операцией, а остаток долга вычисляется из привязанных
+  /// операций.
+  final String? counterpartyId;
   final String kind;
   final int amountMinor;
 
@@ -2405,6 +2975,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     required this.accountId,
     this.toAccountId,
     this.categoryId,
+    this.counterpartyId,
     required this.kind,
     required this.amountMinor,
     this.toAmountMinor,
@@ -2424,6 +2995,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     }
     if (!nullToAbsent || categoryId != null) {
       map['category_id'] = Variable<String>(categoryId);
+    }
+    if (!nullToAbsent || counterpartyId != null) {
+      map['counterparty_id'] = Variable<String>(counterpartyId);
     }
     map['kind'] = Variable<String>(kind);
     map['amount_minor'] = Variable<int>(amountMinor);
@@ -2450,6 +3024,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       categoryId: categoryId == null && nullToAbsent
           ? const Value.absent()
           : Value(categoryId),
+      counterpartyId: counterpartyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(counterpartyId),
       kind: Value(kind),
       amountMinor: Value(amountMinor),
       toAmountMinor: toAmountMinor == null && nullToAbsent
@@ -2473,6 +3050,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       accountId: serializer.fromJson<String>(json['accountId']),
       toAccountId: serializer.fromJson<String?>(json['toAccountId']),
       categoryId: serializer.fromJson<String?>(json['categoryId']),
+      counterpartyId: serializer.fromJson<String?>(json['counterpartyId']),
       kind: serializer.fromJson<String>(json['kind']),
       amountMinor: serializer.fromJson<int>(json['amountMinor']),
       toAmountMinor: serializer.fromJson<int?>(json['toAmountMinor']),
@@ -2491,6 +3069,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'accountId': serializer.toJson<String>(accountId),
       'toAccountId': serializer.toJson<String?>(toAccountId),
       'categoryId': serializer.toJson<String?>(categoryId),
+      'counterpartyId': serializer.toJson<String?>(counterpartyId),
       'kind': serializer.toJson<String>(kind),
       'amountMinor': serializer.toJson<int>(amountMinor),
       'toAmountMinor': serializer.toJson<int?>(toAmountMinor),
@@ -2507,6 +3086,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     String? accountId,
     Value<String?> toAccountId = const Value.absent(),
     Value<String?> categoryId = const Value.absent(),
+    Value<String?> counterpartyId = const Value.absent(),
     String? kind,
     int? amountMinor,
     Value<int?> toAmountMinor = const Value.absent(),
@@ -2520,6 +3100,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     accountId: accountId ?? this.accountId,
     toAccountId: toAccountId.present ? toAccountId.value : this.toAccountId,
     categoryId: categoryId.present ? categoryId.value : this.categoryId,
+    counterpartyId: counterpartyId.present
+        ? counterpartyId.value
+        : this.counterpartyId,
     kind: kind ?? this.kind,
     amountMinor: amountMinor ?? this.amountMinor,
     toAmountMinor: toAmountMinor.present
@@ -2541,6 +3124,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       categoryId: data.categoryId.present
           ? data.categoryId.value
           : this.categoryId,
+      counterpartyId: data.counterpartyId.present
+          ? data.counterpartyId.value
+          : this.counterpartyId,
       kind: data.kind.present ? data.kind.value : this.kind,
       amountMinor: data.amountMinor.present
           ? data.amountMinor.value
@@ -2565,6 +3151,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('accountId: $accountId, ')
           ..write('toAccountId: $toAccountId, ')
           ..write('categoryId: $categoryId, ')
+          ..write('counterpartyId: $counterpartyId, ')
           ..write('kind: $kind, ')
           ..write('amountMinor: $amountMinor, ')
           ..write('toAmountMinor: $toAmountMinor, ')
@@ -2583,6 +3170,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     accountId,
     toAccountId,
     categoryId,
+    counterpartyId,
     kind,
     amountMinor,
     toAmountMinor,
@@ -2600,6 +3188,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.accountId == this.accountId &&
           other.toAccountId == this.toAccountId &&
           other.categoryId == this.categoryId &&
+          other.counterpartyId == this.counterpartyId &&
           other.kind == this.kind &&
           other.amountMinor == this.amountMinor &&
           other.toAmountMinor == this.toAmountMinor &&
@@ -2615,6 +3204,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String> accountId;
   final Value<String?> toAccountId;
   final Value<String?> categoryId;
+  final Value<String?> counterpartyId;
   final Value<String> kind;
   final Value<int> amountMinor;
   final Value<int?> toAmountMinor;
@@ -2629,6 +3219,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.accountId = const Value.absent(),
     this.toAccountId = const Value.absent(),
     this.categoryId = const Value.absent(),
+    this.counterpartyId = const Value.absent(),
     this.kind = const Value.absent(),
     this.amountMinor = const Value.absent(),
     this.toAmountMinor = const Value.absent(),
@@ -2644,6 +3235,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     required String accountId,
     this.toAccountId = const Value.absent(),
     this.categoryId = const Value.absent(),
+    this.counterpartyId = const Value.absent(),
     required String kind,
     required int amountMinor,
     this.toAmountMinor = const Value.absent(),
@@ -2663,6 +3255,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? accountId,
     Expression<String>? toAccountId,
     Expression<String>? categoryId,
+    Expression<String>? counterpartyId,
     Expression<String>? kind,
     Expression<int>? amountMinor,
     Expression<int>? toAmountMinor,
@@ -2678,6 +3271,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (accountId != null) 'account_id': accountId,
       if (toAccountId != null) 'to_account_id': toAccountId,
       if (categoryId != null) 'category_id': categoryId,
+      if (counterpartyId != null) 'counterparty_id': counterpartyId,
       if (kind != null) 'kind': kind,
       if (amountMinor != null) 'amount_minor': amountMinor,
       if (toAmountMinor != null) 'to_amount_minor': toAmountMinor,
@@ -2695,6 +3289,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Value<String>? accountId,
     Value<String?>? toAccountId,
     Value<String?>? categoryId,
+    Value<String?>? counterpartyId,
     Value<String>? kind,
     Value<int>? amountMinor,
     Value<int?>? toAmountMinor,
@@ -2710,6 +3305,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       accountId: accountId ?? this.accountId,
       toAccountId: toAccountId ?? this.toAccountId,
       categoryId: categoryId ?? this.categoryId,
+      counterpartyId: counterpartyId ?? this.counterpartyId,
       kind: kind ?? this.kind,
       amountMinor: amountMinor ?? this.amountMinor,
       toAmountMinor: toAmountMinor ?? this.toAmountMinor,
@@ -2738,6 +3334,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     }
     if (categoryId.present) {
       map['category_id'] = Variable<String>(categoryId.value);
+    }
+    if (counterpartyId.present) {
+      map['counterparty_id'] = Variable<String>(counterpartyId.value);
     }
     if (kind.present) {
       map['kind'] = Variable<String>(kind.value);
@@ -2774,6 +3373,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('accountId: $accountId, ')
           ..write('toAccountId: $toAccountId, ')
           ..write('categoryId: $categoryId, ')
+          ..write('counterpartyId: $counterpartyId, ')
           ..write('kind: $kind, ')
           ..write('amountMinor: $amountMinor, ')
           ..write('toAmountMinor: $toAmountMinor, ')
@@ -3427,6 +4027,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BanksTable banks = $BanksTable(this);
   late final $AccountsTable accounts = $AccountsTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
+  late final $CounterpartiesTable counterparties = $CounterpartiesTable(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $CurrenciesTable currencies = $CurrenciesTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
@@ -3442,6 +4043,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_categories_book_id',
     'CREATE INDEX idx_categories_book_id ON categories (book_id)',
   );
+  late final Index idxCounterpartiesBookId = Index(
+    'idx_counterparties_book_id',
+    'CREATE INDEX idx_counterparties_book_id ON counterparties (book_id)',
+  );
   late final Index idxTransactionsBookId = Index(
     'idx_transactions_book_id',
     'CREATE INDEX idx_transactions_book_id ON transactions (book_id)',
@@ -3454,6 +4059,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_transactions_occurred_at',
     'CREATE INDEX idx_transactions_occurred_at ON transactions (occurred_at)',
   );
+  late final Index idxTransactionsCounterpartyId = Index(
+    'idx_transactions_counterparty_id',
+    'CREATE INDEX idx_transactions_counterparty_id ON transactions (counterparty_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3463,15 +4072,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     banks,
     accounts,
     categories,
+    counterparties,
     transactions,
     currencies,
     appSettings,
     idxAccountsBookId,
     idxAccountsBankId,
     idxCategoriesBookId,
+    idxCounterpartiesBookId,
     idxTransactionsBookId,
     idxTransactionsAccountId,
     idxTransactionsOccurredAt,
+    idxTransactionsCounterpartyId,
   ];
 }
 
@@ -3530,6 +4142,24 @@ final class $$BooksTableReferences
     ).filter((f) => f.bookId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_categoriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CounterpartiesTable, List<Counterparty>>
+  _counterpartiesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.counterparties,
+    aliasName: 'books__id__counterparties__book_id',
+  );
+
+  $$CounterpartiesTableProcessedTableManager get counterpartiesRefs {
+    final manager = $$CounterpartiesTableTableManager(
+      $_db,
+      $_db.counterparties,
+    ).filter((f) => f.bookId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_counterpartiesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3628,6 +4258,31 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
           }) => $$CategoriesTableFilterComposer(
             $db: $db,
             $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> counterpartiesRefs(
+    Expression<bool> Function($$CounterpartiesTableFilterComposer f) f,
+  ) {
+    final $$CounterpartiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.counterparties,
+      getReferencedColumn: (t) => t.bookId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CounterpartiesTableFilterComposer(
+            $db: $db,
+            $table: $db.counterparties,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3774,6 +4429,31 @@ class $$BooksTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> counterpartiesRefs<T extends Object>(
+    Expression<T> Function($$CounterpartiesTableAnnotationComposer a) f,
+  ) {
+    final $$CounterpartiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.counterparties,
+      getReferencedColumn: (t) => t.bookId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CounterpartiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.counterparties,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> transactionsRefs<T extends Object>(
     Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
   ) {
@@ -3816,6 +4496,7 @@ class $$BooksTableTableManager
           PrefetchHooks Function({
             bool accountsRefs,
             bool categoriesRefs,
+            bool counterpartiesRefs,
             bool transactionsRefs,
           })
         > {
@@ -3872,6 +4553,7 @@ class $$BooksTableTableManager
               ({
                 accountsRefs = false,
                 categoriesRefs = false,
+                counterpartiesRefs = false,
                 transactionsRefs = false,
               }) {
                 return PrefetchHooks(
@@ -3879,6 +4561,7 @@ class $$BooksTableTableManager
                   explicitlyWatchedTables: [
                     if (accountsRefs) db.accounts,
                     if (categoriesRefs) db.categories,
+                    if (counterpartiesRefs) db.counterparties,
                     if (transactionsRefs) db.transactions,
                   ],
                   addJoins: null,
@@ -3912,6 +4595,27 @@ class $$BooksTableTableManager
                                 table,
                                 p0,
                               ).categoriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.bookId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (counterpartiesRefs)
+                        await $_getPrefetchedData<
+                          Book,
+                          $BooksTable,
+                          Counterparty
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BooksTableReferences
+                              ._counterpartiesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BooksTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).counterpartiesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.bookId == item.id,
@@ -3962,6 +4666,7 @@ typedef $$BooksTableProcessedTableManager =
       PrefetchHooks Function({
         bool accountsRefs,
         bool categoriesRefs,
+        bool counterpartiesRefs,
         bool transactionsRefs,
       })
     >;
@@ -4817,6 +5522,7 @@ typedef $$CategoriesTableCreateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
       Value<bool> isFallback,
+      Value<String?> debtRole,
       Value<int> rowid,
     });
 typedef $$CategoriesTableUpdateCompanionBuilder =
@@ -4830,6 +5536,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> isArchived,
       Value<bool> isFallback,
+      Value<String?> debtRole,
       Value<int> rowid,
     });
 
@@ -4931,6 +5638,11 @@ class $$CategoriesTableFilterComposer
 
   ColumnFilters<bool> get isFallback => $composableBuilder(
     column: $table.isFallback,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get debtRole => $composableBuilder(
+    column: $table.debtRole,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5050,6 +5762,11 @@ class $$CategoriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get debtRole => $composableBuilder(
+    column: $table.debtRole,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$BooksTableOrderingComposer get bookId {
     final $$BooksTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -5130,6 +5847,9 @@ class $$CategoriesTableAnnotationComposer
     column: $table.isFallback,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get debtRole =>
+      $composableBuilder(column: $table.debtRole, builder: (column) => column);
 
   $$BooksTableAnnotationComposer get bookId {
     final $$BooksTableAnnotationComposer composer = $composerBuilder(
@@ -5244,6 +5964,7 @@ class $$CategoriesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<bool> isFallback = const Value.absent(),
+                Value<String?> debtRole = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion(
                 id: id,
@@ -5255,6 +5976,7 @@ class $$CategoriesTableTableManager
                 updatedAt: updatedAt,
                 isArchived: isArchived,
                 isFallback: isFallback,
+                debtRole: debtRole,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5268,6 +5990,7 @@ class $$CategoriesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<bool> isFallback = const Value.absent(),
+                Value<String?> debtRole = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CategoriesCompanion.insert(
                 id: id,
@@ -5279,6 +6002,7 @@ class $$CategoriesTableTableManager
                 updatedAt: updatedAt,
                 isArchived: isArchived,
                 isFallback: isFallback,
+                debtRole: debtRole,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -5392,6 +6116,460 @@ typedef $$CategoriesTableProcessedTableManager =
         bool transactionsRefs,
       })
     >;
+typedef $$CounterpartiesTableCreateCompanionBuilder =
+    CounterpartiesCompanion Function({
+      required String id,
+      required String bookId,
+      required String name,
+      required String currencyCode,
+      Value<bool> isClosed,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CounterpartiesTableUpdateCompanionBuilder =
+    CounterpartiesCompanion Function({
+      Value<String> id,
+      Value<String> bookId,
+      Value<String> name,
+      Value<String> currencyCode,
+      Value<bool> isClosed,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$CounterpartiesTableReferences
+    extends BaseReferences<_$AppDatabase, $CounterpartiesTable, Counterparty> {
+  $$CounterpartiesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $BooksTable _bookIdTable(_$AppDatabase db) =>
+      db.books.createAlias('counterparties__book_id__books__id');
+
+  $$BooksTableProcessedTableManager get bookId {
+    final $_column = $_itemColumn<String>('book_id')!;
+
+    final manager = $$BooksTableTableManager(
+      $_db,
+      $_db.books,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_bookIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$TransactionsTable, List<Transaction>>
+  _transactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transactions,
+    aliasName: 'counterparties__id__transactions__counterparty_id',
+  );
+
+  $$TransactionsTableProcessedTableManager get transactionsRefs {
+    final manager = $$TransactionsTableTableManager(
+      $_db,
+      $_db.transactions,
+    ).filter((f) => f.counterpartyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CounterpartiesTableFilterComposer
+    extends Composer<_$AppDatabase, $CounterpartiesTable> {
+  $$CounterpartiesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isClosed => $composableBuilder(
+    column: $table.isClosed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BooksTableFilterComposer get bookId {
+    final $$BooksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bookId,
+      referencedTable: $db.books,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BooksTableFilterComposer(
+            $db: $db,
+            $table: $db.books,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> transactionsRefs(
+    Expression<bool> Function($$TransactionsTableFilterComposer f) f,
+  ) {
+    final $$TransactionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.counterpartyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransactionsTableFilterComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CounterpartiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CounterpartiesTable> {
+  $$CounterpartiesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isClosed => $composableBuilder(
+    column: $table.isClosed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BooksTableOrderingComposer get bookId {
+    final $$BooksTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bookId,
+      referencedTable: $db.books,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BooksTableOrderingComposer(
+            $db: $db,
+            $table: $db.books,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CounterpartiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CounterpartiesTable> {
+  $$CounterpartiesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isClosed =>
+      $composableBuilder(column: $table.isClosed, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$BooksTableAnnotationComposer get bookId {
+    final $$BooksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bookId,
+      referencedTable: $db.books,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BooksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.books,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> transactionsRefs<T extends Object>(
+    Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
+  ) {
+    final $$TransactionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.counterpartyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransactionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CounterpartiesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CounterpartiesTable,
+          Counterparty,
+          $$CounterpartiesTableFilterComposer,
+          $$CounterpartiesTableOrderingComposer,
+          $$CounterpartiesTableAnnotationComposer,
+          $$CounterpartiesTableCreateCompanionBuilder,
+          $$CounterpartiesTableUpdateCompanionBuilder,
+          (Counterparty, $$CounterpartiesTableReferences),
+          Counterparty,
+          PrefetchHooks Function({bool bookId, bool transactionsRefs})
+        > {
+  $$CounterpartiesTableTableManager(
+    _$AppDatabase db,
+    $CounterpartiesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CounterpartiesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CounterpartiesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CounterpartiesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> bookId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<bool> isClosed = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CounterpartiesCompanion(
+                id: id,
+                bookId: bookId,
+                name: name,
+                currencyCode: currencyCode,
+                isClosed: isClosed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String bookId,
+                required String name,
+                required String currencyCode,
+                Value<bool> isClosed = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CounterpartiesCompanion.insert(
+                id: id,
+                bookId: bookId,
+                name: name,
+                currencyCode: currencyCode,
+                isClosed: isClosed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CounterpartiesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({bookId = false, transactionsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (transactionsRefs) db.transactions],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (bookId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.bookId,
+                                referencedTable: $$CounterpartiesTableReferences
+                                    ._bookIdTable(db),
+                                referencedColumn:
+                                    $$CounterpartiesTableReferences
+                                        ._bookIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (transactionsRefs)
+                    await $_getPrefetchedData<
+                      Counterparty,
+                      $CounterpartiesTable,
+                      Transaction
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CounterpartiesTableReferences
+                          ._transactionsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$CounterpartiesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).transactionsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.counterpartyId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CounterpartiesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CounterpartiesTable,
+      Counterparty,
+      $$CounterpartiesTableFilterComposer,
+      $$CounterpartiesTableOrderingComposer,
+      $$CounterpartiesTableAnnotationComposer,
+      $$CounterpartiesTableCreateCompanionBuilder,
+      $$CounterpartiesTableUpdateCompanionBuilder,
+      (Counterparty, $$CounterpartiesTableReferences),
+      Counterparty,
+      PrefetchHooks Function({bool bookId, bool transactionsRefs})
+    >;
 typedef $$TransactionsTableCreateCompanionBuilder =
     TransactionsCompanion Function({
       required String id,
@@ -5399,6 +6577,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       required String accountId,
       Value<String?> toAccountId,
       Value<String?> categoryId,
+      Value<String?> counterpartyId,
       required String kind,
       required int amountMinor,
       Value<int?> toAmountMinor,
@@ -5415,6 +6594,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<String> accountId,
       Value<String?> toAccountId,
       Value<String?> categoryId,
+      Value<String?> counterpartyId,
       Value<String> kind,
       Value<int> amountMinor,
       Value<int?> toAmountMinor,
@@ -5491,6 +6671,24 @@ final class $$TransactionsTableReferences
       $_db.categories,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CounterpartiesTable _counterpartyIdTable(_$AppDatabase db) => db
+      .counterparties
+      .createAlias('transactions__counterparty_id__counterparties__id');
+
+  $$CounterpartiesTableProcessedTableManager? get counterpartyId {
+    final $_column = $_itemColumn<String>('counterparty_id');
+    if ($_column == null) return null;
+    final manager = $$CounterpartiesTableTableManager(
+      $_db,
+      $_db.counterparties,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_counterpartyIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -5630,6 +6828,29 @@ class $$TransactionsTableFilterComposer
           }) => $$CategoriesTableFilterComposer(
             $db: $db,
             $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CounterpartiesTableFilterComposer get counterpartyId {
+    final $$CounterpartiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.counterpartyId,
+      referencedTable: $db.counterparties,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CounterpartiesTableFilterComposer(
+            $db: $db,
+            $table: $db.counterparties,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5780,6 +7001,29 @@ class $$TransactionsTableOrderingComposer
     );
     return composer;
   }
+
+  $$CounterpartiesTableOrderingComposer get counterpartyId {
+    final $$CounterpartiesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.counterpartyId,
+      referencedTable: $db.counterparties,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CounterpartiesTableOrderingComposer(
+            $db: $db,
+            $table: $db.counterparties,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TransactionsTableAnnotationComposer
@@ -5912,6 +7156,29 @@ class $$TransactionsTableAnnotationComposer
     );
     return composer;
   }
+
+  $$CounterpartiesTableAnnotationComposer get counterpartyId {
+    final $$CounterpartiesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.counterpartyId,
+      referencedTable: $db.counterparties,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CounterpartiesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.counterparties,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TransactionsTableTableManager
@@ -5932,6 +7199,7 @@ class $$TransactionsTableTableManager
             bool accountId,
             bool toAccountId,
             bool categoryId,
+            bool counterpartyId,
           })
         > {
   $$TransactionsTableTableManager(_$AppDatabase db, $TransactionsTable table)
@@ -5952,6 +7220,7 @@ class $$TransactionsTableTableManager
                 Value<String> accountId = const Value.absent(),
                 Value<String?> toAccountId = const Value.absent(),
                 Value<String?> categoryId = const Value.absent(),
+                Value<String?> counterpartyId = const Value.absent(),
                 Value<String> kind = const Value.absent(),
                 Value<int> amountMinor = const Value.absent(),
                 Value<int?> toAmountMinor = const Value.absent(),
@@ -5966,6 +7235,7 @@ class $$TransactionsTableTableManager
                 accountId: accountId,
                 toAccountId: toAccountId,
                 categoryId: categoryId,
+                counterpartyId: counterpartyId,
                 kind: kind,
                 amountMinor: amountMinor,
                 toAmountMinor: toAmountMinor,
@@ -5982,6 +7252,7 @@ class $$TransactionsTableTableManager
                 required String accountId,
                 Value<String?> toAccountId = const Value.absent(),
                 Value<String?> categoryId = const Value.absent(),
+                Value<String?> counterpartyId = const Value.absent(),
                 required String kind,
                 required int amountMinor,
                 Value<int?> toAmountMinor = const Value.absent(),
@@ -5996,6 +7267,7 @@ class $$TransactionsTableTableManager
                 accountId: accountId,
                 toAccountId: toAccountId,
                 categoryId: categoryId,
+                counterpartyId: counterpartyId,
                 kind: kind,
                 amountMinor: amountMinor,
                 toAmountMinor: toAmountMinor,
@@ -6019,6 +7291,7 @@ class $$TransactionsTableTableManager
                 accountId = false,
                 toAccountId = false,
                 categoryId = false,
+                counterpartyId = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6099,6 +7372,21 @@ class $$TransactionsTableTableManager
                                   )
                                   as T;
                         }
+                        if (counterpartyId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.counterpartyId,
+                                    referencedTable:
+                                        $$TransactionsTableReferences
+                                            ._counterpartyIdTable(db),
+                                    referencedColumn:
+                                        $$TransactionsTableReferences
+                                            ._counterpartyIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
                         return state;
                       },
@@ -6128,6 +7416,7 @@ typedef $$TransactionsTableProcessedTableManager =
         bool accountId,
         bool toAccountId,
         bool categoryId,
+        bool counterpartyId,
       })
     >;
 typedef $$CurrenciesTableCreateCompanionBuilder =
@@ -6500,6 +7789,8 @@ class $AppDatabaseManager {
       $$AccountsTableTableManager(_db, _db.accounts);
   $$CategoriesTableTableManager get categories =>
       $$CategoriesTableTableManager(_db, _db.categories);
+  $$CounterpartiesTableTableManager get counterparties =>
+      $$CounterpartiesTableTableManager(_db, _db.counterparties);
   $$TransactionsTableTableManager get transactions =>
       $$TransactionsTableTableManager(_db, _db.transactions);
   $$CurrenciesTableTableManager get currencies =>

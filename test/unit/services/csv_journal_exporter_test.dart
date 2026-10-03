@@ -9,6 +9,7 @@ const CsvJournalHeaders _ruHeaders = (
   account: 'Счет',
   currency: 'Валюта',
   category: 'Категория',
+  counterparty: 'Контрагент',
   note: 'Заметка',
   amount: 'Сумма',
   toAccount: 'Счет получателя',
@@ -22,6 +23,7 @@ const CsvJournalHeaders _enHeaders = (
   account: 'Account',
   currency: 'Currency',
   category: 'Category',
+  counterparty: 'Counterparty',
   note: 'Note',
   amount: 'Amount',
   toAccount: 'To account',
@@ -58,7 +60,7 @@ void main() {
 
     expect(
       csv,
-      'Дата;Тип;Счет;Валюта;Категория;Заметка;Сумма;Счет получателя;'
+      'Дата;Тип;Счет;Валюта;Категория;Контрагент;Заметка;Сумма;Счет получателя;'
       'Валюта получателя;Сумма зачисления\n',
     );
   });
@@ -71,7 +73,7 @@ void main() {
 
     expect(
       csv,
-      'Date,Type,Account,Currency,Category,Note,Amount,To account,'
+      'Date,Type,Account,Currency,Category,Counterparty,Note,Amount,To account,'
       'To currency,To amount\n',
     );
   });
@@ -94,7 +96,65 @@ void main() {
 
     expect(
       csv.split('\n')[1],
-      '2026-09-24 19:05:03;Доход;Зарплатный;RUB;Зарплата;Аванс;1500,00;;;',
+      '2026-09-24 19:05:03;Доход;Зарплатный;RUB;Зарплата;;Аванс;1500,00;;;',
+    );
+  });
+
+  test('пишет строку операции с контрагентом', () {
+    final csv = exporter.build(
+      rows: [
+        JournalExportRow(
+          occurredAt: DateTime(2026, 9, 24),
+          kind: TransactionKind.expense,
+          accountName: 'Кошелек',
+          currencyCode: 'RUB',
+          categoryName: 'Заём',
+          counterpartyName: 'Иван',
+          amountMinor: 100000,
+        ),
+      ],
+      profile: profileOf(CsvExportLanguage.ru),
+    );
+
+    expect(
+      csv.split('\n')[1],
+      '2026-09-24 00:00:00;Расход;Кошелек;RUB;Заём;Иван;;-1000,00;;;',
+    );
+  });
+
+  test('оставляет колонку контрагента пустой у перевода и без привязки', () {
+    final csv = exporter.build(
+      rows: [
+        JournalExportRow(
+          occurredAt: DateTime(2026, 9, 24),
+          kind: TransactionKind.expense,
+          accountName: 'Кошелек',
+          currencyCode: 'RUB',
+          categoryName: 'Продукты',
+          amountMinor: 100,
+        ),
+        JournalExportRow(
+          occurredAt: DateTime(2026, 9, 25),
+          kind: TransactionKind.transfer,
+          accountName: 'Кошелек',
+          currencyCode: 'RUB',
+          toAccountName: 'Вклад',
+          toCurrencyCode: 'RUB',
+          amountMinor: 200,
+        ),
+      ],
+      profile: profileOf(CsvExportLanguage.ru),
+    );
+
+    final lines = csv.split('\n');
+
+    expect(
+      lines[1],
+      '2026-09-24 00:00:00;Расход;Кошелек;RUB;Продукты;;;-1,00;;;',
+    );
+    expect(
+      lines[2],
+      '2026-09-25 00:00:00;Перевод;Кошелек;RUB;;;;-2,00;Вклад;RUB;2,00',
     );
   });
 
@@ -115,7 +175,7 @@ void main() {
 
     expect(
       csv.split('\n')[1],
-      '2026-01-02 00:00:00,Expense,Main,USD,Groceries,,-123.45,,,',
+      '2026-01-02 00:00:00,Expense,Main,USD,Groceries,,,-123.45,,,',
     );
   });
 
@@ -137,7 +197,7 @@ void main() {
 
     expect(
       csv.split('\n')[1],
-      '2026-03-04 12:30:00;Перевод;Карта;RUB;;;-500,00;Вклад;RUB;500,00',
+      '2026-03-04 12:30:00;Перевод;Карта;RUB;;;;-500,00;Вклад;RUB;500,00',
     );
   });
 
@@ -160,7 +220,7 @@ void main() {
 
     expect(
       csv.split('\n')[1],
-      '2026-03-04 12:30:00,Transfer,USD account,USD,,,-100.00,'
+      '2026-03-04 12:30:00,Transfer,USD account,USD,,,,-100.00,'
       'EUR account,EUR,90.00',
     );
   });
@@ -183,7 +243,7 @@ void main() {
 
     expect(
       csv.split('\n').sublist(1).join('\n'),
-      '2026-01-02 00:00:00,Expense,Main,USD,Food,'
+      '2026-01-02 00:00:00,Expense,Main,USD,Food,,'
       '"Coffee, ""large""\nplease",-1.00,,,\n',
     );
   });
@@ -204,7 +264,7 @@ void main() {
       profile: profileOf(CsvExportLanguage.en),
     );
 
-    expect(csv.split('\n')[1], contains(',Bread and milk,'));
+    expect(csv.split('\n')[1], contains(',,Bread and milk,'));
   });
 
   test('кодирует файл в UTF-8 с BOM', () {

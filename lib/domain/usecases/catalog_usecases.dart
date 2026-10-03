@@ -17,6 +17,10 @@ const String categoryFallbackRenameRejectedError =
 const String categoryKindChangeRejectedError =
     'kind cannot be changed for an existing category.';
 
+/// Код ошибки домена: категорию с признаком долговой роли нельзя удалить.
+const String categoryDebtDeleteRejectedError =
+    'a category with a debt role cannot be deleted.';
+
 /// Код ошибки домена: категория может быть только доходом или расходом.
 const String categoryKindNotAllowedError = 'kind must be income or expense.';
 
@@ -79,11 +83,13 @@ class CategoryUseCases {
     return ValidationResult.valid(created);
   }
 
-  /// Переименовывает категорию, сохраняя ее тип.
+  /// Переименовывает категорию, сохраняя ее тип и признак долговой роли.
   ///
   /// Базовая категория не переименовывается, а попытка сохранить категорию с
   /// типом, отличным от сохраненного, отклоняется с сообщением причины
-  /// (ADR-0004, решения 4.2 и 4.4).
+  /// (ADR-0004, решения 4.2 и 4.4). Признак долговой роли не задается и не
+  /// изменяется пользователем: переименование его сохраняет, а сам признак
+  /// недоступен из формы (ADR-0009, решение 9.5).
   Future<ValidationResult<FinanceCategory>> update(
     FinanceCategory existing, {
     required String name,
@@ -121,6 +127,7 @@ class CategoryUseCases {
       updatedAt: DateTime.now(),
       isArchived: existing.isArchived,
       isFallback: existing.isFallback,
+      debtRole: existing.debtRole,
     );
     await categories.update(updated);
     return ValidationResult.valid(updated);
@@ -130,10 +137,16 @@ class CategoryUseCases {
   /// того же типа одной транзакцией (ADR-0004, решение 4.1).
   ///
   /// Базовая категория не удаляется, а книга без базовой категории нужного
-  /// типа не может принять операции: такой запрос отклоняется.
+  /// типа не может принять операции: такой запрос отклоняется. Категория с
+  /// признаком долговой роли не удаляется и не переносит операции: перенос
+  /// сделал бы долговые движения неотличимыми от обычных расходов и сломал бы
+  /// привязку поля контрагента в форме операции (ADR-0009, решение 9.8).
   Future<ValidationResult<void>> delete(FinanceCategory category) async {
     if (category.isFallback) {
       return ValidationResult.invalid([categoryFallbackDeleteRejectedError]);
+    }
+    if (category.debtRole != null) {
+      return ValidationResult.invalid([categoryDebtDeleteRejectedError]);
     }
 
     final fallback = await categories.findFallback(

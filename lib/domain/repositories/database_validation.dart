@@ -12,6 +12,7 @@ const Map<String, int> applicationTables = {
   'transactions': 2,
   'currencies': 3,
   'app_settings': 3,
+  'counterparties': 6,
 };
 
 /// Таблицы, которые обязана содержать база версии [schemaVersion].

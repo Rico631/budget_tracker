@@ -19,6 +19,18 @@ String _transactionFormErrorMessage(
     localizations.transactionFormToAmountInvalidError,
   transactionKindChangeRejectedError =>
     localizations.transactionFormKindChangeRejectedError,
+  transactionCounterpartyCurrencyMismatchError =>
+    localizations.transactionFormCounterpartyCurrencyError,
+  transactionCounterpartyDebtRoleMismatchError =>
+    localizations.transactionFormCounterpartyDebtRoleError,
+  transactionCounterpartyBookMismatchError =>
+    localizations.transactionFormCounterpartyBookError,
+  transactionCounterpartyNotAllowedError =>
+    localizations.transactionFormCounterpartyNotAllowedError,
+  counterpartyNameDuplicateError =>
+    localizations.transactionFormCounterpartyDuplicateError,
+  catalogNameRequiredError =>
+    localizations.transactionFormCounterpartyNameError,
   _accountRequiredError => localizations.transactionFormAccountRequiredError,
   _toAccountRequiredError =>
     localizations.transactionFormToAccountRequiredError,
@@ -147,6 +159,80 @@ class _PickerField extends StatelessWidget {
                 : theme.textTheme.bodyLarge,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Поле контрагента операции.
+///
+/// Поле доступно доходу и расходу с долговой категорией, его список ограничен
+/// контрагентами валюты счета, допустимыми для долговой роли категории, а нового
+/// контрагента можно создать прямо здесь: он сохранится вместе с операцией
+/// (ADR-0009, решения 9.9, 9.11 и 9.15).
+class _CounterpartyField extends StatelessWidget {
+  const _CounterpartyField({
+    required this.value,
+    required this.enabled,
+    required this.onSelect,
+    required this.onCreate,
+    required this.onClear,
+  });
+
+  final String? value;
+  final bool enabled;
+  final VoidCallback onSelect;
+
+  /// Создание нового контрагента; `null`, когда долговая роль категории его не
+  /// допускает: возврат долга требует уже существующего долга (ADR-0009, 9.15).
+  final VoidCallback? onCreate;
+
+  /// Снятие привязки; `null`, когда привязки нет.
+  final VoidCallback? onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            key: transactionFormCounterpartyFieldKey,
+            onTap: enabled ? onSelect : null,
+            child: InputDecorator(
+              decoration: InputDecoration(
+                labelText: localizations.transactionFormCounterpartyLabel,
+                border: const OutlineInputBorder(),
+                suffixIcon: const Icon(Icons.arrow_drop_down),
+              ),
+              child: Text(value ?? ''),
+            ),
+          ),
+          Wrap(
+            spacing: 8,
+            children: [
+              if (onCreate case final create?)
+                TextButton(
+                  key: transactionFormCounterpartyCreateKey,
+                  onPressed: enabled ? create : null,
+                  child: Text(
+                    localizations.transactionFormCounterpartyAddAction,
+                  ),
+                ),
+              if (onClear case final clear?)
+                TextButton(
+                  key: transactionFormCounterpartyClearKey,
+                  onPressed: enabled ? clear : null,
+                  child: Text(
+                    localizations.transactionFormCounterpartyNoneLabel,
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

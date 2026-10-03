@@ -228,6 +228,7 @@ class _CountingTransactionsRepository implements TransactionsRepository {
     required DateTime occurredAt,
     String? toAccountId,
     String? categoryId,
+    String? counterpartyId,
     int? toAmountMinor,
     String? note,
   }) => _inner.create(
@@ -238,6 +239,7 @@ class _CountingTransactionsRepository implements TransactionsRepository {
     occurredAt: occurredAt,
     toAccountId: toAccountId,
     categoryId: categoryId,
+    counterpartyId: counterpartyId,
     toAmountMinor: toAmountMinor,
     note: note,
   );

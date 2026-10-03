@@ -6,9 +6,11 @@ import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
+import 'package:budget_tracker/data/repositories/counterparties_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
+import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transaction_form_page.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transactions_page.dart';
@@ -102,6 +104,57 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('строка операции показывает контрагента только при привязке', (
+    WidgetTester tester,
+  ) async {
+    final account = await createAccount(name: 'Рубли');
+    final category = await createCategory(
+      name: 'Заём',
+      kind: TransactionKind.expense,
+    );
+    final counterparties = DriftCounterpartiesRepository(database);
+    final now = DateTime(2026, 10, 3);
+    final counterparty = FinanceCounterparty(
+      id: const FinanceIdGenerator().generateV7(),
+      bookId: book.id,
+      name: 'Иван',
+      currencyCode: 'RUB',
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    await counterparties.createWithTransaction(
+      counterparty: counterparty,
+      transaction: FinanceTransaction(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        accountId: account.id,
+        categoryId: category.id,
+        counterpartyId: counterparty.id,
+        kind: TransactionKind.expense,
+        amountMinor: 100000,
+        occurredAt: DateTime(2026, 10, 3, 12),
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+    await transactions.create(
+      bookId: book.id,
+      accountId: account.id,
+      kind: TransactionKind.expense,
+      amountMinor: 50000,
+      categoryId: category.id,
+      occurredAt: DateTime(2026, 10, 2, 12),
+    );
+
+    await pumpPage(tester);
+
+    // Операция с привязкой показывает наименование контрагента, операция без
+    // привязки не показывает пустое значение (ADR-0009, решение 9.4).
+    expect(find.text('Контрагент: Иван'), findsOneWidget);
+    expect(find.textContaining('Контрагент:'), findsOneWidget);
+  });
+
   testWidgets('пустая книга показывает приглашение добавить операцию', (
     WidgetTester tester,
   ) async {
@@ -132,6 +185,7 @@ void main() {
           _FailingJournalUseCases(
             accounts: accounts,
             categories: categories,
+            counterparties: DriftCounterpartiesRepository(database),
             transactions: transactions,
           ),
         ),
@@ -436,6 +490,7 @@ class _FailingJournalUseCases extends FinanceTransactionUseCases {
   _FailingJournalUseCases({
     required super.accounts,
     required super.categories,
+    required super.counterparties,
     required super.transactions,
   });
 

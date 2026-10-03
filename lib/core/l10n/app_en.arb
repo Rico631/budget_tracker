@@ -489,6 +489,10 @@
   "@categoryFormFallbackMissingError": {
     "description": "Rejection of the deletion without a base category of the same type"
   },
+  "categoryFormDebtDeleteRejectedError": "A debt category cannot be deleted. Renaming is available.",
+  "@categoryFormDebtDeleteRejectedError": {
+    "description": "Rejection of the deletion of a category with a debt role"
+  },
   "categoryFormKindNotAllowedError": "A category can be income or expense only.",
   "@categoryFormKindNotAllowedError": {
     "description": "Rejection of the transfer type for a category"
@@ -901,6 +905,10 @@
   "@journalExportColumnCategory": {
     "description": "CSV column header of the category"
   },
+  "journalExportColumnCounterparty": "Counterparty",
+  "@journalExportColumnCounterparty": {
+    "description": "CSV column header of the counterparty"
+  },
   "journalExportColumnNote": "Note",
   "@journalExportColumnNote": {
     "description": "CSV column header of the note"
@@ -982,5 +990,273 @@
   "databaseListDeleteFailureMessage": "Failed to delete the database.",
   "@databaseListDeleteFailureMessage": {
     "description": "Error message of the database deletion"
+  },
+  "accountsSectionAccountsLabel": "Accounts",
+  "@accountsSectionAccountsLabel": {
+    "description": "Accounts part of the section switch"
+  },
+  "accountsSectionDebtsLabel": "Debts",
+  "@accountsSectionDebtsLabel": {
+    "description": "Debts part of the section switch"
+  },
+  "debtsLoadErrorMessage": "Failed to load debts. Try again.",
+  "@debtsLoadErrorMessage": {
+    "description": "Debt list load error message"
+  },
+  "debtsRetryAction": "Retry",
+  "@debtsRetryAction": {
+    "description": "Debt list retry action"
+  },
+  "debtsReceivableTitle": "Owed to me",
+  "@debtsReceivableTitle": {
+    "description": "Debt list part with a positive balance"
+  },
+  "debtsPayableTitle": "I owe",
+  "@debtsPayableTitle": {
+    "description": "Debt list part with a negative balance"
+  },
+  "debtsTotalLabel": "Total",
+  "@debtsTotalLabel": {
+    "description": "Per-currency debt total label"
+  },
+  "debtsArchiveAction": "Archive",
+  "@debtsArchiveAction": {
+    "description": "Action opening the debt archive"
+  },
+  "debtsArchiveTitle": "Debt archive",
+  "@debtsArchiveTitle": {
+    "description": "Debt archive screen title"
+  },
+  "debtsArchiveEmptyMessage": "The archive has no closed debts.",
+  "@debtsArchiveEmptyMessage": {
+    "description": "Debt archive empty state"
+  },
+  "debtsEmptyTitle": "No debts",
+  "@debtsEmptyTitle": {
+    "description": "Debt section empty state title"
+  },
+  "debtsEmptyMessage": "Add a counterparty and enter the debt amount.",
+  "@debtsEmptyMessage": {
+    "description": "Invitation to add the first counterparty"
+  },
+  "debtsEmptyAction": "Add counterparty",
+  "@debtsEmptyAction": {
+    "description": "Action creating the first counterparty"
+  },
+  "debtsOperationsTitle": "Counterparty operations",
+  "@debtsOperationsTitle": {
+    "description": "Counterparty operations subscreen title"
+  },
+  "debtsOperationsEmptyMessage": "The counterparty has no operations.",
+  "@debtsOperationsEmptyMessage": {
+    "description": "Counterparty operations empty state"
+  },
+  "debtsOperationsLoadErrorMessage": "Failed to load operations. Try again.",
+  "@debtsOperationsLoadErrorMessage": {
+    "description": "Counterparty operations load error message"
+  },
+  "debtsEditAction": "Edit",
+  "@debtsEditAction": {
+    "description": "Counterparty details editing action"
+  },
+  "debtsActionsTooltip": "Debt actions",
+  "@debtsActionsTooltip": {
+    "description": "Debt row menu tooltip"
+  },
+  "debtsCloseAction": "Close the debt",
+  "@debtsCloseAction": {
+    "description": "Manual debt closing action"
+  },
+  "debtsCloseDialogTitle": "Close the debt?",
+  "@debtsCloseDialogTitle": {
+    "description": "Manual debt closing confirmation title"
+  },
+  "debtsCloseDialogMessage": "The counterparty moves to the archive with its current balance.",
+  "@debtsCloseDialogMessage": {
+    "description": "Manual debt closing explanation"
+  },
+  "debtsReopenAction": "Return to active",
+  "@debtsReopenAction": {
+    "description": "Action returning a counterparty from the archive"
+  },
+  "debtsDeleteAction": "Delete",
+  "@debtsDeleteAction": {
+    "description": "Action permanently deleting a counterparty"
+  },
+  "debtsDeleteDialogTitle": "Delete the counterparty?",
+  "@debtsDeleteDialogTitle": {
+    "description": "Counterparty deletion confirmation title"
+  },
+  "debtsDeleteDialogMessage": "The counterparty is deleted permanently.",
+  "@debtsDeleteDialogMessage": {
+    "description": "Counterparty deletion explanation"
+  },
+  "debtsDeleteDialogConfirmAction": "Delete",
+  "@debtsDeleteDialogConfirmAction": {
+    "description": "Counterparty deletion confirmation"
+  },
+  "debtsDialogCancelAction": "Cancel",
+  "@debtsDialogCancelAction": {
+    "description": "Debt dialog cancellation"
+  },
+  "debtsCloseOfferMessage": "A counterparty with operations cannot be deleted. Close the debt.",
+  "@debtsCloseOfferMessage": {
+    "description": "Offer to close the debt instead of deleting"
+  },
+  "debtsSavedMessage": "Debt saved.",
+  "@debtsSavedMessage": {
+    "description": "Counterparty saved confirmation"
+  },
+  "debtsDeletedMessage": "Counterparty deleted.",
+  "@debtsDeletedMessage": {
+    "description": "Counterparty deleted confirmation"
+  },
+  "debtsMutationFailureMessage": "Failed to save the debt changes.",
+  "@debtsMutationFailureMessage": {
+    "description": "Debt mutation error message"
+  },
+  "counterpartyFormCreateTitle": "New counterparty",
+  "@counterpartyFormCreateTitle": {
+    "description": "Counterparty creation form title"
+  },
+  "counterpartyFormEditTitle": "Counterparty",
+  "@counterpartyFormEditTitle": {
+    "description": "Counterparty edit form title"
+  },
+  "counterpartyFormNameLabel": "Name",
+  "@counterpartyFormNameLabel": {
+    "description": "Counterparty name field"
+  },
+  "counterpartyFormCurrencyLabel": "Currency",
+  "@counterpartyFormCurrencyLabel": {
+    "description": "Counterparty currency field"
+  },
+  "counterpartyFormDirectionLabel": "Direction",
+  "@counterpartyFormDirectionLabel": {
+    "description": "Debt direction field"
+  },
+  "counterpartyFormDirectionLentLabel": "I lent",
+  "@counterpartyFormDirectionLentLabel": {
+    "description": "I lent direction"
+  },
+  "counterpartyFormDirectionBorrowedLabel": "I borrowed",
+  "@counterpartyFormDirectionBorrowedLabel": {
+    "description": "I borrowed direction"
+  },
+  "counterpartyFormAccountLabel": "Account",
+  "@counterpartyFormAccountLabel": {
+    "description": "First debt operation account field"
+  },
+  "counterpartyFormAmountLabel": "Amount",
+  "@counterpartyFormAmountLabel": {
+    "description": "First debt operation amount field"
+  },
+  "counterpartyFormSaveAction": "Save",
+  "@counterpartyFormSaveAction": {
+    "description": "Counterparty save action"
+  },
+  "counterpartyFormCurrencyLockedMessage": "The currency of a counterparty with operations cannot be changed.",
+  "@counterpartyFormCurrencyLockedMessage": {
+    "description": "Counterparty currency immutability explanation"
+  },
+  "counterpartyFormNoAccountMessage": "The book has no active account with the counterparty currency.",
+  "@counterpartyFormNoAccountMessage": {
+    "description": "Missing account with the counterparty currency"
+  },
+  "counterpartyFormAmountError": "Enter a positive amount.",
+  "@counterpartyFormAmountError": {
+    "description": "First debt operation amount error"
+  },
+  "counterpartyFormNameRequiredError": "Enter the counterparty name.",
+  "@counterpartyFormNameRequiredError": {
+    "description": "Empty counterparty name error"
+  },
+  "counterpartyFormNameDuplicateError": "A counterparty with the same name already exists in the book.",
+  "@counterpartyFormNameDuplicateError": {
+    "description": "Duplicate counterparty name error"
+  },
+  "counterpartyFormCurrencyCodeError": "Choose the counterparty currency.",
+  "@counterpartyFormCurrencyCodeError": {
+    "description": "Counterparty currency code error"
+  },
+  "counterpartyFormAccountError": "Choose the account of the first operation.",
+  "@counterpartyFormAccountError": {
+    "description": "Missing first operation account error"
+  },
+  "counterpartyFormAccountCurrencyError": "Choose an account with the counterparty currency.",
+  "@counterpartyFormAccountCurrencyError": {
+    "description": "Account and counterparty currency mismatch error"
+  },
+  "counterpartyFormCurrencyChangeError": "The currency of a counterparty with operations cannot be changed.",
+  "@counterpartyFormCurrencyChangeError": {
+    "description": "Counterparty currency change error"
+  },
+  "counterpartyFormDebtCategoryError": "The book has no debt category for this direction.",
+  "@counterpartyFormDebtCategoryError": {
+    "description": "Missing debt category error"
+  },
+  "counterpartyFormDeleteError": "A counterparty with operations cannot be deleted. Close the debt.",
+  "@counterpartyFormDeleteError": {
+    "description": "Counterparty with operations deletion error"
+  },
+  "counterpartyFormSaveErrorMessage": "Failed to save the counterparty.",
+  "@counterpartyFormSaveErrorMessage": {
+    "description": "Counterparty save error message"
+  },
+  "transactionFormCounterpartyLabel": "Counterparty",
+  "@transactionFormCounterpartyLabel": {
+    "description": "Counterparty field of the transaction form"
+  },
+  "transactionFormCounterpartyNoneLabel": "No counterparty",
+  "@transactionFormCounterpartyNoneLabel": {
+    "description": "Empty counterparty field value"
+  },
+  "transactionFormCounterpartyAddAction": "New counterparty",
+  "@transactionFormCounterpartyAddAction": {
+    "description": "Counterparty creation action of the transaction form"
+  },
+  "transactionFormCounterpartyCreateTitle": "New counterparty",
+  "@transactionFormCounterpartyCreateTitle": {
+    "description": "Counterparty creation title of the transaction form"
+  },
+  "transactionFormCounterpartyCreateMessage": "The counterparty is saved together with the operation.",
+  "@transactionFormCounterpartyCreateMessage": {
+    "description": "Counterparty creation explanation"
+  },
+  "transactionFormCounterpartyCreateConfirmAction": "Create",
+  "@transactionFormCounterpartyCreateConfirmAction": {
+    "description": "Counterparty creation confirmation"
+  },
+  "transactionFormCounterpartyCreateCancelAction": "Cancel",
+  "@transactionFormCounterpartyCreateCancelAction": {
+    "description": "Counterparty creation cancellation"
+  },
+  "transactionFormCounterpartyNameError": "Enter the counterparty name.",
+  "@transactionFormCounterpartyNameError": {
+    "description": "Empty counterparty name error in the transaction form"
+  },
+  "transactionFormCounterpartyDuplicateError": "A counterparty with the same name already exists in the book.",
+  "@transactionFormCounterpartyDuplicateError": {
+    "description": "Duplicate counterparty error in the transaction form"
+  },
+  "transactionFormCounterpartyCurrencyError": "The counterparty currency differs from the account currency.",
+  "@transactionFormCounterpartyCurrencyError": {
+    "description": "Counterparty and account currency mismatch error"
+  },
+  "transactionFormCounterpartyBookError": "Choose a counterparty of this book.",
+  "@transactionFormCounterpartyBookError": {
+    "description": "Counterparty of another book error"
+  },
+  "transactionFormCounterpartyDebtRoleError": "A debt repayment is available only for a counterparty that owes in that direction.",
+  "@transactionFormCounterpartyDebtRoleError": {
+    "description": "Counterparty debt direction and category role mismatch error"
+  },
+  "transactionFormCounterpartyNotAllowedError": "A transfer cannot have a counterparty.",
+  "@transactionFormCounterpartyNotAllowedError": {
+    "description": "Counterparty on a transfer error"
+  },
+  "transactionTileCounterpartyLabel": "Counterparty",
+  "@transactionTileCounterpartyLabel": {
+    "description": "Counterparty label of the transaction row"
   }
 }

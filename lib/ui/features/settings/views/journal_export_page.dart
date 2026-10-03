@@ -30,6 +30,7 @@ CsvExportProfile csvExportProfileForLanguage(CsvExportLanguage language) {
       account: localizations.journalExportColumnAccount,
       currency: localizations.journalExportColumnCurrency,
       category: localizations.journalExportColumnCategory,
+      counterparty: localizations.journalExportColumnCounterparty,
       note: localizations.journalExportColumnNote,
       amount: localizations.journalExportColumnAmount,
       toAccount: localizations.journalExportColumnToAccount,

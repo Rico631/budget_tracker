@@ -2,7 +2,7 @@ import 'package:budget_tracker/data/local/seed/seed_records.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 
 /// Стартовый набор категорий из раздела «Категории» документа
-/// `docs/reference-data/categories.md`: 11 доходных и 26 расходных категорий.
+/// `docs/reference-data/categories.md`: 12 доходных и 28 расходных категорий.
 ///
 /// Категория типа `transfer` не создается: перевод не имеет
 /// категории (решение 3.3 ADR-0001).
@@ -42,12 +42,19 @@ const List<CategorySeed> categorySeedCatalog = <CategorySeed>[
     nameRu: 'Возврат денег',
     nameEn: 'Refund',
     kind: TransactionKind.income,
+    debtRole: CategoryDebtRole.refundInflow,
   ),
   CategorySeed(nameRu: 'Подарок', nameEn: 'Gift', kind: TransactionKind.income),
   CategorySeed(
     nameRu: 'Кэшбэк',
     nameEn: 'Cashback',
     kind: TransactionKind.income,
+  ),
+  CategorySeed(
+    nameRu: 'Заём',
+    nameEn: 'Loan',
+    kind: TransactionKind.income,
+    debtRole: CategoryDebtRole.loanInflow,
   ),
   CategorySeed(
     nameRu: 'Прочий доход',
@@ -177,6 +184,18 @@ const List<CategorySeed> categorySeedCatalog = <CategorySeed>[
     kind: TransactionKind.expense,
   ),
   CategorySeed(
+    nameRu: 'Заём',
+    nameEn: 'Loan',
+    kind: TransactionKind.expense,
+    debtRole: CategoryDebtRole.loanOutflow,
+  ),
+  CategorySeed(
+    nameRu: 'Возврат денег',
+    nameEn: 'Refund',
+    kind: TransactionKind.expense,
+    debtRole: CategoryDebtRole.refundOutflow,
+  ),
+  CategorySeed(
     nameRu: 'Прочие расходы',
     nameEn: 'Other Expenses',
     kind: TransactionKind.expense,
@@ -200,4 +219,49 @@ CategorySeed fallbackCategorySeed(TransactionKind kind) => categorySeedCatalog
 String fallbackCategoryName(TransactionKind kind, String languageCode) {
   final seed = fallbackCategorySeed(kind);
   return languageCode.trim().toLowerCase() == 'en' ? seed.nameEn : seed.nameRu;
+}
+
+/// Долговые категории стартового набора типа [kind] (ADR-0009, решение 9.7).
+///
+/// Миграция доставляет их в каждую существующую книгу: расходные «Заём» с ролью
+/// `loanOutflow` и «Возврат денег» с ролью `refundOutflow`, доходные — с ролями
+/// `loanInflow` и `refundInflow`. Порядок ролей — заём, затем возврат: по нему
+/// миграция разделения ролей подбирает роль переименованной категории.
+List<CategorySeed> debtCategorySeedsFor(TransactionKind kind) => [
+  for (final role in debtCategoryRolesFor(kind))
+    categorySeedCatalog.firstWhere((seed) => seed.debtRole == role),
+];
+
+/// Долговые роли стартового набора типа [kind]: заём, затем возврат долга.
+List<CategoryDebtRole> debtCategoryRolesFor(TransactionKind kind) =>
+    switch (kind) {
+      TransactionKind.expense => const [
+        CategoryDebtRole.loanOutflow,
+        CategoryDebtRole.refundOutflow,
+      ],
+      TransactionKind.income => const [
+        CategoryDebtRole.loanInflow,
+        CategoryDebtRole.refundInflow,
+      ],
+      TransactionKind.transfer => const [],
+    };
+
+/// Наименование категории [seed] на языке данных книги [languageCode].
+///
+/// Миграция определяет язык книги по наименованию базовой категории: локаль
+/// интерфейса в момент обновления неизвестна (ADR-0009, решение 9.7).
+String categorySeedName(CategorySeed seed, String languageCode) =>
+    languageCode.trim().toLowerCase() == 'en' ? seed.nameEn : seed.nameRu;
+
+/// Язык данных книги по наименованию базовой категории дохода [name].
+///
+/// Значение `en` возвращается только для английского наименования базовой
+/// категории дохода: русское наименование и любое другое значение дают `ru`,
+/// как и при первом запуске приложения с неанглийской локалью.
+String categoryDataLanguage(String? name) {
+  final normalized = name?.trim().toLowerCase() ?? '';
+  return normalized ==
+          fallbackCategorySeed(TransactionKind.income).nameEn.toLowerCase()
+      ? 'en'
+      : 'ru';
 }

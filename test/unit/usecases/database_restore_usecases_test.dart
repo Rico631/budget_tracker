@@ -135,7 +135,7 @@ void main() {
     final future = sourceFile('future.sqlite');
     final database = AppDatabase.forTesting(NativeDatabase(future));
     await DriftBooksRepository(database).create(name: 'Из будущего');
-    await database.customStatement('PRAGMA user_version = 6');
+    await database.customStatement('PRAGMA user_version = 8');
     await database.close();
 
     final result = await useCasesWith(

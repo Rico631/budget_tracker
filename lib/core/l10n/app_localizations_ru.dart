@@ -413,6 +413,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'В книге нет базовой категории этого типа.';
 
   @override
+  String get categoryFormDebtDeleteRejectedError =>
+      'Долговую категорию нельзя удалить. Переименование доступно.';
+
+  @override
   String get categoryFormKindNotAllowedError =>
       'Категория может быть только доходом или расходом.';
 
@@ -710,6 +714,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get journalExportColumnCategory => 'Категория';
 
   @override
+  String get journalExportColumnCounterparty => 'Контрагент';
+
+  @override
   String get journalExportColumnNote => 'Заметка';
 
   @override
@@ -769,4 +776,227 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get databaseListDeleteFailureMessage => 'Не удалось удалить базу.';
+
+  @override
+  String get accountsSectionAccountsLabel => 'Счета';
+
+  @override
+  String get accountsSectionDebtsLabel => 'Долги';
+
+  @override
+  String get debtsLoadErrorMessage =>
+      'Не удалось загрузить долги. Повторите попытку.';
+
+  @override
+  String get debtsRetryAction => 'Повторить';
+
+  @override
+  String get debtsReceivableTitle => 'Мне должны';
+
+  @override
+  String get debtsPayableTitle => 'Я должен';
+
+  @override
+  String get debtsTotalLabel => 'Итого';
+
+  @override
+  String get debtsArchiveAction => 'Архив';
+
+  @override
+  String get debtsArchiveTitle => 'Архив долгов';
+
+  @override
+  String get debtsArchiveEmptyMessage => 'В архиве нет закрытых долгов.';
+
+  @override
+  String get debtsEmptyTitle => 'Долгов нет';
+
+  @override
+  String get debtsEmptyMessage => 'Добавьте контрагента и укажите сумму долга.';
+
+  @override
+  String get debtsEmptyAction => 'Добавить контрагента';
+
+  @override
+  String get debtsOperationsTitle => 'Операции контрагента';
+
+  @override
+  String get debtsOperationsEmptyMessage => 'У контрагента нет операций.';
+
+  @override
+  String get debtsOperationsLoadErrorMessage =>
+      'Не удалось загрузить операции. Повторите попытку.';
+
+  @override
+  String get debtsEditAction => 'Редактировать';
+
+  @override
+  String get debtsActionsTooltip => 'Действия с долгом';
+
+  @override
+  String get debtsCloseAction => 'Закрыть долг';
+
+  @override
+  String get debtsCloseDialogTitle => 'Закрыть долг?';
+
+  @override
+  String get debtsCloseDialogMessage =>
+      'Контрагент уйдет в архив вместе с текущим остатком.';
+
+  @override
+  String get debtsReopenAction => 'Вернуть в активные';
+
+  @override
+  String get debtsDeleteAction => 'Удалить';
+
+  @override
+  String get debtsDeleteDialogTitle => 'Удалить контрагента?';
+
+  @override
+  String get debtsDeleteDialogMessage => 'Контрагент удаляется безвозвратно.';
+
+  @override
+  String get debtsDeleteDialogConfirmAction => 'Удалить';
+
+  @override
+  String get debtsDialogCancelAction => 'Отмена';
+
+  @override
+  String get debtsCloseOfferMessage =>
+      'Контрагента с операциями нельзя удалить. Закройте долг.';
+
+  @override
+  String get debtsSavedMessage => 'Долг сохранен.';
+
+  @override
+  String get debtsDeletedMessage => 'Контрагент удален.';
+
+  @override
+  String get debtsMutationFailureMessage =>
+      'Не удалось сохранить изменения долга.';
+
+  @override
+  String get counterpartyFormCreateTitle => 'Новый контрагент';
+
+  @override
+  String get counterpartyFormEditTitle => 'Контрагент';
+
+  @override
+  String get counterpartyFormNameLabel => 'Наименование';
+
+  @override
+  String get counterpartyFormCurrencyLabel => 'Валюта';
+
+  @override
+  String get counterpartyFormDirectionLabel => 'Направление';
+
+  @override
+  String get counterpartyFormDirectionLentLabel => 'Я дал в долг';
+
+  @override
+  String get counterpartyFormDirectionBorrowedLabel => 'Я взял в долг';
+
+  @override
+  String get counterpartyFormAccountLabel => 'Счет';
+
+  @override
+  String get counterpartyFormAmountLabel => 'Сумма';
+
+  @override
+  String get counterpartyFormSaveAction => 'Сохранить';
+
+  @override
+  String get counterpartyFormCurrencyLockedMessage =>
+      'Валюта контрагента с операциями не изменяется.';
+
+  @override
+  String get counterpartyFormNoAccountMessage =>
+      'В книге нет активного счета с валютой контрагента.';
+
+  @override
+  String get counterpartyFormAmountError => 'Укажите положительную сумму.';
+
+  @override
+  String get counterpartyFormNameRequiredError =>
+      'Укажите наименование контрагента.';
+
+  @override
+  String get counterpartyFormNameDuplicateError =>
+      'Контрагент с таким наименованием уже есть в книге.';
+
+  @override
+  String get counterpartyFormCurrencyCodeError =>
+      'Выберите валюту контрагента.';
+
+  @override
+  String get counterpartyFormAccountError => 'Выберите счет первой операции.';
+
+  @override
+  String get counterpartyFormAccountCurrencyError =>
+      'Выберите счет с валютой контрагента.';
+
+  @override
+  String get counterpartyFormCurrencyChangeError =>
+      'Валюту контрагента с операциями изменить нельзя.';
+
+  @override
+  String get counterpartyFormDebtCategoryError =>
+      'В книге нет долговой категории этого направления.';
+
+  @override
+  String get counterpartyFormDeleteError =>
+      'Контрагента с операциями удалить нельзя. Закройте долг.';
+
+  @override
+  String get counterpartyFormSaveErrorMessage =>
+      'Не удалось сохранить контрагента.';
+
+  @override
+  String get transactionFormCounterpartyLabel => 'Контрагент';
+
+  @override
+  String get transactionFormCounterpartyNoneLabel => 'Без контрагента';
+
+  @override
+  String get transactionFormCounterpartyAddAction => 'Новый контрагент';
+
+  @override
+  String get transactionFormCounterpartyCreateTitle => 'Новый контрагент';
+
+  @override
+  String get transactionFormCounterpartyCreateMessage =>
+      'Контрагент сохранится вместе с операцией.';
+
+  @override
+  String get transactionFormCounterpartyCreateConfirmAction => 'Создать';
+
+  @override
+  String get transactionFormCounterpartyCreateCancelAction => 'Отмена';
+
+  @override
+  String get transactionFormCounterpartyNameError =>
+      'Укажите наименование контрагента.';
+
+  @override
+  String get transactionFormCounterpartyDuplicateError =>
+      'Контрагент с таким наименованием уже есть в книге.';
+
+  @override
+  String get transactionFormCounterpartyCurrencyError =>
+      'Валюта контрагента не совпадает с валютой счета.';
+
+  @override
+  String get transactionFormCounterpartyBookError =>
+      'Выберите контрагента своей книги.';
+
+  @override
+  String get transactionFormCounterpartyDebtRoleError =>
+      'Возврат долга доступен только контрагенту с долгом этого направления.';
+
+  @override
+  String get transactionFormCounterpartyNotAllowedError =>
+      'Переводу контрагент недоступен.';
+
+  @override
+  String get transactionTileCounterpartyLabel => 'Контрагент';
 }

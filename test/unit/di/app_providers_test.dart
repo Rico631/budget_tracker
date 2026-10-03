@@ -91,7 +91,7 @@ void main() {
 
     expect(repeated.status, FirstRunBootstrapStatus.alreadyInitialized);
     expect(await database.select(database.books).get(), hasLength(1));
-    expect(await database.select(database.categories).get(), hasLength(37));
+    expect(await database.select(database.categories).get(), hasLength(40));
   });
 
   test(

@@ -7,8 +7,10 @@ import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
+import 'package:budget_tracker/data/repositories/counterparties_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
@@ -402,6 +404,7 @@ void main() {
           _RejectingKindChangeUseCases(
             accounts: accounts,
             categories: categories,
+            counterparties: DriftCounterpartiesRepository(database),
             transactions: transactions,
           ),
         ),
@@ -488,6 +491,371 @@ void main() {
     expect(find.text('-300,00 ₽'), findsOneWidget);
     expect(find.text('Кафе · Рубли'), findsOneWidget);
   });
+
+  group('поле контрагента', () {
+    late CounterpartiesRepository counterparties;
+
+    setUp(() {
+      counterparties = DriftCounterpartiesRepository(database);
+    });
+
+    /// Создает категорию с признаком долговой роли.
+    Future<FinanceCategory> createDebtCategory({
+      String name = 'Заём',
+      TransactionKind kind = TransactionKind.expense,
+      CategoryDebtRole role = CategoryDebtRole.loanOutflow,
+    }) async {
+      final now = DateTime(2026, 10, 3);
+      final category = FinanceCategory(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        name: name,
+        kind: kind,
+        createdAt: now,
+        updatedAt: now,
+        debtRole: role,
+      );
+      await database
+          .into(database.categories)
+          .insert(categoryToCompanion(category));
+      return category;
+    }
+
+    /// Создает контрагента с первой операцией долга.
+    ///
+    /// Расход означает выданный заем (контрагент должен пользователю), доход —
+    /// полученный (пользователь должен контрагенту).
+    Future<FinanceCounterparty> createCounterparty({
+      required String name,
+      required FinanceAccount account,
+      int amountMinor = 1000,
+      TransactionKind kind = TransactionKind.expense,
+    }) async {
+      final now = DateTime(2026, 10, 3);
+      final counterparty = FinanceCounterparty(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        name: name,
+        currencyCode: account.currencyCode,
+        createdAt: now,
+        updatedAt: now,
+      );
+      await counterparties.createWithTransaction(
+        counterparty: counterparty,
+        transaction: FinanceTransaction(
+          id: const FinanceIdGenerator().generateV7(),
+          bookId: book.id,
+          accountId: account.id,
+          categoryId: null,
+          counterpartyId: counterparty.id,
+          kind: kind,
+          amountMinor: amountMinor,
+          occurredAt: now,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+      return counterparty;
+    }
+
+    testWidgets('показывается только для долговой категории', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory();
+      await createCategory(TransactionKind.expense);
+      await createCounterparty(name: 'Иван', account: account);
+
+      await pumpForm(tester);
+
+      // Категория не выбрана: поля контрагента нет.
+      expect(find.byKey(transactionFormCounterpartyFieldKey), findsNothing);
+
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Кафе');
+      expect(find.byKey(transactionFormCounterpartyFieldKey), findsNothing);
+
+      await selectCategory(tester, 'Заём');
+      expect(find.byKey(transactionFormCounterpartyFieldKey), findsOneWidget);
+      expect(find.text('Без контрагента'), findsOneWidget);
+      // Тип «Перевод» поле не показывает.
+      await tester.tap(find.byKey(transactionFormKindTransferKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(transactionFormCounterpartyFieldKey), findsNothing);
+    });
+
+    testWidgets('ограничивает список контрагентов валютой счета', (
+      WidgetTester tester,
+    ) async {
+      final rubleAccount = await createAccount(name: 'Рубли');
+      final dollarAccount = await createAccount(
+        name: 'Доллары',
+        currencyCode: 'USD',
+      );
+      await createDebtCategory();
+      await createCounterparty(name: 'Рублевый', account: rubleAccount);
+      await createCounterparty(name: 'Долларовый', account: dollarAccount);
+
+      await pumpForm(tester);
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Рублевый'), findsOneWidget);
+      expect(find.text('Долларовый'), findsNothing);
+    });
+
+    testWidgets('сохраняет привязку к выбранному контрагенту', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory();
+      await createCounterparty(name: 'Иван', account: account);
+
+      await pumpForm(tester);
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Иван').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(transactionFormAmountFieldKey), '500');
+      await tester.tap(find.byKey(transactionFormSaveButtonKey));
+      await tester.pumpAndSettle();
+
+      final stored = (await transactions.listByBook(
+        book.id,
+      )).where((transaction) => transaction.amountMinor == 50000).single;
+
+      expect(stored.counterpartyId, isNotNull);
+      expect(
+        (await counterparties.getById(stored.counterpartyId!))!.name,
+        'Иван',
+      );
+    });
+
+    testWidgets('создает контрагента вместе с операцией', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory();
+      await createCounterparty(name: 'Иван', account: account);
+
+      await pumpForm(tester);
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      await tester.tap(find.byKey(transactionFormCounterpartyCreateKey));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(transactionFormCounterpartyNameFieldKey),
+        'Пётр',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Создать'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(transactionFormAmountFieldKey), '700');
+      await tester.tap(find.byKey(transactionFormSaveButtonKey));
+      await tester.pumpAndSettle();
+
+      final created = await counterparties.findByName(
+        bookId: book.id,
+        name: 'Пётр',
+      );
+
+      expect(created, isNotNull);
+      expect(created!.currencyCode, 'RUB');
+      // Операция привязана к новому контрагенту.
+      expect(
+        (await transactions.listByBook(
+          book.id,
+        )).where((transaction) => transaction.counterpartyId == created.id),
+        hasLength(1),
+      );
+    });
+
+    testWidgets('не сохраняет контрагента при отказе от операции', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory();
+      await createCounterparty(name: 'Иван', account: account);
+
+      await pumpForm(tester);
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      await tester.tap(find.byKey(transactionFormCounterpartyCreateKey));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(transactionFormCounterpartyNameFieldKey),
+        'Пётр',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Создать'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Пётр'), findsOneWidget);
+
+      // Отказ от сохранения операции не оставляет записи контрагента: форма
+      // закрывается без сохранения.
+      await pumpApp(tester, home: const Scaffold());
+
+      expect(
+        await counterparties.findByName(bookId: book.id, name: 'Пётр'),
+        isNull,
+      );
+    });
+
+    testWidgets('снимает привязку при смене категории', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory();
+      await createCategory(TransactionKind.expense);
+      final counterparty = await createCounterparty(
+        name: 'Иван',
+        account: account,
+      );
+
+      await pumpForm(tester);
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Иван').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Иван'), findsWidgets);
+
+      await selectCategory(tester, 'Кафе');
+
+      // Поле скрыто, а сохраненная операция не привязана к контрагенту.
+      expect(find.byKey(transactionFormCounterpartyFieldKey), findsNothing);
+      await tester.enterText(find.byKey(transactionFormAmountFieldKey), '400');
+      await tester.tap(find.byKey(transactionFormSaveButtonKey));
+      await tester.pumpAndSettle();
+
+      final stored = (await transactions.listByBook(
+        book.id,
+      )).where((transaction) => transaction.amountMinor == 40000).single;
+
+      expect(stored.counterpartyId, isNull);
+      expect(
+        (await counterparties.listWithBalances(book.id))
+            .where((debt) => debt.counterparty.id == counterparty.id)
+            .single
+            .balanceMinor,
+        1000,
+        reason: 'остаток долга не изменился',
+      );
+    });
+
+    testWidgets('предлагает возврат долга только должнику', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      // Должник должен пользователю 1000, кредитору пользователь должен 1000.
+      await createCounterparty(name: 'Должник', account: account);
+      await createCounterparty(
+        name: 'Кредитор',
+        account: account,
+        kind: TransactionKind.income,
+      );
+      await createDebtCategory(
+        name: 'Возврат денег',
+        kind: TransactionKind.income,
+        role: CategoryDebtRole.refundInflow,
+      );
+
+      await pumpForm(tester);
+      await tester.tap(find.byKey(transactionFormKindIncomeKey));
+      await tester.pumpAndSettle();
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Возврат денег');
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+
+      // Возврат выданного займа доступен должнику, но не тому, кому пользователь
+      // должен сам (ADR-0009, решение 9.15).
+      expect(find.text('Должник'), findsOneWidget);
+      expect(find.text('Кредитор'), findsNothing);
+      // Нового контрагента для возврата долга не создают: долга у него нет.
+      expect(find.byKey(transactionFormCounterpartyCreateKey), findsNothing);
+    });
+
+    testWidgets('снимает привязку при смене категории на возврат долга', (
+      WidgetTester tester,
+    ) async {
+      final account = await createAccount(name: 'Рубли');
+      await createDebtCategory(
+        name: 'Заём',
+        kind: TransactionKind.income,
+        role: CategoryDebtRole.loanInflow,
+      );
+      await createDebtCategory(
+        name: 'Возврат денег',
+        kind: TransactionKind.income,
+        role: CategoryDebtRole.refundInflow,
+      );
+      await createCounterparty(name: 'Должник', account: account);
+      await createCounterparty(
+        name: 'Кредитор',
+        account: account,
+        kind: TransactionKind.income,
+      );
+
+      await pumpForm(tester);
+      await tester.tap(find.byKey(transactionFormKindIncomeKey));
+      await tester.pumpAndSettle();
+      await selectAccount(
+        tester,
+        fieldKey: transactionFormAccountFieldKey,
+        name: 'Рубли',
+      );
+      await selectCategory(tester, 'Заём');
+      // Получение займа доступно и тому, кому пользователь должен.
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Кредитор').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Кредитор'), findsWidgets);
+
+      await selectCategory(tester, 'Возврат денег');
+
+      // Возврат выданного займа кредитора не допускает: привязка снята, а в
+      // списке остается только должник (ADR-0009, решение 9.15).
+      expect(find.text('Без контрагента'), findsOneWidget);
+      await tester.tap(find.byKey(transactionFormCounterpartyFieldKey));
+      await tester.pumpAndSettle();
+      expect(find.text('Должник'), findsOneWidget);
+      expect(find.text('Кредитор'), findsNothing);
+    });
+  });
 }
 
 /// Use cases, у которых обновление операции всегда отклоняется доменом.
@@ -495,6 +863,7 @@ class _RejectingKindChangeUseCases extends FinanceTransactionUseCases {
   _RejectingKindChangeUseCases({
     required super.accounts,
     required super.categories,
+    required super.counterparties,
     required super.transactions,
   });
 
@@ -503,5 +872,6 @@ class _RejectingKindChangeUseCases extends FinanceTransactionUseCases {
     FinanceTransaction existing,
     FinanceTransactionInput input, {
     required DateTime occurredAt,
+    String? newCounterpartyName,
   }) async => ValidationResult.invalid([transactionKindChangeRejectedError]);
 }

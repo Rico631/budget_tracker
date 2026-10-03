@@ -493,9 +493,9 @@ void main() {
     final russian = utf8.decode(dialog.saved.first.sublist(3));
     expect(
       russian,
-      'Дата;Тип;Счет;Валюта;Категория;Заметка;Сумма;Счет получателя;'
+      'Дата;Тип;Счет;Валюта;Категория;Контрагент;Заметка;Сумма;Счет получателя;'
       'Валюта получателя;Сумма зачисления\n'
-      '2026-05-06 07:08:09;Расход;Карта;RUB;Продукты;;-123,45;;;\n',
+      '2026-05-06 07:08:09;Расход;Карта;RUB;Продукты;;;-123,45;;;\n',
     );
 
     await tester.tap(find.text('Английский'));
@@ -506,9 +506,9 @@ void main() {
     final english = utf8.decode(dialog.saved.last.sublist(3));
     expect(
       english,
-      'Date,Type,Account,Currency,Category,Note,Amount,To account,'
+      'Date,Type,Account,Currency,Category,Counterparty,Note,Amount,To account,'
       'To currency,To amount\n'
-      '2026-05-06 07:08:09,Expense,Карта,RUB,Продукты,,-123.45,,,\n',
+      '2026-05-06 07:08:09,Expense,Карта,RUB,Продукты,,,-123.45,,,\n',
     );
   });
 }

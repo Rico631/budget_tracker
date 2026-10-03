@@ -10,6 +10,7 @@ class FinanceTransactionInput {
     required this.amountMinor,
     this.toAccountId,
     this.categoryId,
+    this.counterpartyId,
     this.toAmountMinor,
     this.note,
   });
@@ -21,6 +22,7 @@ class FinanceTransactionInput {
     required int amountMinor,
     String? toAccountId,
     String? categoryId,
+    String? counterpartyId,
     int? toAmountMinor,
     String? note,
   }) {
@@ -28,6 +30,7 @@ class FinanceTransactionInput {
     accountId = accountId.trim();
     toAccountId = _trimToNull(toAccountId);
     categoryId = _trimToNull(categoryId);
+    counterpartyId = _trimToNull(counterpartyId);
     note = _trimToNull(note);
 
     final errors = <String>[];
@@ -66,6 +69,9 @@ class FinanceTransactionInput {
         if (categoryId != null) {
           errors.add('categoryId must be empty.');
         }
+        if (counterpartyId != null) {
+          errors.add(transactionCounterpartyNotAllowedError);
+        }
         if (toAmountMinor != null && toAmountMinor <= 0) {
           errors.add(transactionToAmountNotPositiveError);
         }
@@ -83,6 +89,7 @@ class FinanceTransactionInput {
         amountMinor: amountMinor,
         toAccountId: toAccountId,
         categoryId: categoryId,
+        counterpartyId: counterpartyId,
         toAmountMinor: toAmountMinor,
         note: note,
       ),
@@ -93,6 +100,13 @@ class FinanceTransactionInput {
   final String accountId;
   final String? toAccountId;
   final String? categoryId;
+
+  /// Контрагент долга, к которому привязывается операция; `null` — без привязки.
+  ///
+  /// Привязка необязательна и доступна только доходу и расходу, валюта счета
+  /// которых совпадает с валютой контрагента (ADR-0009, решение 9.9).
+  final String? counterpartyId;
+
   final TransactionKind kind;
   final int amountMinor;
 

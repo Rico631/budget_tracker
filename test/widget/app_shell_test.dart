@@ -1,6 +1,8 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/ui/core/router/app_shell.dart';
+import 'package:budget_tracker/ui/features/accounts/views/accounts_page.dart';
+import 'package:budget_tracker/ui/features/debts/views/debts_view.dart';
 import 'package:budget_tracker/ui/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -75,13 +77,100 @@ void main() {
     await pumpShell(tester);
 
     expect(selectedTab(tester), 0);
-    expect(find.text('Счета'), findsOneWidget);
+    // Заголовок раздела и подпись части переключателя совпадают текстом, поэтому
+    // проверяется и переключатель частей, и содержимое части «Счета».
+    expect(find.text('Счета'), findsNWidgets(2));
+    expect(find.byKey(accountsSectionSwitchKey), findsOneWidget);
     expect(find.text('Мои счета'), findsOneWidget);
     expect(find.text('Пока нет счетов'), findsOneWidget);
     // На «Счетах» доступны и добавление счета (действие в AppBar), и добавление
-    // операции (крупная кнопка).
-    expect(find.byIcon(Icons.add), findsNWidgets(2));
+    // операции (крупная кнопка): действие добавления операции использует ту же
+    // иконку, поэтому проверяется ключ действия счета.
+    expect(find.byKey(shellAddAccountActionKey), findsOneWidget);
+    expect(find.byKey(shellAddCounterpartyActionKey), findsNothing);
     expect(find.byType(FloatingActionButton), findsOneWidget);
+  });
+
+  testWidgets('часть «Долги» сохраняет четыре вкладки и меняет действия', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+    await pumpShell(tester);
+
+    await tester.tap(find.text('Долги'));
+    await tester.pumpAndSettle();
+
+    // Нижняя навигация не меняет состав: активной остается вкладка «Счета».
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(selectedTab(tester), 0);
+    expect(
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).destinations,
+      hasLength(4),
+    );
+    // На части «Долги» доступны добавление контрагента и добавление операции,
+    // а добавления счета нет (ADR-0009, решение 9.12).
+    expect(find.byKey(shellAddCounterpartyActionKey), findsOneWidget);
+    expect(find.byKey(shellAddAccountActionKey), findsNothing);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.text('Долгов нет'), findsOneWidget);
+  });
+
+  testWidgets('возврат в раздел «Счета» показывает счета', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+    await tester.tap(find.text('Долги'));
+    await tester.pumpAndSettle();
+    expect(find.text('Долгов нет'), findsOneWidget);
+
+    await tester.tap(find.text('Настройки'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Счета'));
+    await tester.pumpAndSettle();
+
+    // Раздел открывается частью «Счета»: выбор части действует в пределах
+    // текущего захода в раздел (ADR-0009, решение 9.12).
+    expect(find.text('Пока нет счетов'), findsOneWidget);
+    expect(find.text('Долгов нет'), findsNothing);
+    expect(find.byKey(shellAddAccountActionKey), findsOneWidget);
+    expect(find.byKey(shellAddCounterpartyActionKey), findsNothing);
+  });
+
+  testWidgets('нажатие на раздел «Счета» показывает счета', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+    await tester.tap(find.text('Долги'));
+    await tester.pumpAndSettle();
+    expect(find.text('Долгов нет'), findsOneWidget);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Счета'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Пока нет счетов'), findsOneWidget);
+    expect(find.text('Долгов нет'), findsNothing);
+  });
+
+  testWidgets('на экране архива долгов нет действий добавления', (
+    WidgetTester tester,
+  ) async {
+    await pumpShell(tester);
+
+    await tester.tap(find.text('Долги'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(debtsArchiveActionKey));
+    await tester.pumpAndSettle();
+
+    // Архив открывается поверх раздела и показывает действия самого экрана.
+    expect(find.text('Архив долгов'), findsOneWidget);
+    expect(find.byKey(shellAddCounterpartyActionKey), findsNothing);
+    expect(find.byKey(shellAddAccountActionKey), findsNothing);
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 
   testWidgets('переключает четыре раздела и не теряет навигацию', (

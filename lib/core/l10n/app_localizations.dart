@@ -836,6 +836,12 @@ abstract class AppLocalizations {
   /// **'The book has no base category of this type.'**
   String get categoryFormFallbackMissingError;
 
+  /// Rejection of the deletion of a category with a debt role
+  ///
+  /// In en, this message translates to:
+  /// **'A debt category cannot be deleted. Renaming is available.'**
+  String get categoryFormDebtDeleteRejectedError;
+
   /// Rejection of the transfer type for a category
   ///
   /// In en, this message translates to:
@@ -1370,6 +1376,12 @@ abstract class AppLocalizations {
   /// **'Category'**
   String get journalExportColumnCategory;
 
+  /// CSV column header of the counterparty
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty'**
+  String get journalExportColumnCounterparty;
+
   /// CSV column header of the note
   ///
   /// In en, this message translates to:
@@ -1483,6 +1495,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete the database.'**
   String get databaseListDeleteFailureMessage;
+
+  /// Accounts part of the section switch
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get accountsSectionAccountsLabel;
+
+  /// Debts part of the section switch
+  ///
+  /// In en, this message translates to:
+  /// **'Debts'**
+  String get accountsSectionDebtsLabel;
+
+  /// Debt list load error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load debts. Try again.'**
+  String get debtsLoadErrorMessage;
+
+  /// Debt list retry action
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get debtsRetryAction;
+
+  /// Debt list part with a positive balance
+  ///
+  /// In en, this message translates to:
+  /// **'Owed to me'**
+  String get debtsReceivableTitle;
+
+  /// Debt list part with a negative balance
+  ///
+  /// In en, this message translates to:
+  /// **'I owe'**
+  String get debtsPayableTitle;
+
+  /// Per-currency debt total label
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get debtsTotalLabel;
+
+  /// Action opening the debt archive
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get debtsArchiveAction;
+
+  /// Debt archive screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Debt archive'**
+  String get debtsArchiveTitle;
+
+  /// Debt archive empty state
+  ///
+  /// In en, this message translates to:
+  /// **'The archive has no closed debts.'**
+  String get debtsArchiveEmptyMessage;
+
+  /// Debt section empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No debts'**
+  String get debtsEmptyTitle;
+
+  /// Invitation to add the first counterparty
+  ///
+  /// In en, this message translates to:
+  /// **'Add a counterparty and enter the debt amount.'**
+  String get debtsEmptyMessage;
+
+  /// Action creating the first counterparty
+  ///
+  /// In en, this message translates to:
+  /// **'Add counterparty'**
+  String get debtsEmptyAction;
+
+  /// Counterparty operations subscreen title
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty operations'**
+  String get debtsOperationsTitle;
+
+  /// Counterparty operations empty state
+  ///
+  /// In en, this message translates to:
+  /// **'The counterparty has no operations.'**
+  String get debtsOperationsEmptyMessage;
+
+  /// Counterparty operations load error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load operations. Try again.'**
+  String get debtsOperationsLoadErrorMessage;
+
+  /// Counterparty details editing action
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get debtsEditAction;
+
+  /// Debt row menu tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Debt actions'**
+  String get debtsActionsTooltip;
+
+  /// Manual debt closing action
+  ///
+  /// In en, this message translates to:
+  /// **'Close the debt'**
+  String get debtsCloseAction;
+
+  /// Manual debt closing confirmation title
+  ///
+  /// In en, this message translates to:
+  /// **'Close the debt?'**
+  String get debtsCloseDialogTitle;
+
+  /// Manual debt closing explanation
+  ///
+  /// In en, this message translates to:
+  /// **'The counterparty moves to the archive with its current balance.'**
+  String get debtsCloseDialogMessage;
+
+  /// Action returning a counterparty from the archive
+  ///
+  /// In en, this message translates to:
+  /// **'Return to active'**
+  String get debtsReopenAction;
+
+  /// Action permanently deleting a counterparty
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get debtsDeleteAction;
+
+  /// Counterparty deletion confirmation title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the counterparty?'**
+  String get debtsDeleteDialogTitle;
+
+  /// Counterparty deletion explanation
+  ///
+  /// In en, this message translates to:
+  /// **'The counterparty is deleted permanently.'**
+  String get debtsDeleteDialogMessage;
+
+  /// Counterparty deletion confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get debtsDeleteDialogConfirmAction;
+
+  /// Debt dialog cancellation
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get debtsDialogCancelAction;
+
+  /// Offer to close the debt instead of deleting
+  ///
+  /// In en, this message translates to:
+  /// **'A counterparty with operations cannot be deleted. Close the debt.'**
+  String get debtsCloseOfferMessage;
+
+  /// Counterparty saved confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Debt saved.'**
+  String get debtsSavedMessage;
+
+  /// Counterparty deleted confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty deleted.'**
+  String get debtsDeletedMessage;
+
+  /// Debt mutation error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save the debt changes.'**
+  String get debtsMutationFailureMessage;
+
+  /// Counterparty creation form title
+  ///
+  /// In en, this message translates to:
+  /// **'New counterparty'**
+  String get counterpartyFormCreateTitle;
+
+  /// Counterparty edit form title
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty'**
+  String get counterpartyFormEditTitle;
+
+  /// Counterparty name field
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get counterpartyFormNameLabel;
+
+  /// Counterparty currency field
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get counterpartyFormCurrencyLabel;
+
+  /// Debt direction field
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get counterpartyFormDirectionLabel;
+
+  /// I lent direction
+  ///
+  /// In en, this message translates to:
+  /// **'I lent'**
+  String get counterpartyFormDirectionLentLabel;
+
+  /// I borrowed direction
+  ///
+  /// In en, this message translates to:
+  /// **'I borrowed'**
+  String get counterpartyFormDirectionBorrowedLabel;
+
+  /// First debt operation account field
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get counterpartyFormAccountLabel;
+
+  /// First debt operation amount field
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get counterpartyFormAmountLabel;
+
+  /// Counterparty save action
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get counterpartyFormSaveAction;
+
+  /// Counterparty currency immutability explanation
+  ///
+  /// In en, this message translates to:
+  /// **'The currency of a counterparty with operations cannot be changed.'**
+  String get counterpartyFormCurrencyLockedMessage;
+
+  /// Missing account with the counterparty currency
+  ///
+  /// In en, this message translates to:
+  /// **'The book has no active account with the counterparty currency.'**
+  String get counterpartyFormNoAccountMessage;
+
+  /// First debt operation amount error
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive amount.'**
+  String get counterpartyFormAmountError;
+
+  /// Empty counterparty name error
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the counterparty name.'**
+  String get counterpartyFormNameRequiredError;
+
+  /// Duplicate counterparty name error
+  ///
+  /// In en, this message translates to:
+  /// **'A counterparty with the same name already exists in the book.'**
+  String get counterpartyFormNameDuplicateError;
+
+  /// Counterparty currency code error
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the counterparty currency.'**
+  String get counterpartyFormCurrencyCodeError;
+
+  /// Missing first operation account error
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the account of the first operation.'**
+  String get counterpartyFormAccountError;
+
+  /// Account and counterparty currency mismatch error
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an account with the counterparty currency.'**
+  String get counterpartyFormAccountCurrencyError;
+
+  /// Counterparty currency change error
+  ///
+  /// In en, this message translates to:
+  /// **'The currency of a counterparty with operations cannot be changed.'**
+  String get counterpartyFormCurrencyChangeError;
+
+  /// Missing debt category error
+  ///
+  /// In en, this message translates to:
+  /// **'The book has no debt category for this direction.'**
+  String get counterpartyFormDebtCategoryError;
+
+  /// Counterparty with operations deletion error
+  ///
+  /// In en, this message translates to:
+  /// **'A counterparty with operations cannot be deleted. Close the debt.'**
+  String get counterpartyFormDeleteError;
+
+  /// Counterparty save error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save the counterparty.'**
+  String get counterpartyFormSaveErrorMessage;
+
+  /// Counterparty field of the transaction form
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty'**
+  String get transactionFormCounterpartyLabel;
+
+  /// Empty counterparty field value
+  ///
+  /// In en, this message translates to:
+  /// **'No counterparty'**
+  String get transactionFormCounterpartyNoneLabel;
+
+  /// Counterparty creation action of the transaction form
+  ///
+  /// In en, this message translates to:
+  /// **'New counterparty'**
+  String get transactionFormCounterpartyAddAction;
+
+  /// Counterparty creation title of the transaction form
+  ///
+  /// In en, this message translates to:
+  /// **'New counterparty'**
+  String get transactionFormCounterpartyCreateTitle;
+
+  /// Counterparty creation explanation
+  ///
+  /// In en, this message translates to:
+  /// **'The counterparty is saved together with the operation.'**
+  String get transactionFormCounterpartyCreateMessage;
+
+  /// Counterparty creation confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get transactionFormCounterpartyCreateConfirmAction;
+
+  /// Counterparty creation cancellation
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get transactionFormCounterpartyCreateCancelAction;
+
+  /// Empty counterparty name error in the transaction form
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the counterparty name.'**
+  String get transactionFormCounterpartyNameError;
+
+  /// Duplicate counterparty error in the transaction form
+  ///
+  /// In en, this message translates to:
+  /// **'A counterparty with the same name already exists in the book.'**
+  String get transactionFormCounterpartyDuplicateError;
+
+  /// Counterparty and account currency mismatch error
+  ///
+  /// In en, this message translates to:
+  /// **'The counterparty currency differs from the account currency.'**
+  String get transactionFormCounterpartyCurrencyError;
+
+  /// Counterparty of another book error
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a counterparty of this book.'**
+  String get transactionFormCounterpartyBookError;
+
+  /// Counterparty debt direction and category role mismatch error
+  ///
+  /// In en, this message translates to:
+  /// **'A debt repayment is available only for a counterparty that owes in that direction.'**
+  String get transactionFormCounterpartyDebtRoleError;
+
+  /// Counterparty on a transfer error
+  ///
+  /// In en, this message translates to:
+  /// **'A transfer cannot have a counterparty.'**
+  String get transactionFormCounterpartyNotAllowedError;
+
+  /// Counterparty label of the transaction row
+  ///
+  /// In en, this message translates to:
+  /// **'Counterparty'**
+  String get transactionTileCounterpartyLabel;
 }
 
 class _AppLocalizationsDelegate

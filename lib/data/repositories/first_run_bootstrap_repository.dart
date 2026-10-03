@@ -61,11 +61,12 @@ class DriftFirstRunBootstrapRepository implements FirstRunBootstrapRepository {
               FinanceCategory(
                 id: idGenerator.generateV7(),
                 bookId: book.id,
-                name: _categoryName(seed, languageCode),
+                name: categorySeedName(seed, languageCode),
                 kind: seed.kind,
                 createdAt: now,
                 updatedAt: now,
                 isFallback: seed.isFallback,
+                debtRole: seed.debtRole,
               ),
             ),
         ]);
@@ -131,7 +132,4 @@ class DriftFirstRunBootstrapRepository implements FirstRunBootstrapRepository {
   List<BankSeed> _bankSeeds(String languageCode) => languageCode == 'en'
       ? internationalBankSeedCatalog
       : russianBankSeedCatalog;
-
-  String _categoryName(CategorySeed seed, String languageCode) =>
-      languageCode == 'en' ? seed.nameEn : seed.nameRu;
 }

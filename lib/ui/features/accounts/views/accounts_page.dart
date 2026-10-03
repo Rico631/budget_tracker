@@ -2,37 +2,93 @@ import 'package:budget_tracker/core/di/app_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/ui/features/accounts/views/account_form_page.dart';
+import 'package:budget_tracker/ui/features/accounts/view_models/accounts_section.dart';
 import 'package:budget_tracker/ui/features/accounts/widgets/bank_avatar.dart';
+import 'package:budget_tracker/ui/features/debts/views/debts_view.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transactions_page.dart';
 import 'package:budget_tracker/ui/features/accounts/view_models/accounts_controller.dart';
 import 'package:budget_tracker/ui/core/utils/money_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Главный экран продукта: активные счета книги с текущими остатками.
+/// Ключ переключателя частей раздела «Счета».
+const Key accountsSectionSwitchKey = Key('accountsSectionSwitch');
+
+/// Главный экран продукта: счета книги с остатками или долги с контрагентами.
 ///
-/// Счета группируются по валюте, и каждая группа показывает собственный итог:
-/// суммы разных валют не складываются и не конвертируются (ADR 2.1). Общий итог
-/// по всем валютам сразу не показывается.
+/// Переключатель «Счета | Долги» расположен в верхней части раздела и не меняет
+/// состав нижних вкладок: активной остается вкладка «Счета» (ADR-0009,
+/// решение 9.12). Раздел открывается частью «Счета», а выбранная часть действует
+/// в пределах текущего захода в раздел. Счета группируются по валюте, и каждая
+/// группа показывает собственный итог: суммы разных валют не складываются и не
+/// конвертируются (ADR 2.1). Общий итог по всем валютам сразу не показывается.
 class AccountsPage extends ConsumerWidget {
   const AccountsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localizations = AppLocalizations.of(context);
+    final section = ref.watch(accountsSectionProvider);
 
-    return ref
-        .watch(activeBookProvider)
-        .when(
-          loading: () => const _AccountsLoadingView(),
-          error: (error, stackTrace) => _AccountsErrorView(
-            message: localizations.accountsLoadErrorMessage,
-            onRetry: () => ref.invalidate(activeBookProvider),
+    return Column(
+      children: [
+        _SectionSwitch(
+          section: section,
+          onSelected: (value) =>
+              ref.read(accountsSectionProvider.notifier).select(value),
+        ),
+        Expanded(
+          child: ref
+              .watch(activeBookProvider)
+              .when(
+                loading: () => const _AccountsLoadingView(),
+                error: (error, stackTrace) => _AccountsErrorView(
+                  message: localizations.accountsLoadErrorMessage,
+                  onRetry: () => ref.invalidate(activeBookProvider),
+                ),
+                data: (book) => book == null
+                    ? const _AccountsEmptyView()
+                    : switch (section) {
+                        AccountsSection.accounts => _AccountsOverview(
+                          bookId: book.id,
+                        ),
+                        AccountsSection.debts => DebtsView(bookId: book.id),
+                      },
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionSwitch extends StatelessWidget {
+  const _SectionSwitch({required this.section, required this.onSelected});
+
+  final AccountsSection section;
+  final ValueChanged<AccountsSection> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: SegmentedButton<AccountsSection>(
+        key: accountsSectionSwitchKey,
+        segments: [
+          ButtonSegment(
+            value: AccountsSection.accounts,
+            label: Text(localizations.accountsSectionAccountsLabel),
           ),
-          data: (book) => book == null
-              ? const _AccountsEmptyView()
-              : _AccountsOverview(bookId: book.id),
-        );
+          ButtonSegment(
+            value: AccountsSection.debts,
+            label: Text(localizations.accountsSectionDebtsLabel),
+          ),
+        ],
+        selected: {section},
+        onSelectionChanged: (selection) => onSelected(selection.first),
+      ),
+    );
   }
 }
 

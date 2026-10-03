@@ -24,6 +24,7 @@ class TransactionSlidable extends ConsumerWidget {
     required this.account,
     this.toAccount,
     this.category,
+    this.counterparty,
     this.currencySymbol,
     this.toCurrencySymbol,
   });
@@ -41,6 +42,9 @@ class TransactionSlidable extends ConsumerWidget {
 
   /// Категория дохода или расхода; у перевода ее нет.
   final FinanceCategory? category;
+
+  /// Контрагент долга у операции с привязкой.
+  final FinanceCounterparty? counterparty;
 
   final String? currencySymbol;
   final String? toCurrencySymbol;
@@ -84,6 +88,7 @@ class TransactionSlidable extends ConsumerWidget {
               account: sourceAccount,
               toAccount: toAccount,
               category: category,
+              counterparty: counterparty,
               currencySymbol: currencySymbol,
               toCurrencySymbol: toCurrencySymbol,
               onTap: () =>

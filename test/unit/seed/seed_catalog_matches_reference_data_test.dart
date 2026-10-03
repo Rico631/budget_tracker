@@ -114,19 +114,19 @@ void main() {
         skipFirstCell: 'Русское название',
       );
 
-      expect(rows, hasLength(37));
-      expect(categorySeedCatalog, hasLength(37));
+      expect(rows, hasLength(40));
+      expect(categorySeedCatalog, hasLength(40));
       expect(
         categorySeedCatalog.where(
           (seed) => seed.kind == TransactionKind.income,
         ),
-        hasLength(11),
+        hasLength(12),
       );
       expect(
         categorySeedCatalog.where(
           (seed) => seed.kind == TransactionKind.expense,
         ),
-        hasLength(26),
+        hasLength(28),
       );
 
       // Базовая категория каждого типа помечена признаком (ADR-0004, 4.2).
@@ -134,6 +134,68 @@ void main() {
         categorySeedCatalog.where((seed) => seed.isFallback),
         hasLength(2),
       );
+
+      // Каждая долговая категория помечена собственной ролью (ADR-0009, 9.5):
+      // роль различает и тип операции, и событие долга.
+      for (final entry in const [
+        (CategoryDebtRole.loanOutflow, 'Заём', TransactionKind.expense),
+        (
+          CategoryDebtRole.refundOutflow,
+          'Возврат денег',
+          TransactionKind.expense,
+        ),
+        (CategoryDebtRole.loanInflow, 'Заём', TransactionKind.income),
+        (
+          CategoryDebtRole.refundInflow,
+          'Возврат денег',
+          TransactionKind.income,
+        ),
+      ]) {
+        final role = entry.$1;
+        expect(
+          categorySeedCatalog
+              .where((seed) => seed.debtRole == role)
+              .map((seed) => (seed.nameRu, seed.kind)),
+          [(entry.$2, entry.$3)],
+        );
+      }
+      expect(
+        categorySeedCatalog.where((seed) => seed.debtRole != null),
+        hasLength(4),
+      );
+      expect(
+        debtCategorySeedsFor(
+          TransactionKind.income,
+        ).map((seed) => seed.debtRole),
+        [CategoryDebtRole.loanInflow, CategoryDebtRole.refundInflow],
+      );
+      expect(
+        debtCategorySeedsFor(
+          TransactionKind.expense,
+        ).map((seed) => seed.debtRole),
+        [CategoryDebtRole.loanOutflow, CategoryDebtRole.refundOutflow],
+      );
+
+      // Одинаковые наименования категорий разных типов допустимы (ADR-0009, 9.6).
+      for (final name in const ['Заём', 'Возврат денег']) {
+        expect(
+          categorySeedCatalog
+              .where((seed) => seed.nameRu == name)
+              .map((seed) => seed.kind),
+          containsAll(<TransactionKind>[
+            TransactionKind.income,
+            TransactionKind.expense,
+          ]),
+        );
+      }
+      expect(categoryDataLanguage('Other Income'), 'en');
+      expect(categoryDataLanguage('Прочий доход'), 'ru');
+      expect(categoryDataLanguage(null), 'ru');
+      expect(
+        categorySeedName(fallbackCategorySeed(TransactionKind.income), 'en'),
+        'Other Income',
+      );
+
       expect(
         fallbackCategorySeed(TransactionKind.income).nameRu,
         'Прочий доход',
@@ -175,6 +237,11 @@ void main() {
         expect(seed.nameRu, row[1], reason: 'русское имя категории $index');
         expect(seed.nameEn, row[2], reason: 'английское имя категории $index');
         expect(seed.kind.name, row[3], reason: 'тип операции категории $index');
+        expect(
+          seed.debtRole?.name ?? '—',
+          row[4],
+          reason: 'долговая роль категории $index',
+        );
       }
     });
   });

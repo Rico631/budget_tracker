@@ -2,6 +2,7 @@ import 'package:budget_tracker/core/di/app_providers.dart';
 import 'package:budget_tracker/ui/features/accounts/view_models/account_selection_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/ui/features/debts/view_models/debts_controller.dart';
 import 'package:budget_tracker/ui/features/transactions/views/transaction_form_page.dart';
 import 'package:budget_tracker/ui/features/transactions/widgets/transaction_slidable.dart';
 import 'package:budget_tracker/ui/features/transactions/view_models/transactions_journal_provider.dart';
@@ -74,6 +75,8 @@ class _TransactionsListView extends ConsumerWidget {
     final categories =
         ref.watch(bookCategoriesProvider(bookId)).value ?? const [];
     final currencies = ref.watch(currencyCatalogProvider).value ?? const {};
+    final counterparties =
+        ref.watch(bookCounterpartiesProvider(bookId)).value ?? const {};
     final accountsById = {for (final account in accounts) account.id: account};
     final categoriesById = {
       for (final category in categories) category.id: category,
@@ -104,6 +107,7 @@ class _TransactionsListView extends ConsumerWidget {
               account: accountsById[transaction.accountId],
               toAccount: accountsById[transaction.toAccountId],
               category: categoriesById[transaction.categoryId],
+              counterparty: counterparties[transaction.counterpartyId],
               currencySymbol: _currencySymbol(
                 currencies,
                 accountsById[transaction.accountId],

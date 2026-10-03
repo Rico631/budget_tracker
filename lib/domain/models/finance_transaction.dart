@@ -15,6 +15,7 @@ class FinanceTransaction {
     required this.updatedAt,
     this.toAccountId,
     this.categoryId,
+    this.counterpartyId,
     this.toAmountMinor,
     this.note,
   });
@@ -24,6 +25,11 @@ class FinanceTransaction {
   final String accountId;
   final String? toAccountId;
   final String? categoryId;
+
+  /// Контрагент долга, к которому привязана операция дохода или расхода, или
+  /// `null` у операции без привязки и у перевода (ADR-0009, решение 9.4).
+  final String? counterpartyId;
+
   final TransactionKind kind;
 
   /// Сумма списания в валюте счета [accountId].

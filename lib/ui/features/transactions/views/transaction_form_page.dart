@@ -6,6 +6,7 @@ import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/ui/features/debts/view_models/debts_controller.dart';
 import 'package:budget_tracker/ui/features/transactions/widgets/account_picker_sheet.dart';
 import 'package:budget_tracker/ui/features/transactions/widgets/category_picker_sheet.dart';
 import 'package:budget_tracker/ui/features/transactions/widgets/transaction_tile.dart';
@@ -44,6 +45,26 @@ const Key transactionFormAmountFieldKey = Key('transactionFormAmountField');
 
 /// Ключ поля суммы зачисления перевода.
 const Key transactionFormToAmountFieldKey = Key('transactionFormToAmountField');
+
+/// Ключ поля выбора контрагента операции.
+const Key transactionFormCounterpartyFieldKey = Key(
+  'transactionFormCounterpartyField',
+);
+
+/// Ключ действия создания контрагента из формы операции.
+const Key transactionFormCounterpartyCreateKey = Key(
+  'transactionFormCounterpartyCreate',
+);
+
+/// Ключ действия снятия привязки к контрагенту.
+const Key transactionFormCounterpartyClearKey = Key(
+  'transactionFormCounterpartyClear',
+);
+
+/// Ключ поля наименования нового контрагента.
+const Key transactionFormCounterpartyNameFieldKey = Key(
+  'transactionFormCounterpartyNameField',
+);
 
 /// Ключ поля даты операции.
 const Key transactionFormDateFieldKey = Key('transactionFormDateField');
@@ -123,6 +144,14 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
   String? _accountId;
   String? _toAccountId;
   String? _categoryId;
+  String? _counterpartyId;
+
+  /// Наименование контрагента, создаваемого вместе с сохраняемой операцией.
+  ///
+  /// Запись контрагента появляется только при сохранении операции: закрытие
+  /// формы без сохранения не оставляет контрагента (ADR-0009, решение 9.11).
+  String? _newCounterpartyName;
+
   late DateTime _date;
   List<String> _errors = const [];
   bool _isBusy = false;
@@ -148,6 +177,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
     _accountId = transaction?.accountId;
     _toAccountId = transaction?.toAccountId;
     _categoryId = transaction?.categoryId;
+    _counterpartyId = transaction?.counterpartyId;
     _date = transaction?.occurredAt ?? DateTime.now();
   }
 
@@ -172,6 +202,9 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
         : ref.watch(activeBookCategoriesProvider(bookId)).value ??
               const <FinanceCategory>[];
     final accountsById = {for (final account in accounts) account.id: account};
+    final categoriesById = {
+      for (final category in categories) category.id: category,
+    };
     final sourceAccount = accountsById[_accountId];
     final targetAccount = accountsById[_toAccountId];
     final isTransfer = _kind == TransactionKind.transfer;
@@ -180,6 +213,19 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
         sourceAccount != null &&
         targetAccount != null &&
         sourceAccount.currencyCode != targetAccount.currencyCode;
+    final counterpartyRole = _counterpartyRole(sourceAccount, categoriesById);
+    final counterparties = bookId != null && counterpartyRole != null
+        ? ref
+                  .watch(
+                    operationCounterpartiesProvider((
+                      bookId: bookId,
+                      currencyCode: sourceAccount!.currencyCode,
+                      role: counterpartyRole,
+                    )),
+                  )
+                  .value ??
+              const <FinanceCounterparty>[]
+        : const <FinanceCounterparty>[];
 
     return Scaffold(
       appBar: AppBar(
@@ -245,6 +291,20 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
               enabled: !_isBusy,
               onTap: () => _selectCategory(bookId),
             ),
+          if (counterparties.isNotEmpty)
+            _CounterpartyField(
+              value: _counterpartyLabel(counterparties),
+              enabled: !_isBusy,
+              onSelect: () => _selectCounterparty(counterparties),
+              // Возврат долга уменьшает существующий долг, поэтому нового
+              // контрагента для него не создают (ADR-0009, решение 9.15).
+              onCreate: counterpartyRole != null && !counterpartyRole.isRefund
+                  ? _createCounterparty
+                  : null,
+              onClear: _counterpartyId == null && _newCounterpartyName == null
+                  ? null
+                  : _clearCounterparty,
+            ),
           _DateField(
             fieldKey: transactionFormDateFieldKey,
             label: localizations.transactionFormDateLabel,
@@ -273,6 +333,137 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
     );
   }
 
+  /// Долговая роль выбранной категории, если поле контрагента применимо.
+  ///
+  /// Поле доступно доходу и расходу, категория которых имеет признак долговой
+  /// роли (ADR-0009, решение 9.9).
+  CategoryDebtRole? _counterpartyRole(
+    FinanceAccount? sourceAccount,
+    Map<String, FinanceCategory> categoriesById,
+  ) {
+    if (_kind == TransactionKind.transfer || sourceAccount == null) {
+      return null;
+    }
+    return categoriesById[_categoryId]?.debtRole;
+  }
+
+  /// Подпись поля контрагента: выбранный контрагент, имя нового или «без
+  /// контрагента».
+  String? _counterpartyLabel(List<FinanceCounterparty> counterparties) {
+    if (_newCounterpartyName case final name?) {
+      return name;
+    }
+    final counterpartyId = _counterpartyId;
+    if (counterpartyId == null) {
+      return AppLocalizations.of(context).transactionFormCounterpartyNoneLabel;
+    }
+    for (final counterparty in counterparties) {
+      if (counterparty.id == counterpartyId) {
+        return counterparty.name;
+      }
+    }
+    return AppLocalizations.of(context).transactionFormCounterpartyNoneLabel;
+  }
+
+  Future<void> _selectCounterparty(
+    List<FinanceCounterparty> counterparties,
+  ) async {
+    final selected = await showModalBottomSheet<FinanceCounterparty>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final counterparty in counterparties)
+              ListTile(
+                title: Text(counterparty.name),
+                subtitle: Text(counterparty.currencyCode),
+                selected: counterparty.id == _counterpartyId,
+                onTap: () => Navigator.of(sheetContext).pop(counterparty),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (selected == null || !mounted) {
+      return;
+    }
+    setState(() {
+      _counterpartyId = selected.id;
+      _newCounterpartyName = null;
+      _errors = const [];
+    });
+  }
+
+  /// Спрашивает наименование нового контрагента и запоминает его.
+  ///
+  /// Запись создается только при сохранении операции, поэтому отказ от
+  /// сохранения не оставляет контрагента (ADR-0009, решение 9.11).
+  Future<void> _createCounterparty() async {
+    final localizations = AppLocalizations.of(context);
+    var name = _newCounterpartyName ?? '';
+    final selectedName = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        key: const Key('transactionFormCounterpartyDialog'),
+        title: Text(localizations.transactionFormCounterpartyCreateTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(localizations.transactionFormCounterpartyCreateMessage),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: transactionFormCounterpartyNameFieldKey,
+              initialValue: name,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              onChanged: (value) => name = value,
+              decoration: InputDecoration(
+                labelText: localizations.transactionFormCounterpartyLabel,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              localizations.transactionFormCounterpartyCreateCancelAction,
+            ),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(name.trim()),
+            child: Text(
+              localizations.transactionFormCounterpartyCreateConfirmAction,
+            ),
+          ),
+        ],
+      ),
+    );
+    if (selectedName == null || !mounted) {
+      return;
+    }
+    setState(() {
+      if (selectedName.isEmpty) {
+        _errors = const [catalogNameRequiredError];
+        return;
+      }
+      _newCounterpartyName = selectedName;
+      _counterpartyId = null;
+      _errors = const [];
+    });
+  }
+
+  void _clearCounterparty() {
+    setState(() {
+      _counterpartyId = null;
+      _newCounterpartyName = null;
+      _errors = const [];
+    });
+  }
+
   void _selectKind(TransactionKind kind) {
     if (_isEditing || kind == _kind) {
       return;
@@ -280,9 +471,13 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
     setState(() {
       _kind = kind;
       // Категория другого типа невалидна, а счет-получатель и сумма зачисления
-      // относятся только к переводу, поэтому выбор сбрасывается.
+      // относятся только к переводу, поэтому выбор сбрасывается. Привязка к
+      // контрагенту снимается вместе с категорией: поле контрагента показывается
+      // только для долговой категории (ADR-0009, решение 9.5).
       _categoryId = null;
       _toAccountId = null;
+      _counterpartyId = null;
+      _newCounterpartyName = null;
       _toAmountController.clear();
       _errors = const [];
     });
@@ -302,10 +497,18 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
       return;
     }
     setState(() {
+      final previousAccount = isTarget ? _toAccountId : _accountId;
       if (isTarget) {
         _toAccountId = account.id;
       } else {
         _accountId = account.id;
+        // Смена счета на счет другой валюты снимает привязку к контрагенту:
+        // валюта контрагента должна совпадать с валютой счета операции
+        // (ADR-0009, решение 9.9).
+        if (previousAccount != account.id) {
+          _counterpartyId = null;
+          _newCounterpartyName = null;
+        }
       }
       _errors = const [];
     });
@@ -325,9 +528,62 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
       return;
     }
     setState(() {
+      if (category.id != _categoryId && category.debtRole == null) {
+        // Категория без долговой роли не участвует в учете долгов, поэтому
+        // привязка снимается (ADR-0009, решение 9.5).
+        _counterpartyId = null;
+        _newCounterpartyName = null;
+      }
       _categoryId = category.id;
       _errors = const [];
     });
+    await _dropCounterpartyUnfitForRole(bookId, category.debtRole);
+  }
+
+  /// Снимает привязку, если выбранная категория не допускает контрагента.
+  ///
+  /// Возврат долга допустим только у контрагента с остатком своего направления
+  /// (ADR-0009, решение 9.15), поэтому смена категории на возврат привязку к
+  /// контрагенту другого направления не сохраняет.
+  Future<void> _dropCounterpartyUnfitForRole(
+    String? bookId,
+    CategoryDebtRole? role,
+  ) async {
+    final boundId = _counterpartyId;
+    if (bookId == null || role == null || boundId == null) {
+      return;
+    }
+    final account = _transactionAccount(bookId);
+    if (account == null) {
+      return;
+    }
+    final available = await ref.read(
+      operationCounterpartiesProvider((
+        bookId: bookId,
+        currencyCode: account.currencyCode,
+        role: role,
+      )).future,
+    );
+    if (!mounted ||
+        available.any((counterparty) => counterparty.id == boundId)) {
+      return;
+    }
+    setState(() {
+      _counterpartyId = null;
+    });
+  }
+
+  /// Счет операции из активных счетов книги.
+  FinanceAccount? _transactionAccount(String bookId) {
+    final accounts =
+        ref.read(activeBookAccountsProvider(bookId)).value ??
+        const <FinanceAccount>[];
+    for (final account in accounts) {
+      if (account.id == _accountId) {
+        return account;
+      }
+    }
+    return null;
   }
 
   Future<void> _selectDate() async {
@@ -404,6 +660,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
       amountMinor: amountMinor!,
       toAccountId: isTransfer ? _toAccountId : null,
       categoryId: isTransfer ? null : _categoryId,
+      counterpartyId: isTransfer ? null : _counterpartyId,
       toAmountMinor: toAmountMinor,
       note: _noteController.text,
     );
@@ -427,7 +684,12 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
     try {
       final result = await ref
           .read(financeTransactionControllerProvider.notifier)
-          .save(input, occurredAt: _occurredAt(), existing: widget.transaction);
+          .save(
+            input,
+            occurredAt: _occurredAt(),
+            existing: widget.transaction,
+            newCounterpartyName: _newCounterpartyName,
+          );
       if (!mounted) {
         return;
       }

@@ -4,6 +4,7 @@ import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/services/transactions_journal_rule.dart';
 import 'package:budget_tracker/ui/features/analytics/widgets/analytics_labels.dart';
 import 'package:budget_tracker/ui/features/analytics/widgets/analytics_status_views.dart';
+import 'package:budget_tracker/ui/features/debts/view_models/debts_controller.dart';
 import 'package:budget_tracker/ui/features/transactions/widgets/transaction_slidable.dart';
 import 'package:budget_tracker/ui/features/analytics/view_models/analytics_controller.dart';
 import 'package:budget_tracker/ui/features/transactions/view_models/transactions_journal_provider.dart';
@@ -148,6 +149,8 @@ class _CategoryOperationsView extends ConsumerWidget {
         ref.watch(bookAccountsProvider(bookId)).value ??
         const <FinanceAccount>[];
     final currencies = ref.watch(currencyCatalogProvider).value ?? const {};
+    final counterparties =
+        ref.watch(bookCounterpartiesProvider(bookId)).value ?? const {};
     final accountsById = {for (final account in accounts) account.id: account};
     final localeTag = Localizations.localeOf(context).toLanguageTag();
     final dayFormat = DateFormat.yMMMMEEEEd(localeTag);
@@ -190,6 +193,7 @@ class _CategoryOperationsView extends ConsumerWidget {
               transaction: operation,
               account: accountsById[operation.accountId],
               category: category,
+              counterparty: counterparties[operation.counterpartyId],
               currencySymbol:
                   currencies[accountsById[operation.accountId]?.currencyCode]
                       ?.symbol,

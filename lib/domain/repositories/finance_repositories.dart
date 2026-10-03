@@ -104,6 +104,54 @@ abstract interface class CategoriesRepository {
   Future<void> delete(String id);
 }
 
+abstract interface class CounterpartiesRepository {
+  /// Контрагент книги [bookId] с наименованием [name] или `null`.
+  ///
+  /// Сравнение выполняется в Dart без учета регистра и краевых пробелов:
+  /// SQLite без ICU не приводит кириллицу к нижнему регистру встроенной
+  /// функцией `lower()` (ADR-0004, решение 4.5).
+  Future<FinanceCounterparty?> findByName({
+    required String bookId,
+    required String name,
+  });
+
+  /// Контрагенты книги с вычисленными остатками долга.
+  ///
+  /// Остатки считаются одним запросом по привязанным операциям книги, включая
+  /// операции архивных счетов: остаток контрагента не зависит от состояния
+  /// счета (ADR-0009, решение 9.2). При [onlyActive] возвращаются только
+  /// активные контрагенты: со снятым ручным закрытием и ненулевым остатком.
+  Future<List<CounterpartyDebt>> listWithBalances(
+    String bookId, {
+    bool onlyActive = false,
+  });
+
+  Future<FinanceCounterparty?> getById(String id);
+
+  /// Есть ли у контрагента привязанные операции.
+  Future<bool> hasTransactions(String counterpartyId);
+
+  /// Операции контрагента в порядке от новых к старым.
+  Future<List<FinanceTransaction>> listTransactions(String counterpartyId);
+
+  /// Создает контрагента вместе с операцией, которая его указывает, одной
+  /// транзакцией.
+  ///
+  /// Операция сохраняется по своему идентификатору: новая вставляется, уже
+  /// существующая заменяется. Отказ любой из записей не оставляет частично
+  /// сохраненного состояния, а запись контрагента без операции невозможна
+  /// (ADR-0009, решение 9.11).
+  Future<void> createWithTransaction({
+    required FinanceCounterparty counterparty,
+    required FinanceTransaction transaction,
+  });
+
+  /// Сохраняет наименование, валюту и признак ручного закрытия контрагента.
+  Future<void> update(FinanceCounterparty counterparty);
+
+  Future<void> delete(String id);
+}
+
 abstract interface class TransactionsRepository {
   Future<FinanceTransaction> create({
     required String bookId,
@@ -113,6 +161,7 @@ abstract interface class TransactionsRepository {
     required DateTime occurredAt,
     String? toAccountId,
     String? categoryId,
+    String? counterpartyId,
     int? toAmountMinor,
     String? note,
   });

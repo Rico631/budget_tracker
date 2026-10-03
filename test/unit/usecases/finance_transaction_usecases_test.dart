@@ -1,13 +1,16 @@
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/data/local/mappers/finance_row_mappers.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
+import 'package:budget_tracker/data/repositories/counterparties_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
+import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +19,7 @@ void main() {
   late BooksRepository books;
   late AccountsRepository accounts;
   late CategoriesRepository categories;
+  late CounterpartiesRepository counterparties;
   late TransactionsRepository transactions;
   late FinanceTransactionUseCases useCases;
 
@@ -24,10 +28,12 @@ void main() {
     books = DriftBooksRepository(database);
     accounts = DriftAccountsRepository(database);
     categories = DriftCategoriesRepository(database);
+    counterparties = DriftCounterpartiesRepository(database);
     transactions = DriftTransactionsRepository(database);
     useCases = FinanceTransactionUseCases(
       accounts: accounts,
       categories: categories,
+      counterparties: counterparties,
       transactions: transactions,
     );
   });
@@ -561,6 +567,284 @@ void main() {
     expect(journal.days, isEmpty);
     expect(journal.isEmpty, isTrue);
     expect(journal.hasTransactions, isFalse);
+  });
+
+  group('Counterparty binding', () {
+    late FinanceBook book;
+    late FinanceAccount rubleAccount;
+    late FinanceAccount dollarAccount;
+    late FinanceCategory expenseCategory;
+    late FinanceCounterparty rubleCounterparty;
+
+    setUp(() async {
+      book = await books.create(name: 'Debts');
+      rubleAccount = await accounts.create(
+        bookId: book.id,
+        name: 'Рубли',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 10000,
+      );
+      dollarAccount = await accounts.create(
+        bookId: book.id,
+        name: 'Доллары',
+        currencyCode: 'USD',
+        initialBalanceMinor: 10000,
+      );
+      expenseCategory = await categories.create(
+        bookId: book.id,
+        name: 'Заём',
+        kind: TransactionKind.expense,
+      );
+      rubleCounterparty = FinanceCounterparty(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        name: 'Иван',
+        currencyCode: 'RUB',
+        createdAt: DateTime(2026, 10, 3),
+        updatedAt: DateTime(2026, 10, 3),
+      );
+      await counterparties.createWithTransaction(
+        counterparty: rubleCounterparty,
+        transaction: FinanceTransaction(
+          id: const FinanceIdGenerator().generateV7(),
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          categoryId: expenseCategory.id,
+          counterpartyId: rubleCounterparty.id,
+          kind: TransactionKind.expense,
+          amountMinor: 1000,
+          occurredAt: DateTime(2026, 10, 3),
+          createdAt: DateTime(2026, 10, 3),
+          updatedAt: DateTime(2026, 10, 3),
+        ),
+      );
+    });
+
+    test('keeps the binding when the account currency matches', () async {
+      final created = await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          kind: TransactionKind.expense,
+          amountMinor: 250,
+          categoryId: expenseCategory.id,
+          counterpartyId: rubleCounterparty.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect(created.valueOrFail().counterpartyId, rubleCounterparty.id);
+    });
+
+    test('rejects the binding when the account currency differs', () async {
+      final input = FinanceTransactionInput.tryCreate(
+        bookId: book.id,
+        accountId: dollarAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 250,
+        categoryId: expenseCategory.id,
+        counterpartyId: rubleCounterparty.id,
+      ).valueOrFail();
+
+      expect(
+        await useCases.create(input, occurredAt: DateTime(2026, 10, 4)),
+        isA<Invalid<FinanceTransaction>>(),
+      );
+      expect(
+        await transactions.listByBook(book.id),
+        hasLength(1),
+        reason: 'отклоненная операция не сохраняется',
+      );
+    });
+
+    test('rejects a counterparty of another book', () async {
+      final otherBook = await books.create(name: 'Другая книга');
+      final otherCounterparty = FinanceCounterparty(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: otherBook.id,
+        name: 'Пётр',
+        currencyCode: 'RUB',
+        createdAt: DateTime(2026, 10, 3),
+        updatedAt: DateTime(2026, 10, 3),
+      );
+
+      await counterparties.createWithTransaction(
+        counterparty: otherCounterparty,
+        transaction: FinanceTransaction(
+          id: const FinanceIdGenerator().generateV7(),
+          bookId: otherBook.id,
+          accountId: rubleAccount.id,
+          categoryId: expenseCategory.id,
+          kind: TransactionKind.expense,
+          amountMinor: 100,
+          occurredAt: DateTime(2026, 10, 3),
+          createdAt: DateTime(2026, 10, 3),
+          updatedAt: DateTime(2026, 10, 3),
+        ),
+      );
+
+      final input = FinanceTransactionInput.tryCreate(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 250,
+        categoryId: expenseCategory.id,
+        counterpartyId: otherCounterparty.id,
+      ).valueOrFail();
+
+      final result = await useCases.create(
+        input,
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect((result as Invalid<FinanceTransaction>).errors, [
+        transactionCounterpartyBookMismatchError,
+      ]);
+    });
+
+    test('does not allow the counterparty on a transfer', () {
+      final result = FinanceTransactionInput.tryCreate(
+        bookId: book.id,
+        accountId: rubleAccount.id,
+        toAccountId: dollarAccount.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 250,
+        toAmountMinor: 3,
+        counterpartyId: rubleCounterparty.id,
+      );
+
+      expect(
+        (result as Invalid<FinanceTransactionInput>).errors,
+        contains(transactionCounterpartyNotAllowedError),
+      );
+    });
+
+    test(
+      'clears the binding on update when the account changes currency',
+      () async {
+        final created = (await useCases.create(
+          FinanceTransactionInput.tryCreate(
+            bookId: book.id,
+            accountId: rubleAccount.id,
+            kind: TransactionKind.expense,
+            amountMinor: 300,
+            categoryId: expenseCategory.id,
+            counterpartyId: rubleCounterparty.id,
+          ).valueOrFail(),
+          occurredAt: DateTime(2026, 10, 4),
+        )).valueOrFail();
+
+        final updated = await useCases.update(
+          created,
+          FinanceTransactionInput.tryCreate(
+            bookId: book.id,
+            accountId: dollarAccount.id,
+            kind: TransactionKind.expense,
+            amountMinor: 300,
+            categoryId: expenseCategory.id,
+          ).valueOrFail(),
+          occurredAt: DateTime(2026, 10, 4),
+        );
+
+        expect(updated.valueOrFail().counterpartyId, isNull);
+        expect(
+          (await transactions.getById(created.id))!.counterpartyId,
+          isNull,
+        );
+      },
+    );
+
+    /// Долговая категория [kind] с ролью [role] поверх стартового набора.
+    Future<FinanceCategory> insertRoleCategory(
+      TransactionKind kind,
+      CategoryDebtRole role,
+    ) async {
+      final category = FinanceCategory(
+        id: const FinanceIdGenerator().generateV7(),
+        bookId: book.id,
+        name: 'Долговая ${role.name}',
+        kind: kind,
+        createdAt: DateTime(2026, 10, 3),
+        updatedAt: DateTime(2026, 10, 3),
+        debtRole: role,
+      );
+      await database
+          .into(database.categories)
+          .insert(categoryToCompanion(category));
+      return category;
+    }
+
+    test('accepts a refund of the issued loan from the debtor', () async {
+      // Контрагент должен пользователю 1000, поэтому возврат выданного займа
+      // привязывается к нему (ADR-0009, решение 9.15).
+      final category = await insertRoleCategory(
+        TransactionKind.income,
+        CategoryDebtRole.refundInflow,
+      );
+
+      final created = await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          kind: TransactionKind.income,
+          amountMinor: 400,
+          categoryId: category.id,
+          counterpartyId: rubleCounterparty.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect(created.valueOrFail().counterpartyId, rubleCounterparty.id);
+    });
+
+    test('rejects repaying a debt to a counterparty that owes money', () async {
+      // Контрагент должен пользователю, поэтому возврат своего долга ему
+      // невозможен: остаток долга поменял бы направление (ADR-0009, 9.15).
+      final category = await insertRoleCategory(
+        TransactionKind.expense,
+        CategoryDebtRole.refundOutflow,
+      );
+
+      final created = await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          kind: TransactionKind.expense,
+          amountMinor: 400,
+          categoryId: category.id,
+          counterpartyId: rubleCounterparty.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect((created as Invalid<FinanceTransaction>).errors, [
+        transactionCounterpartyDebtRoleMismatchError,
+      ]);
+      expect(await transactions.listByBook(book.id), hasLength(1));
+    });
+
+    test('accepts any counterparty for a loan role', () async {
+      // Заем создает новый долг, поэтому остаток контрагента его не ограничивает
+      // (ADR-0009, решение 9.15).
+      final category = await insertRoleCategory(
+        TransactionKind.income,
+        CategoryDebtRole.loanInflow,
+      );
+
+      final created = await useCases.create(
+        FinanceTransactionInput.tryCreate(
+          bookId: book.id,
+          accountId: rubleAccount.id,
+          kind: TransactionKind.income,
+          amountMinor: 400,
+          categoryId: category.id,
+          counterpartyId: rubleCounterparty.id,
+        ).valueOrFail(),
+        occurredAt: DateTime(2026, 10, 4),
+      );
+
+      expect(created.valueOrFail().counterpartyId, rubleCounterparty.id);
+    });
   });
 }
 

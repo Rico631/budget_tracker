@@ -22,6 +22,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
     required DateTime occurredAt,
     String? toAccountId,
     String? categoryId,
+    String? counterpartyId,
     int? toAmountMinor,
     String? note,
   }) async {
@@ -32,6 +33,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
       accountId: accountId,
       toAccountId: toAccountId,
       categoryId: categoryId,
+      counterpartyId: counterpartyId,
       kind: kind,
       amountMinor: amountMinor,
       toAmountMinor: toAmountMinor,
@@ -44,6 +46,11 @@ class DriftTransactionsRepository implements TransactionsRepository {
       await database
           .into(database.transactions)
           .insert(transactionToCompanion(transaction));
+      if (counterpartyId != null) {
+        // Новая привязанная операция снимает ручное закрытие и возвращает
+        // контрагента в активные (ADR-0009, решение 9.10).
+        await _reopenCounterparty(counterpartyId);
+      }
     });
     return transaction;
   }
@@ -82,6 +89,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
     final sourceAccount = database.accounts;
     final targetAccount = database.alias(database.accounts, 'to_account');
     final category = database.categories;
+    final counterparty = database.counterparties;
 
     final query =
         database.select(database.transactions).join([
@@ -96,6 +104,10 @@ class DriftTransactionsRepository implements TransactionsRepository {
             leftOuterJoin(
               category,
               category.id.equalsExp(database.transactions.categoryId),
+            ),
+            leftOuterJoin(
+              counterparty,
+              counterparty.id.equalsExp(database.transactions.counterpartyId),
             ),
           ])
           ..where(database.transactions.bookId.equals(bookId))
@@ -114,6 +126,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
           sourceAccount: sourceAccount,
           targetAccount: targetAccount,
           category: category,
+          counterparty: counterparty,
         ),
     ];
   }
@@ -124,6 +137,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
     required $AccountsTable sourceAccount,
     required $AccountsTable targetAccount,
     required $CategoriesTable category,
+    required $CounterpartiesTable counterparty,
   }) {
     final transaction = row.readTable(transactionTable);
     final source = row.readTable(sourceAccount);
@@ -134,6 +148,7 @@ class DriftTransactionsRepository implements TransactionsRepository {
       currencyCode: source.currencyCode,
       amountMinor: transaction.amountMinor,
       categoryName: row.readTableOrNull(category)?.name,
+      counterpartyName: row.readTableOrNull(counterparty)?.name,
       note: transaction.note,
       toAccountName: row.readTableOrNull(targetAccount)?.name,
       toCurrencyCode: row.readTableOrNull(targetAccount)?.currencyCode,
@@ -147,6 +162,9 @@ class DriftTransactionsRepository implements TransactionsRepository {
       await database
           .update(database.transactions)
           .replace(transactionToCompanion(transaction));
+      if (transaction.counterpartyId != null) {
+        await _reopenCounterparty(transaction.counterpartyId!);
+      }
     });
   }
 
@@ -156,4 +174,10 @@ class DriftTransactionsRepository implements TransactionsRepository {
       database.transactions,
     )..where((transaction) => transaction.id.equals(id))).go();
   });
+
+  Future<void> _reopenCounterparty(String counterpartyId) async {
+    await (database.update(database.counterparties)
+          ..where((counterparty) => counterparty.id.equals(counterpartyId)))
+        .write(const CounterpartiesCompanion(isClosed: Value(false)));
+  }
 }

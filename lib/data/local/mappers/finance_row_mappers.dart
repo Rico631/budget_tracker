@@ -60,6 +60,9 @@ extension CategoryRowMapper on Category {
     updatedAt: updatedAt,
     isArchived: isArchived,
     isFallback: isFallback,
+    debtRole: debtRole == null
+        ? null
+        : CategoryDebtRole.values.byName(debtRole!),
   );
 }
 
@@ -70,6 +73,7 @@ extension TransactionRowMapper on Transaction {
     accountId: accountId,
     toAccountId: toAccountId,
     categoryId: categoryId,
+    counterpartyId: counterpartyId,
     kind: TransactionKind.values.byName(kind),
     amountMinor: amountMinor,
     toAmountMinor: toAmountMinor,
@@ -132,7 +136,32 @@ CategoriesCompanion categoryToCompanion(FinanceCategory category) =>
       updatedAt: Value(category.updatedAt),
       isArchived: Value(category.isArchived),
       isFallback: Value(category.isFallback),
+      debtRole: Value(category.debtRole?.name),
     );
+
+extension CounterpartyRowMapper on Counterparty {
+  FinanceCounterparty toDomain() => FinanceCounterparty(
+    id: id,
+    bookId: bookId,
+    name: name,
+    currencyCode: currencyCode,
+    isClosed: isClosed,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
+}
+
+CounterpartiesCompanion counterpartyToCompanion(
+  FinanceCounterparty counterparty,
+) => CounterpartiesCompanion.insert(
+  id: counterparty.id,
+  bookId: counterparty.bookId,
+  name: counterparty.name,
+  currencyCode: counterparty.currencyCode,
+  isClosed: Value(counterparty.isClosed),
+  createdAt: Value(counterparty.createdAt),
+  updatedAt: Value(counterparty.updatedAt),
+);
 
 TransactionsCompanion transactionToCompanion(FinanceTransaction transaction) =>
     TransactionsCompanion.insert(
@@ -141,6 +170,7 @@ TransactionsCompanion transactionToCompanion(FinanceTransaction transaction) =>
       accountId: transaction.accountId,
       toAccountId: Value(transaction.toAccountId),
       categoryId: Value(transaction.categoryId),
+      counterpartyId: Value(transaction.counterpartyId),
       kind: transaction.kind.name,
       amountMinor: transaction.amountMinor,
       toAmountMinor: Value(transaction.toAmountMinor),

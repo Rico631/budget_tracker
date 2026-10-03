@@ -10,6 +10,7 @@ export 'finance_account.dart';
 export 'finance_bank.dart';
 export 'finance_book.dart';
 export 'finance_category.dart';
+export 'finance_counterparty.dart';
 export 'finance_currency.dart';
 export 'finance_transaction.dart';
 export 'transactions_journal.dart';

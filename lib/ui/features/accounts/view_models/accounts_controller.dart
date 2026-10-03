@@ -5,7 +5,7 @@ import 'package:budget_tracker/domain/commands/finance_account_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
-import 'package:budget_tracker/ui/features/transactions/view_models/finance_transaction_controller.dart';
+import 'package:budget_tracker/ui/core/utils/finance_validation_exception.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Активные счета книги с текущими остатками и итогами по валютам.
