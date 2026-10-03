@@ -5,6 +5,7 @@ import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/domain/models/journal_export_row.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/presentation/providers/analytics_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -246,6 +247,10 @@ class _CountingTransactionsRepository implements TransactionsRepository {
 
   @override
   Future<void> delete(String id) => _inner.delete(id);
+
+  @override
+  Future<List<JournalExportRow>> listJournalForExport(String bookId) =>
+      _inner.listJournalForExport(bookId);
 }
 
 /// Шпион: считает выборки счетов книги.

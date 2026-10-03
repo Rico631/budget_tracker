@@ -8,6 +8,8 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/path_provider_mock.dart';
+
 /// Схема версии 2 без колонок `Banks` и таблиц справочника валют и настроек.
 const List<String> _version2Schema = <String>[
   '''
@@ -234,6 +236,8 @@ const List<String> _version4Schema = <String>[
 ];
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('Finance database schema', () {
     test('creates finance tables and required indexes in memory', () async {
       final database = AppDatabase.forTesting();
@@ -264,6 +268,34 @@ void main() {
           .get();
 
       expect(indexes, isNotEmpty);
+    });
+
+    test('opens the database by an explicit path and keeps the data', () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'budget_tracker_',
+      );
+      final file = File.fromUri(directory.uri.resolve('explicit.sqlite'));
+      mockTemporaryDirectoryPath(directory.path);
+      final database = AppDatabase(filePath: file.path);
+      addTearDown(() => directory.delete(recursive: true));
+
+      await database
+          .into(database.books)
+          .insert(
+            BooksCompanion.insert(
+              id: const FinanceIdGenerator().generateV7(),
+              name: 'Личная книга',
+            ),
+          );
+
+      expect(file.existsSync(), isTrue);
+
+      await database.close();
+
+      final reopened = AppDatabase(filePath: file.path);
+      addTearDown(reopened.close);
+
+      expect(await reopened.select(reopened.books).get(), hasLength(1));
     });
 
     test('upgrades an existing version 1 database to version 5', () async {

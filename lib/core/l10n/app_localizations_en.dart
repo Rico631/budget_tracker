@@ -639,4 +639,136 @@ class AppLocalizationsEn extends AppLocalizations {
   String categoryOperationsEmptyMessage(String period) {
     return 'There are no operations in this category in $period.';
   }
+
+  @override
+  String get settingsDataManagementItemLabel => 'Export and databases';
+
+  @override
+  String get dataManagementJournalExportItemLabel => 'Export journal';
+
+  @override
+  String get dataManagementBackupItemLabel => 'Backup';
+
+  @override
+  String get dataManagementRestoreItemLabel => 'Restore from backup';
+
+  @override
+  String get dataManagementDatabaseListItemLabel => 'Databases';
+
+  @override
+  String get dataManagementBackupSuccessMessage => 'Backup saved.';
+
+  @override
+  String get dataManagementBackupFailureMessage => 'Failed to create a backup.';
+
+  @override
+  String get dataManagementRestoreNotApplicationDatabaseMessage =>
+      'The selected file is not an application database.';
+
+  @override
+  String get dataManagementRestoreUnsupportedVersionMessage =>
+      'The database version is newer than the app supports.';
+
+  @override
+  String get dataManagementRestoreFileUnreadableMessage =>
+      'Failed to read the selected file.';
+
+  @override
+  String get journalExportLanguageLabel => 'Export language';
+
+  @override
+  String get journalExportLanguageRussianLabel => 'Russian';
+
+  @override
+  String get journalExportLanguageEnglishLabel => 'English';
+
+  @override
+  String get journalExportAction => 'Export';
+
+  @override
+  String get journalExportSuccessMessage => 'Journal exported.';
+
+  @override
+  String get journalExportFailureMessage => 'Failed to export the journal.';
+
+  @override
+  String get journalExportNoBookMessage => 'There is no data to export.';
+
+  @override
+  String get journalExportColumnOccurredAt => 'Date';
+
+  @override
+  String get journalExportColumnKind => 'Type';
+
+  @override
+  String get journalExportColumnAccount => 'Account';
+
+  @override
+  String get journalExportColumnCurrency => 'Currency';
+
+  @override
+  String get journalExportColumnCategory => 'Category';
+
+  @override
+  String get journalExportColumnNote => 'Note';
+
+  @override
+  String get journalExportColumnAmount => 'Amount';
+
+  @override
+  String get journalExportColumnToAccount => 'To account';
+
+  @override
+  String get journalExportColumnToCurrency => 'To currency';
+
+  @override
+  String get journalExportColumnToAmount => 'To amount';
+
+  @override
+  String get databaseListCurrentBadge => 'Current';
+
+  @override
+  String get databaseListMakeActiveAction => 'Make active';
+
+  @override
+  String get databaseListDeleteAction => 'Delete';
+
+  @override
+  String get databaseListDeleteDialogTitle => 'Delete database?';
+
+  @override
+  String databaseListDeleteDialogMessage(String name) {
+    return 'Database \"$name\" will be deleted permanently.';
+  }
+
+  @override
+  String get databaseListDeleteOnlyDialogMessage =>
+      'This is the only database. After deletion a new empty database will be created.';
+
+  @override
+  String get databaseListDeleteDialogCancelAction => 'Cancel';
+
+  @override
+  String get databaseListSourceOriginalLabel => 'Original';
+
+  @override
+  String get databaseListSourceImportedLabel => 'Restored';
+
+  @override
+  String get databaseListSourceBackupLabel => 'Backup';
+
+  @override
+  String get databaseListLoadErrorMessage =>
+      'Failed to load the database list.';
+
+  @override
+  String get databaseListRetryAction => 'Retry';
+
+  @override
+  String get databaseListMakeActiveFailureMessage =>
+      'Failed to switch the database.';
+
+  @override
+  String get databaseListDeleteFailureMessage =>
+      'Failed to delete the database.';
 }

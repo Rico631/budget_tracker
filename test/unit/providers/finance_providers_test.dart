@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:budget_tracker/data/local/database/app_database.dart';
+import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
@@ -6,7 +9,32 @@ import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/presentation/providers/finance_transaction_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../support/path_provider_mock.dart';
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('открывает базу по пути из activeDatabasePathProvider', () async {
+    final directory = await Directory.systemTemp.createTemp('budget_tracker_');
+    final file = File.fromUri(directory.uri.resolve('active.sqlite'));
+    mockTemporaryDirectoryPath(directory.path);
+    final container = ProviderContainer(
+      overrides: [activeDatabasePathProvider.overrideWithValue(file.path)],
+    );
+    final database = container.read(appDatabaseProvider);
+    // База закрывается здесь единожды: `ProviderContainer.dispose` не ожидает
+    // асинхронное закрытие, а файл должен быть освобожден до удаления каталога.
+    addTearDown(() async {
+      await database.close();
+      await directory.delete(recursive: true);
+    });
+
+    await container.read(booksRepositoryProvider).create(name: 'Книга по пути');
+
+    expect(file.existsSync(), isTrue);
+    expect(await database.select(database.books).get(), hasLength(1));
+  });
   test(
     'overrides providers with an in-memory database and controls errors',
     () async {

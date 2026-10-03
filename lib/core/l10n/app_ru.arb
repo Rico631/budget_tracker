@@ -812,5 +812,175 @@
         "example": "Сентябрь 2026"
       }
     }
+  },
+  "settingsDataManagementItemLabel": "Экспорт и базы данных",
+  "@settingsDataManagementItemLabel": {
+    "description": "Подпись пункта «Экспорт и базы данных» раздела настроек"
+  },
+  "dataManagementJournalExportItemLabel": "Выгрузка журнала",
+  "@dataManagementJournalExportItemLabel": {
+    "description": "Подпись пункта выгрузки журнала на подэкране экспорта и баз данных"
+  },
+  "dataManagementBackupItemLabel": "Резервная копия",
+  "@dataManagementBackupItemLabel": {
+    "description": "Подпись пункта резервной копии на подэкране экспорта и баз данных"
+  },
+  "dataManagementRestoreItemLabel": "Восстановление из копии",
+  "@dataManagementRestoreItemLabel": {
+    "description": "Подпись пункта восстановления на подэкране экспорта и баз данных"
+  },
+  "dataManagementDatabaseListItemLabel": "Базы данных",
+  "@dataManagementDatabaseListItemLabel": {
+    "description": "Подпись пункта списка баз на подэкране экспорта и баз данных"
+  },
+  "dataManagementBackupSuccessMessage": "Резервная копия сохранена.",
+  "@dataManagementBackupSuccessMessage": {
+    "description": "Подтверждение успешного создания резервной копии"
+  },
+  "dataManagementBackupFailureMessage": "Не удалось создать резервную копию.",
+  "@dataManagementBackupFailureMessage": {
+    "description": "Сообщение об ошибке создания резервной копии"
+  },
+  "dataManagementRestoreNotApplicationDatabaseMessage": "Выбранный файл не является базой данных приложения.",
+  "@dataManagementRestoreNotApplicationDatabaseMessage": {
+    "description": "Сообщение об отказе восстановления из файла, не являющегося базой данных приложения"
+  },
+  "dataManagementRestoreUnsupportedVersionMessage": "Версия базы выше поддерживаемой приложением.",
+  "@dataManagementRestoreUnsupportedVersionMessage": {
+    "description": "Сообщение об отказе восстановления из-за неподдерживаемой версии схемы"
+  },
+  "dataManagementRestoreFileUnreadableMessage": "Не удалось прочитать выбранный файл.",
+  "@dataManagementRestoreFileUnreadableMessage": {
+    "description": "Сообщение об отказе восстановления из-за нечитаемого файла"
+  },
+  "journalExportLanguageLabel": "Язык выгрузки",
+  "@journalExportLanguageLabel": {
+    "description": "Подпись селектора языка выгрузки"
+  },
+  "journalExportLanguageRussianLabel": "Русский",
+  "@journalExportLanguageRussianLabel": {
+    "description": "Подпись русского языка выгрузки"
+  },
+  "journalExportLanguageEnglishLabel": "Английский",
+  "@journalExportLanguageEnglishLabel": {
+    "description": "Подпись английского языка выгрузки"
+  },
+  "journalExportAction": "Выгрузить",
+  "@journalExportAction": {
+    "description": "Подпись действия выгрузки журнала"
+  },
+  "journalExportSuccessMessage": "Журнал выгружен.",
+  "@journalExportSuccessMessage": {
+    "description": "Подтверждение успешной выгрузки журнала"
+  },
+  "journalExportFailureMessage": "Не удалось выгрузить журнал.",
+  "@journalExportFailureMessage": {
+    "description": "Сообщение об ошибке выгрузки журнала"
+  },
+  "journalExportNoBookMessage": "Нет данных для выгрузки.",
+  "@journalExportNoBookMessage": {
+    "description": "Сообщение об отсутствии активной книги для выгрузки"
+  },
+  "journalExportColumnOccurredAt": "Дата",
+  "@journalExportColumnOccurredAt": {
+    "description": "Заголовок колонки даты операции в CSV-файле"
+  },
+  "journalExportColumnKind": "Тип",
+  "@journalExportColumnKind": {
+    "description": "Заголовок колонки типа операции в CSV-файле"
+  },
+  "journalExportColumnAccount": "Счет",
+  "@journalExportColumnAccount": {
+    "description": "Заголовок колонки счета в CSV-файле"
+  },
+  "journalExportColumnCurrency": "Валюта",
+  "@journalExportColumnCurrency": {
+    "description": "Заголовок колонки валюты в CSV-файле"
+  },
+  "journalExportColumnCategory": "Категория",
+  "@journalExportColumnCategory": {
+    "description": "Заголовок колонки категории в CSV-файле"
+  },
+  "journalExportColumnNote": "Заметка",
+  "@journalExportColumnNote": {
+    "description": "Заголовок колонки заметки в CSV-файле"
+  },
+  "journalExportColumnAmount": "Сумма",
+  "@journalExportColumnAmount": {
+    "description": "Заголовок колонки суммы в CSV-файле"
+  },
+  "journalExportColumnToAccount": "Счет получателя",
+  "@journalExportColumnToAccount": {
+    "description": "Заголовок колонки счета-получателя в CSV-файле"
+  },
+  "journalExportColumnToCurrency": "Валюта получателя",
+  "@journalExportColumnToCurrency": {
+    "description": "Заголовок колонки валюты получателя в CSV-файле"
+  },
+  "journalExportColumnToAmount": "Сумма зачисления",
+  "@journalExportColumnToAmount": {
+    "description": "Заголовок колонки суммы зачисления в CSV-файле"
+  },
+  "databaseListCurrentBadge": "Текущая",
+  "@databaseListCurrentBadge": {
+    "description": "Бейдж активной базы в списке баз"
+  },
+  "databaseListMakeActiveAction": "Сделать активной",
+  "@databaseListMakeActiveAction": {
+    "description": "Действие переключения активной базы"
+  },
+  "databaseListDeleteAction": "Удалить",
+  "@databaseListDeleteAction": {
+    "description": "Действие удаления неактивной базы"
+  },
+  "databaseListDeleteDialogTitle": "Удалить базу?",
+  "@databaseListDeleteDialogTitle": {
+    "description": "Заголовок диалога подтверждения удаления базы"
+  },
+  "databaseListDeleteDialogMessage": "База «{name}» будет удалена безвозвратно.",
+  "@databaseListDeleteDialogMessage": {
+    "description": "Сообщение диалога подтверждения удаления базы",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "03.10.2026"
+      }
+    }
+  },
+  "databaseListDeleteOnlyDialogMessage": "Это единственная база. После удаления будет создана новая пустая база.",
+  "@databaseListDeleteOnlyDialogMessage": {
+    "description": "Сообщение диалога подтверждения удаления единственной базы"
+  },
+  "databaseListDeleteDialogCancelAction": "Отмена",
+  "@databaseListDeleteDialogCancelAction": {
+    "description": "Действие отмены в диалоге подтверждения удаления базы"
+  },
+  "databaseListSourceOriginalLabel": "Исходная",
+  "@databaseListSourceOriginalLabel": {
+    "description": "Подпись исходной базы"
+  },
+  "databaseListSourceImportedLabel": "Восстановленная",
+  "@databaseListSourceImportedLabel": {
+    "description": "Подпись восстановленной базы"
+  },
+  "databaseListSourceBackupLabel": "Резервная копия",
+  "@databaseListSourceBackupLabel": {
+    "description": "Подпись базы из резервной копии"
+  },
+  "databaseListLoadErrorMessage": "Не удалось прочитать список баз.",
+  "@databaseListLoadErrorMessage": {
+    "description": "Сообщение об ошибке чтения списка баз"
+  },
+  "databaseListRetryAction": "Повторить",
+  "@databaseListRetryAction": {
+    "description": "Действие повтора чтения списка баз"
+  },
+  "databaseListMakeActiveFailureMessage": "Не удалось переключить базу.",
+  "@databaseListMakeActiveFailureMessage": {
+    "description": "Сообщение об ошибке переключения активной базы"
+  },
+  "databaseListDeleteFailureMessage": "Не удалось удалить базу.",
+  "@databaseListDeleteFailureMessage": {
+    "description": "Сообщение об ошибке удаления базы"
   }
 }

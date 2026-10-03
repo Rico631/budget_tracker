@@ -7,6 +7,7 @@ import 'package:budget_tracker/data/repositories/transactions_repository.dart';
 import 'package:budget_tracker/domain/commands/finance_account_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/domain/models/journal_export_row.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/usecases/account_usecases.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -510,6 +511,10 @@ class _CountingTransactionsRepository implements TransactionsRepository {
 
   @override
   Future<void> delete(String id) => _inner.delete(id);
+
+  @override
+  Future<List<JournalExportRow>> listJournalForExport(String bookId) =>
+      _inner.listJournalForExport(bookId);
 }
 
 extension on ValidationResult<FinanceAccountInput> {

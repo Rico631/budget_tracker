@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:drift/native.dart';
@@ -127,10 +129,25 @@ class AppSettings extends Table {
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  /// Открывает базу по явному пути [filePath].
+  ///
+  /// Без явного пути сохраняется дефолтное поведение `drift_flutter`: файл
+  /// `budget_tracker.sqlite` в каталоге application support. Явный путь нужен
+  /// управлению базами: активная база определяется реестром, и после
+  /// переключения или восстановления приложение открывает выбранный файл
+  /// (ADR-0006, решения 6.6 и 6.7).
+  AppDatabase({String? filePath}) : super(_openConnection(filePath));
 
   AppDatabase.forTesting([QueryExecutor? executor])
     : super(executor ?? NativeDatabase.memory());
+
+  /// Открывает файл базы напрямую в текущем изоляте, без `drift_flutter`.
+  ///
+  /// Нужен там, где базу открывают разово по пути и закрывают: доигрывание
+  /// миграций кандидата на восстановление и его пробное чтение (ADR-0006,
+  /// решение 6.6). Обычная работа приложения открывает базу через
+  /// [AppDatabase.new] с фоновым изолятом соединения.
+  AppDatabase.forFile(String filePath) : super(NativeDatabase(File(filePath)));
 
   @override
   int get schemaVersion => 5;
@@ -185,11 +202,18 @@ class AppDatabase extends _$AppDatabase {
   );
 }
 
-QueryExecutor _openConnection() {
+QueryExecutor _openConnection(String? filePath) {
+  if (filePath == null) {
+    return driftDatabase(
+      name: 'budget_tracker',
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+    );
+  }
+
   return driftDatabase(
     name: 'budget_tracker',
-    native: const DriftNativeOptions(
-      databaseDirectory: getApplicationSupportDirectory,
-    ),
+    native: DriftNativeOptions(databasePath: () async => filePath),
   );
 }

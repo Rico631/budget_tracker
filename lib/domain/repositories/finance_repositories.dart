@@ -1,4 +1,5 @@
 import 'package:budget_tracker/domain/models/finance_models.dart';
+import 'package:budget_tracker/domain/models/journal_export_row.dart';
 
 abstract interface class BooksRepository {
   Future<FinanceBook> create({required String name});
@@ -121,6 +122,13 @@ abstract interface class TransactionsRepository {
   Future<List<FinanceTransaction>> listByBook(String bookId);
 
   Future<FinanceTransaction?> getById(String id);
+
+  /// Денормализованный журнал книги для выгрузки.
+  ///
+  /// Возвращает операции книги с именами счета, валюты и категории, включая
+  /// операции архивированных счетов: журнал — полная история книги (ADR-0006,
+  /// решение 6.2). Порядок строк совпадает с [listByBook].
+  Future<List<JournalExportRow>> listJournalForExport(String bookId);
 
   /// Сохраняет операцию, сохраняя ее идентификатор и дату создания.
   Future<void> update(FinanceTransaction transaction);

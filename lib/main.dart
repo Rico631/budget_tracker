@@ -2,8 +2,8 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/core/licensing/app_licenses.dart';
 import 'package:budget_tracker/core/theme/app_theme.dart';
 import 'package:budget_tracker/presentation/features/bootstrap/app_bootstrap_gate.dart';
+import 'package:budget_tracker/presentation/features/bootstrap/app_root.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Locale resolveSupportedLocale(
   Locale? locale,
@@ -24,7 +24,7 @@ Locale resolveSupportedLocale(
 
 void main() {
   registerAppLicenses();
-  runApp(const ProviderScope(child: BudgetTrackerApp()));
+  runApp(const AppRoot());
 }
 
 class BudgetTrackerApp extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/presentation/features/settings/banks_page.dart';
 import 'package:budget_tracker/presentation/features/settings/categories_page.dart';
+import 'package:budget_tracker/presentation/features/settings/data_management_page.dart';
 import 'package:flutter/material.dart';
 
 /// Ключ пункта «Категории» раздела настроек.
@@ -8,6 +9,9 @@ const Key settingsCategoriesItemKey = Key('settingsCategoriesItem');
 
 /// Ключ пункта «Банки» раздела настроек.
 const Key settingsBanksItemKey = Key('settingsBanksItem');
+
+/// Ключ пункта «Экспорт и базы данных» раздела настроек.
+const Key settingsDataManagementItemKey = Key('settingsDataManagementItem');
 
 /// Раздел «Настройки»: хаб со списком пунктов управления справочниками.
 ///
@@ -36,6 +40,13 @@ class SettingsPage extends StatelessWidget {
           title: Text(localizations.settingsBanksItemLabel),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => BanksPage.open(context),
+        ),
+        ListTile(
+          key: settingsDataManagementItemKey,
+          leading: const Icon(Icons.import_export_outlined),
+          title: Text(localizations.settingsDataManagementItemLabel),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => DataManagementPage.open(context),
         ),
       ],
     );

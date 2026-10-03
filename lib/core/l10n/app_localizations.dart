@@ -1237,6 +1237,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'There are no operations in this category in {period}.'**
   String categoryOperationsEmptyMessage(String period);
+
+  /// Label of the export and databases item of the settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Export and databases'**
+  String get settingsDataManagementItemLabel;
+
+  /// Label of the journal export item of the export and databases sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Export journal'**
+  String get dataManagementJournalExportItemLabel;
+
+  /// Label of the backup item of the export and databases sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get dataManagementBackupItemLabel;
+
+  /// Label of the restore item of the export and databases sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from backup'**
+  String get dataManagementRestoreItemLabel;
+
+  /// Label of the database list item of the export and databases sub-screen
+  ///
+  /// In en, this message translates to:
+  /// **'Databases'**
+  String get dataManagementDatabaseListItemLabel;
+
+  /// Confirmation after a successful backup
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved.'**
+  String get dataManagementBackupSuccessMessage;
+
+  /// Error message of the backup creation
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create a backup.'**
+  String get dataManagementBackupFailureMessage;
+
+  /// Restore rejection message for a file that is not an application database
+  ///
+  /// In en, this message translates to:
+  /// **'The selected file is not an application database.'**
+  String get dataManagementRestoreNotApplicationDatabaseMessage;
+
+  /// Restore rejection message for an unsupported schema version
+  ///
+  /// In en, this message translates to:
+  /// **'The database version is newer than the app supports.'**
+  String get dataManagementRestoreUnsupportedVersionMessage;
+
+  /// Restore rejection message for an unreadable file
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read the selected file.'**
+  String get dataManagementRestoreFileUnreadableMessage;
+
+  /// Label of the export language selector
+  ///
+  /// In en, this message translates to:
+  /// **'Export language'**
+  String get journalExportLanguageLabel;
+
+  /// Label of the Russian export language
+  ///
+  /// In en, this message translates to:
+  /// **'Russian'**
+  String get journalExportLanguageRussianLabel;
+
+  /// Label of the English export language
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get journalExportLanguageEnglishLabel;
+
+  /// Label of the journal export action
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get journalExportAction;
+
+  /// Confirmation after a successful journal export
+  ///
+  /// In en, this message translates to:
+  /// **'Journal exported.'**
+  String get journalExportSuccessMessage;
+
+  /// Error message of the journal export
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export the journal.'**
+  String get journalExportFailureMessage;
+
+  /// Message shown when the active book is missing for the export
+  ///
+  /// In en, this message translates to:
+  /// **'There is no data to export.'**
+  String get journalExportNoBookMessage;
+
+  /// CSV column header of the operation date
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get journalExportColumnOccurredAt;
+
+  /// CSV column header of the operation kind
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get journalExportColumnKind;
+
+  /// CSV column header of the account
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get journalExportColumnAccount;
+
+  /// CSV column header of the currency
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get journalExportColumnCurrency;
+
+  /// CSV column header of the category
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get journalExportColumnCategory;
+
+  /// CSV column header of the note
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get journalExportColumnNote;
+
+  /// CSV column header of the amount
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get journalExportColumnAmount;
+
+  /// CSV column header of the destination account
+  ///
+  /// In en, this message translates to:
+  /// **'To account'**
+  String get journalExportColumnToAccount;
+
+  /// CSV column header of the destination currency
+  ///
+  /// In en, this message translates to:
+  /// **'To currency'**
+  String get journalExportColumnToCurrency;
+
+  /// CSV column header of the destination amount
+  ///
+  /// In en, this message translates to:
+  /// **'To amount'**
+  String get journalExportColumnToAmount;
+
+  /// Badge of the active database in the database list
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get databaseListCurrentBadge;
+
+  /// Action that switches the active database
+  ///
+  /// In en, this message translates to:
+  /// **'Make active'**
+  String get databaseListMakeActiveAction;
+
+  /// Action that deletes an inactive database
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get databaseListDeleteAction;
+
+  /// Title of the database deletion confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete database?'**
+  String get databaseListDeleteDialogTitle;
+
+  /// Message of the database deletion confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Database \"{name}\" will be deleted permanently.'**
+  String databaseListDeleteDialogMessage(String name);
+
+  /// Message of the confirmation dialog for deleting the only database
+  ///
+  /// In en, this message translates to:
+  /// **'This is the only database. After deletion a new empty database will be created.'**
+  String get databaseListDeleteOnlyDialogMessage;
+
+  /// Cancel action of the database deletion confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get databaseListDeleteDialogCancelAction;
+
+  /// Label of the original database source
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get databaseListSourceOriginalLabel;
+
+  /// Label of the imported database source
+  ///
+  /// In en, this message translates to:
+  /// **'Restored'**
+  String get databaseListSourceImportedLabel;
+
+  /// Label of the backup database source
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get databaseListSourceBackupLabel;
+
+  /// Database list read error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the database list.'**
+  String get databaseListLoadErrorMessage;
+
+  /// Database list retry action
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get databaseListRetryAction;
+
+  /// Error message of the active database switching
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to switch the database.'**
+  String get databaseListMakeActiveFailureMessage;
+
+  /// Error message of the database deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the database.'**
+  String get databaseListDeleteFailureMessage;
 }
 
 class _AppLocalizationsDelegate

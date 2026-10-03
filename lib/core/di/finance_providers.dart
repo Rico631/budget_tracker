@@ -1,3 +1,4 @@
+import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/seed/category_seed_catalog.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
@@ -14,7 +15,7 @@ import 'package:budget_tracker/domain/usecases/finance_transaction_usecases.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
-  final database = AppDatabase();
+  final database = AppDatabase(filePath: ref.watch(activeDatabasePathProvider));
   ref.onDispose(database.close);
   return database;
 });

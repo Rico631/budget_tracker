@@ -638,4 +638,135 @@ class AppLocalizationsRu extends AppLocalizations {
   String categoryOperationsEmptyMessage(String period) {
     return 'За $period операций в этой категории нет.';
   }
+
+  @override
+  String get settingsDataManagementItemLabel => 'Экспорт и базы данных';
+
+  @override
+  String get dataManagementJournalExportItemLabel => 'Выгрузка журнала';
+
+  @override
+  String get dataManagementBackupItemLabel => 'Резервная копия';
+
+  @override
+  String get dataManagementRestoreItemLabel => 'Восстановление из копии';
+
+  @override
+  String get dataManagementDatabaseListItemLabel => 'Базы данных';
+
+  @override
+  String get dataManagementBackupSuccessMessage => 'Резервная копия сохранена.';
+
+  @override
+  String get dataManagementBackupFailureMessage =>
+      'Не удалось создать резервную копию.';
+
+  @override
+  String get dataManagementRestoreNotApplicationDatabaseMessage =>
+      'Выбранный файл не является базой данных приложения.';
+
+  @override
+  String get dataManagementRestoreUnsupportedVersionMessage =>
+      'Версия базы выше поддерживаемой приложением.';
+
+  @override
+  String get dataManagementRestoreFileUnreadableMessage =>
+      'Не удалось прочитать выбранный файл.';
+
+  @override
+  String get journalExportLanguageLabel => 'Язык выгрузки';
+
+  @override
+  String get journalExportLanguageRussianLabel => 'Русский';
+
+  @override
+  String get journalExportLanguageEnglishLabel => 'Английский';
+
+  @override
+  String get journalExportAction => 'Выгрузить';
+
+  @override
+  String get journalExportSuccessMessage => 'Журнал выгружен.';
+
+  @override
+  String get journalExportFailureMessage => 'Не удалось выгрузить журнал.';
+
+  @override
+  String get journalExportNoBookMessage => 'Нет данных для выгрузки.';
+
+  @override
+  String get journalExportColumnOccurredAt => 'Дата';
+
+  @override
+  String get journalExportColumnKind => 'Тип';
+
+  @override
+  String get journalExportColumnAccount => 'Счет';
+
+  @override
+  String get journalExportColumnCurrency => 'Валюта';
+
+  @override
+  String get journalExportColumnCategory => 'Категория';
+
+  @override
+  String get journalExportColumnNote => 'Заметка';
+
+  @override
+  String get journalExportColumnAmount => 'Сумма';
+
+  @override
+  String get journalExportColumnToAccount => 'Счет получателя';
+
+  @override
+  String get journalExportColumnToCurrency => 'Валюта получателя';
+
+  @override
+  String get journalExportColumnToAmount => 'Сумма зачисления';
+
+  @override
+  String get databaseListCurrentBadge => 'Текущая';
+
+  @override
+  String get databaseListMakeActiveAction => 'Сделать активной';
+
+  @override
+  String get databaseListDeleteAction => 'Удалить';
+
+  @override
+  String get databaseListDeleteDialogTitle => 'Удалить базу?';
+
+  @override
+  String databaseListDeleteDialogMessage(String name) {
+    return 'База «$name» будет удалена безвозвратно.';
+  }
+
+  @override
+  String get databaseListDeleteOnlyDialogMessage =>
+      'Это единственная база. После удаления будет создана новая пустая база.';
+
+  @override
+  String get databaseListDeleteDialogCancelAction => 'Отмена';
+
+  @override
+  String get databaseListSourceOriginalLabel => 'Исходная';
+
+  @override
+  String get databaseListSourceImportedLabel => 'Восстановленная';
+
+  @override
+  String get databaseListSourceBackupLabel => 'Резервная копия';
+
+  @override
+  String get databaseListLoadErrorMessage => 'Не удалось прочитать список баз.';
+
+  @override
+  String get databaseListRetryAction => 'Повторить';
+
+  @override
+  String get databaseListMakeActiveFailureMessage =>
+      'Не удалось переключить базу.';
+
+  @override
+  String get databaseListDeleteFailureMessage => 'Не удалось удалить базу.';
 }

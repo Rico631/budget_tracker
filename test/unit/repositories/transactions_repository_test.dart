@@ -309,6 +309,104 @@ void main() {
       orderedIds.first,
     ]);
   });
+
+  test(
+    'денормализует журнал и включает операции архивированных счетов',
+    () async {
+      final book = await books.create(name: 'Journal');
+      final otherBook = await books.create(name: 'Other');
+      final categories = DriftCategoriesRepository(database);
+      final card = await accounts.create(
+        bookId: book.id,
+        name: 'Карта',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+      final deposit = await accounts.create(
+        bookId: book.id,
+        name: 'Вклад',
+        currencyCode: 'USD',
+        initialBalanceMinor: 0,
+      );
+      final archived = await accounts.create(
+        bookId: book.id,
+        name: 'Старый счет',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+      final salary = await categories.create(
+        bookId: book.id,
+        name: 'Зарплата',
+        kind: TransactionKind.income,
+      );
+      final foreignAccount = await accounts.create(
+        bookId: otherBook.id,
+        name: 'Чужая книга',
+        currencyCode: 'RUB',
+        initialBalanceMinor: 0,
+      );
+
+      await transactions.create(
+        bookId: book.id,
+        accountId: card.id,
+        categoryId: salary.id,
+        kind: TransactionKind.income,
+        amountMinor: 150000,
+        occurredAt: DateTime(2026, 9, 24, 10),
+        note: 'Аванс',
+      );
+      await transactions.create(
+        bookId: book.id,
+        accountId: card.id,
+        toAccountId: deposit.id,
+        kind: TransactionKind.transfer,
+        amountMinor: 50000,
+        occurredAt: DateTime(2026, 9, 25, 11),
+      );
+      await transactions.create(
+        bookId: otherBook.id,
+        accountId: foreignAccount.id,
+        kind: TransactionKind.expense,
+        amountMinor: 100,
+        occurredAt: DateTime(2026, 9, 26, 12),
+      );
+      await accounts.archive(archived.id);
+      await transactions.create(
+        bookId: book.id,
+        accountId: archived.id,
+        kind: TransactionKind.expense,
+        amountMinor: 700,
+        occurredAt: DateTime(2026, 9, 27, 13),
+      );
+
+      final rows = await transactions.listJournalForExport(book.id);
+
+      expect(rows, hasLength(3));
+
+      final archivedRow = rows.first;
+      expect(archivedRow.accountName, 'Старый счет');
+      expect(archivedRow.kind, TransactionKind.expense);
+      expect(archivedRow.categoryName, isNull);
+      expect(archivedRow.amountMinor, 700);
+
+      final transferRow = rows[1];
+      expect(transferRow.kind, TransactionKind.transfer);
+      expect(transferRow.accountName, 'Карта');
+      expect(transferRow.currencyCode, 'RUB');
+      expect(transferRow.categoryName, isNull);
+      expect(transferRow.toAccountName, 'Вклад');
+      expect(transferRow.toCurrencyCode, 'USD');
+      expect(transferRow.toAmountMinor, isNull);
+
+      final incomeRow = rows.last;
+      expect(incomeRow.accountName, 'Карта');
+      expect(incomeRow.categoryName, 'Зарплата');
+      expect(incomeRow.note, 'Аванс');
+      expect(incomeRow.currencyCode, 'RUB');
+      expect(incomeRow.amountMinor, 150000);
+      expect(incomeRow.toAccountName, isNull);
+    },
+  );
 }
 
 /// Генератор идентификаторов с заданной последовательностью значений.

@@ -812,5 +812,175 @@
         "example": "September 2026"
       }
     }
+  },
+  "settingsDataManagementItemLabel": "Export and databases",
+  "@settingsDataManagementItemLabel": {
+    "description": "Label of the export and databases item of the settings section"
+  },
+  "dataManagementJournalExportItemLabel": "Export journal",
+  "@dataManagementJournalExportItemLabel": {
+    "description": "Label of the journal export item of the export and databases sub-screen"
+  },
+  "dataManagementBackupItemLabel": "Backup",
+  "@dataManagementBackupItemLabel": {
+    "description": "Label of the backup item of the export and databases sub-screen"
+  },
+  "dataManagementRestoreItemLabel": "Restore from backup",
+  "@dataManagementRestoreItemLabel": {
+    "description": "Label of the restore item of the export and databases sub-screen"
+  },
+  "dataManagementDatabaseListItemLabel": "Databases",
+  "@dataManagementDatabaseListItemLabel": {
+    "description": "Label of the database list item of the export and databases sub-screen"
+  },
+  "dataManagementBackupSuccessMessage": "Backup saved.",
+  "@dataManagementBackupSuccessMessage": {
+    "description": "Confirmation after a successful backup"
+  },
+  "dataManagementBackupFailureMessage": "Failed to create a backup.",
+  "@dataManagementBackupFailureMessage": {
+    "description": "Error message of the backup creation"
+  },
+  "dataManagementRestoreNotApplicationDatabaseMessage": "The selected file is not an application database.",
+  "@dataManagementRestoreNotApplicationDatabaseMessage": {
+    "description": "Restore rejection message for a file that is not an application database"
+  },
+  "dataManagementRestoreUnsupportedVersionMessage": "The database version is newer than the app supports.",
+  "@dataManagementRestoreUnsupportedVersionMessage": {
+    "description": "Restore rejection message for an unsupported schema version"
+  },
+  "dataManagementRestoreFileUnreadableMessage": "Failed to read the selected file.",
+  "@dataManagementRestoreFileUnreadableMessage": {
+    "description": "Restore rejection message for an unreadable file"
+  },
+  "journalExportLanguageLabel": "Export language",
+  "@journalExportLanguageLabel": {
+    "description": "Label of the export language selector"
+  },
+  "journalExportLanguageRussianLabel": "Russian",
+  "@journalExportLanguageRussianLabel": {
+    "description": "Label of the Russian export language"
+  },
+  "journalExportLanguageEnglishLabel": "English",
+  "@journalExportLanguageEnglishLabel": {
+    "description": "Label of the English export language"
+  },
+  "journalExportAction": "Export",
+  "@journalExportAction": {
+    "description": "Label of the journal export action"
+  },
+  "journalExportSuccessMessage": "Journal exported.",
+  "@journalExportSuccessMessage": {
+    "description": "Confirmation after a successful journal export"
+  },
+  "journalExportFailureMessage": "Failed to export the journal.",
+  "@journalExportFailureMessage": {
+    "description": "Error message of the journal export"
+  },
+  "journalExportNoBookMessage": "There is no data to export.",
+  "@journalExportNoBookMessage": {
+    "description": "Message shown when the active book is missing for the export"
+  },
+  "journalExportColumnOccurredAt": "Date",
+  "@journalExportColumnOccurredAt": {
+    "description": "CSV column header of the operation date"
+  },
+  "journalExportColumnKind": "Type",
+  "@journalExportColumnKind": {
+    "description": "CSV column header of the operation kind"
+  },
+  "journalExportColumnAccount": "Account",
+  "@journalExportColumnAccount": {
+    "description": "CSV column header of the account"
+  },
+  "journalExportColumnCurrency": "Currency",
+  "@journalExportColumnCurrency": {
+    "description": "CSV column header of the currency"
+  },
+  "journalExportColumnCategory": "Category",
+  "@journalExportColumnCategory": {
+    "description": "CSV column header of the category"
+  },
+  "journalExportColumnNote": "Note",
+  "@journalExportColumnNote": {
+    "description": "CSV column header of the note"
+  },
+  "journalExportColumnAmount": "Amount",
+  "@journalExportColumnAmount": {
+    "description": "CSV column header of the amount"
+  },
+  "journalExportColumnToAccount": "To account",
+  "@journalExportColumnToAccount": {
+    "description": "CSV column header of the destination account"
+  },
+  "journalExportColumnToCurrency": "To currency",
+  "@journalExportColumnToCurrency": {
+    "description": "CSV column header of the destination currency"
+  },
+  "journalExportColumnToAmount": "To amount",
+  "@journalExportColumnToAmount": {
+    "description": "CSV column header of the destination amount"
+  },
+  "databaseListCurrentBadge": "Current",
+  "@databaseListCurrentBadge": {
+    "description": "Badge of the active database in the database list"
+  },
+  "databaseListMakeActiveAction": "Make active",
+  "@databaseListMakeActiveAction": {
+    "description": "Action that switches the active database"
+  },
+  "databaseListDeleteAction": "Delete",
+  "@databaseListDeleteAction": {
+    "description": "Action that deletes an inactive database"
+  },
+  "databaseListDeleteDialogTitle": "Delete database?",
+  "@databaseListDeleteDialogTitle": {
+    "description": "Title of the database deletion confirmation dialog"
+  },
+  "databaseListDeleteDialogMessage": "Database \"{name}\" will be deleted permanently.",
+  "@databaseListDeleteDialogMessage": {
+    "description": "Message of the database deletion confirmation dialog",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "03.10.2026"
+      }
+    }
+  },
+  "databaseListDeleteOnlyDialogMessage": "This is the only database. After deletion a new empty database will be created.",
+  "@databaseListDeleteOnlyDialogMessage": {
+    "description": "Message of the confirmation dialog for deleting the only database"
+  },
+  "databaseListDeleteDialogCancelAction": "Cancel",
+  "@databaseListDeleteDialogCancelAction": {
+    "description": "Cancel action of the database deletion confirmation dialog"
+  },
+  "databaseListSourceOriginalLabel": "Original",
+  "@databaseListSourceOriginalLabel": {
+    "description": "Label of the original database source"
+  },
+  "databaseListSourceImportedLabel": "Restored",
+  "@databaseListSourceImportedLabel": {
+    "description": "Label of the imported database source"
+  },
+  "databaseListSourceBackupLabel": "Backup",
+  "@databaseListSourceBackupLabel": {
+    "description": "Label of the backup database source"
+  },
+  "databaseListLoadErrorMessage": "Failed to load the database list.",
+  "@databaseListLoadErrorMessage": {
+    "description": "Database list read error message"
+  },
+  "databaseListRetryAction": "Retry",
+  "@databaseListRetryAction": {
+    "description": "Database list retry action"
+  },
+  "databaseListMakeActiveFailureMessage": "Failed to switch the database.",
+  "@databaseListMakeActiveFailureMessage": {
+    "description": "Error message of the active database switching"
+  },
+  "databaseListDeleteFailureMessage": "Failed to delete the database.",
+  "@databaseListDeleteFailureMessage": {
+    "description": "Error message of the database deletion"
   }
 }
