@@ -1,6 +1,6 @@
 import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
 import 'package:budget_tracker/presentation/features/settings/widgets/catalog_status_views.dart';
 import 'package:budget_tracker/presentation/providers/data_management_controller.dart';
 import 'package:flutter/material.dart';
@@ -186,7 +186,7 @@ class _DatabaseTile extends ConsumerWidget {
 
     try {
       await ref
-          .read(databaseListControllerProvider.notifier)
+          .read(dataManagementControllerProvider.notifier)
           .makeActive(entry.id);
     } catch (_) {
       if (!context.mounted) {
@@ -213,7 +213,7 @@ class _DatabaseTile extends ConsumerWidget {
     }
 
     try {
-      await ref.read(databaseListControllerProvider.notifier).delete(entry.id);
+      await ref.read(dataManagementControllerProvider.notifier).delete(entry.id);
     } catch (_) {
       if (!context.mounted) {
         return;

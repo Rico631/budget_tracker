@@ -1,10 +1,10 @@
 import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
-import 'package:budget_tracker/core/di/data_management_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/domain/repositories/database_validation.dart';
 import 'package:budget_tracker/domain/usecases/database_restore_usecases.dart';
 import 'package:budget_tracker/presentation/features/settings/database_list_page.dart';
 import 'package:budget_tracker/presentation/features/settings/journal_export_page.dart';
+import 'package:budget_tracker/presentation/providers/data_management_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,8 +108,8 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
     setState(() => _isBusy = true);
     try {
       final saved = await ref
-          .read(databaseBackupUseCasesProvider)
-          .exportBackup();
+          .read(dataManagementControllerProvider.notifier)
+          .backup();
       if (!mounted) {
         return;
       }
@@ -140,7 +140,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
 
     final RestoreResult result;
     try {
-      result = await ref.read(databaseRestoreUseCasesProvider).restore();
+      result = await ref
+          .read(dataManagementControllerProvider.notifier)
+          .restore();
     } catch (_) {
       if (!mounted) {
         return;

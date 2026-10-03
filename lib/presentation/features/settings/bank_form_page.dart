@@ -1,4 +1,5 @@
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
+import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/usecases/catalog_usecases.dart';

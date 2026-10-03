@@ -59,6 +59,13 @@ class AccountsController extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
+  /// Валюта счета по умолчанию для языка устройства.
+  ///
+  /// Вью получает значение через контроллер, не обращаясь к use cases
+  /// напрямую.
+  String defaultCurrencyCodeFor(String languageCode) =>
+      ref.read(accountUseCasesProvider).defaultCurrencyCodeFor(languageCode);
+
   /// Создает счет при `existing == null` или сохраняет изменения счета.
   Future<ValidationResult<FinanceAccount>> save(
     FinanceAccountInput input, {

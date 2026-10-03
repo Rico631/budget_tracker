@@ -1,5 +1,5 @@
 import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/domain/repositories/database_registry.dart';
 import 'package:budget_tracker/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,13 +16,13 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 class AppRoot extends StatefulWidget {
   const AppRoot({
     super.key,
-    this.registry,
+    required this.registry,
     this.locale,
     this.overrides = const [],
   });
 
   /// Реестр баз: подменяется в тестах, чтобы не обращаться к платформе.
-  final DatabaseRegistry? registry;
+  final DatabaseRegistry registry;
 
   /// Явная локаль приложения: используется тестами.
   final Locale? locale;
@@ -55,7 +55,7 @@ class _AppRootState extends State<AppRoot> {
   /// дефолтному пути, а о неудачной инициализации сообщает экран начальной
   /// загрузки.
   Future<String?> _resolveActiveDatabasePath() async {
-    final registry = widget.registry ?? DatabaseRegistry();
+    final registry = widget.registry;
     try {
       final state = await registry.load();
       return await registry.pathOf(state.activeEntry.fileName);

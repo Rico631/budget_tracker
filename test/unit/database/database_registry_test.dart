@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/data/local/database/file_database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late Directory directory;
-  late DatabaseRegistry registry;
+  late FileDatabaseRegistry registry;
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('budget_tracker_db_');
-    registry = DatabaseRegistry(supportDirectory: () async => directory);
+    registry = FileDatabaseRegistry(supportDirectory: () async => directory);
   });
 
   tearDown(() => directory.delete(recursive: true));
@@ -36,7 +37,7 @@ void main() {
       expect(state.entries, hasLength(1));
       expect(state.activeEntry.fileName, 'budget_tracker.sqlite');
       expect(state.activeEntry.source, DatabaseSource.original);
-      expect(state.activeId, DatabaseRegistry.originalEntryId);
+      expect(state.activeId, FileDatabaseRegistry.originalEntryId);
       expect(fileIn('db_registry.json').existsSync(), isTrue);
     },
   );
@@ -54,7 +55,7 @@ void main() {
     expect(registered.activeEntry.fileName, 'import_1.sqlite');
     expect(registered.activeEntry.source, DatabaseSource.imported);
 
-    final reloaded = await DatabaseRegistry(
+    final reloaded = await FileDatabaseRegistry(
       supportDirectory: () async => directory,
     ).load();
 
@@ -75,10 +76,10 @@ void main() {
       source: DatabaseSource.imported,
     );
 
-    final switched = await registry.setActive(DatabaseRegistry.originalEntryId);
+    final switched = await registry.setActive(FileDatabaseRegistry.originalEntryId);
 
     expect(switched.activeEntry.fileName, 'budget_tracker.sqlite');
-    expect(persistedActiveId(), DatabaseRegistry.originalEntryId);
+    expect(persistedActiveId(), FileDatabaseRegistry.originalEntryId);
   });
 
   test('восстанавливает реестр при нечитаемом содержимом файла', () async {
@@ -98,11 +99,11 @@ void main() {
     await fileIn('budget_tracker.sqlite').writeAsString('original');
     await fileIn('db_registry.json').writeAsString(
       jsonEncode({
-        'version': DatabaseRegistry.formatVersion,
+        'version': FileDatabaseRegistry.formatVersion,
         'activeId': 'imported-entry',
         'entries': [
           {
-            'id': DatabaseRegistry.originalEntryId,
+            'id': FileDatabaseRegistry.originalEntryId,
             'fileName': 'budget_tracker.sqlite',
             'createdAt': DateTime(2026, 1, 1).toIso8601String(),
             'source': 'original',
@@ -120,9 +121,9 @@ void main() {
     final state = await registry.load();
 
     expect(state.entries, hasLength(1));
-    expect(state.activeId, DatabaseRegistry.originalEntryId);
+    expect(state.activeId, FileDatabaseRegistry.originalEntryId);
     expect(state.activeEntry.fileName, 'budget_tracker.sqlite');
-    expect(persistedActiveId(), DatabaseRegistry.originalEntryId);
+    expect(persistedActiveId(), FileDatabaseRegistry.originalEntryId);
   });
 
   test('удаляет неактивную базу вместе с файлом, сохраняя активную', () async {

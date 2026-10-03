@@ -1,9 +1,10 @@
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/data/local/database/database_candidate_migrator.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
 import 'package:budget_tracker/data/local/database/drift_database_restore_validator.dart';
+import 'package:budget_tracker/data/local/database/drift_database_snapshot_service.dart';
+import 'package:budget_tracker/data/local/database/file_database_registry.dart';
 import 'package:budget_tracker/data/local/files/file_picker_file_dialog.dart';
+import 'package:budget_tracker/domain/repositories/database_registry.dart';
 import 'package:budget_tracker/domain/repositories/database_validation.dart';
 import 'package:budget_tracker/domain/repositories/file_dialogs.dart';
 import 'package:budget_tracker/domain/usecases/database_backup_usecases.dart';
@@ -18,7 +19,7 @@ final fileDialogProvider = Provider<FileDialog>(
 
 /// Реестр баз данных приложения.
 final databaseRegistryProvider = Provider<DatabaseRegistry>(
-  (ref) => DatabaseRegistry(),
+  (ref) => FileDatabaseRegistry(),
 );
 
 /// Выгрузка журнала операций активной книги в CSV-файл.
@@ -32,7 +33,7 @@ final journalExportUseCasesProvider = Provider<JournalExportUseCases>(
 /// Создание резервной копии данных одним файлом `.sqlite`.
 final databaseBackupUseCasesProvider = Provider<DatabaseBackupUseCases>(
   (ref) => DatabaseBackupUseCases(
-    snapshot: DatabaseSnapshotService(ref.watch(appDatabaseProvider)),
+    snapshot: DriftDatabaseSnapshotService(ref.watch(appDatabaseProvider)),
     files: ref.watch(fileDialogProvider),
   ),
 );

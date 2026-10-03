@@ -6,6 +6,7 @@ import 'package:budget_tracker/data/repositories/banks_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
 import 'package:budget_tracker/data/repositories/transactions_repository.dart';
+import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';

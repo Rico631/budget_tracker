@@ -1,3 +1,4 @@
+import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
@@ -23,9 +24,6 @@ const String categoryKindNotAllowedError =
 /// Код ошибки домена: у книги нет базовой категории нужного типа.
 const String categoryFallbackMissingError =
     'the book has no fallback category of the requested kind.';
-
-/// Код ошибки домена: наименование справочной записи не заполнено.
-const String catalogNameRequiredError = 'name is required.';
 
 /// Код ошибки домена: категория с таким наименованием уже есть в книге и типе.
 const String categoryNameDuplicateError =

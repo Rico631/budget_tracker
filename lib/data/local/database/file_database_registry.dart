@@ -1,52 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
+import 'package:budget_tracker/domain/repositories/database_registry.dart';
 import 'package:budget_tracker/domain/services/finance_id_generator.dart';
 import 'package:path_provider/path_provider.dart';
-
-/// Источник базы данных в реестре.
-enum DatabaseSource {
-  /// Исходная база приложения (`budget_tracker.sqlite`).
-  original,
-
-  /// Копия, принятая при восстановлении из резервной копии.
-  imported,
-
-  /// Резервная копия, зарегистрированная в приложении.
-  backup,
-}
-
-/// Запись реестра баз данных.
-class DatabaseEntry {
-  const DatabaseEntry({
-    required this.id,
-    required this.fileName,
-    required this.createdAt,
-    required this.source,
-  });
-
-  final String id;
-
-  /// Имя файла базы относительно каталога application support.
-  final String fileName;
-
-  final DateTime createdAt;
-
-  final DatabaseSource source;
-}
-
-/// Состояние реестра баз: известные базы и указатель активной базы.
-class DatabaseRegistryState {
-  const DatabaseRegistryState({required this.entries, required this.activeId});
-
-  final List<DatabaseEntry> entries;
-
-  final String activeId;
-
-  /// Запись активной базы.
-  DatabaseEntry get activeEntry =>
-      entries.firstWhere((entry) => entry.id == activeId);
-}
 
 /// Реестр баз данных приложения: файл `db_registry.json` в каталоге application
 /// support рядом с файлами баз (ADR-0006, решение 6.7).
@@ -65,8 +23,8 @@ class DatabaseRegistryState {
 /// указателя активной базы не зависит от планировщика, а вызовы остаются
 /// асинхронными по подписи, потому что каталог приложения запрашивается у
 /// платформы асинхронно.
-class DatabaseRegistry {
-  DatabaseRegistry({
+class FileDatabaseRegistry implements DatabaseRegistry {
+  FileDatabaseRegistry({
     Future<Directory> Function()? supportDirectory,
     this.idGenerator = const FinanceIdGenerator(),
     this.registryFileName = 'db_registry.json',
@@ -94,9 +52,11 @@ class DatabaseRegistry {
   final String defaultDatabaseFileName;
 
   /// Каталог application support, в котором лежат файлы баз и реестр.
+  @override
   Future<Directory> supportDirectory() => _supportDirectory();
 
   /// Абсолютный путь файла базы с именем [fileName].
+  @override
   Future<String> pathOf(String fileName) async {
     final directory = await supportDirectory();
     return _pathIn(directory, fileName);
@@ -106,6 +66,7 @@ class DatabaseRegistry {
   ///
   /// Отсутствующий файл активной базы отбрасывается: активной становится первая
   /// оставшаяся база, а реестр переписывается (ADR-0006, решение 6.8).
+  @override
   Future<DatabaseRegistryState> load() async {
     final directory = await supportDirectory();
     final file = File(_pathIn(directory, registryFileName));
@@ -122,6 +83,7 @@ class DatabaseRegistry {
   }
 
   /// Делает базу [id] активной и сохраняет реестр.
+  @override
   Future<DatabaseRegistryState> setActive(String id) async {
     final state = await load();
     if (!state.entries.any((entry) => entry.id == id)) {
@@ -137,6 +99,7 @@ class DatabaseRegistry {
   ///
   /// Используется конвейером восстановления: новая база становится активной
   /// только после успешной проверки (ADR-0006, решение 6.6).
+  @override
   Future<DatabaseRegistryState> registerActive({
     required String fileName,
     required DatabaseSource source,
@@ -161,6 +124,7 @@ class DatabaseRegistry {
   /// Активную базу удалить нельзя, пока в реестре есть другие базы. Удаление
   /// единственной базы разрешено: вместо нее регистрируется исходная база, а
   /// заводское состояние создает первый запуск (ADR-0006, решение 6.8).
+  @override
   Future<DatabaseRegistryState> deleteDatabase(String id) async {
     final state = await load();
     if (!state.entries.any((entry) => entry.id == id)) {

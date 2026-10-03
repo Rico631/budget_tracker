@@ -1,14 +1,6 @@
+import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
-
-/// Код ошибки домена: сумма зачисления задана для операции, которой она не
-/// положена (доход или расход).
-const String transactionToAmountNotAllowedError =
-    'toAmountMinor must be empty.';
-
-/// Код ошибки домена: заданная сумма зачисления неположительна.
-const String transactionToAmountNotPositiveError =
-    'toAmountMinor must be positive.';
 
 class FinanceTransactionInput {
   const FinanceTransactionInput._({

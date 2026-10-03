@@ -9,8 +9,9 @@ import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/core/router/app_shell.dart';
 import 'package:budget_tracker/core/theme/app_theme.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
+import 'package:budget_tracker/data/local/database/file_database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
+import 'package:budget_tracker/data/local/database/drift_database_snapshot_service.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/categories_repository.dart';
@@ -108,7 +109,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory directory;
-  late DatabaseRegistry registry;
+  late FileDatabaseRegistry registry;
   late AppDatabase database;
   late _RecordingFileDialog dialog;
   late int restartCount;
@@ -144,7 +145,7 @@ void main() {
   /// реальный асинхронный ввод-вывод не завершается.
   Future<void> seedRegistry({required bool withImported}) async {
     fileIn('budget_tracker.sqlite').writeAsStringSync('исходная база');
-    registry = DatabaseRegistry(supportDirectory: () async => directory);
+    registry = FileDatabaseRegistry(supportDirectory: () async => directory);
     await registry.load();
     if (withImported) {
       fileIn(_importedFileName).writeAsStringSync('восстановленная база');
@@ -152,7 +153,7 @@ void main() {
         fileName: _importedFileName,
         source: DatabaseSource.imported,
       );
-      await registry.setActive(DatabaseRegistry.originalEntryId);
+      await registry.setActive(FileDatabaseRegistry.originalEntryId);
     }
   }
 
@@ -269,7 +270,7 @@ void main() {
       overrides: [
         databaseBackupUseCasesProvider.overrideWithValue(
           _FailingBackupUseCases(
-            snapshot: DatabaseSnapshotService(database),
+            snapshot: DriftDatabaseSnapshotService(database),
             files: dialog,
           ),
         ),
@@ -292,7 +293,7 @@ void main() {
         databaseBackupUseCasesProvider.overrideWithValue(
           _StubBackupUseCases(
             true,
-            snapshot: DatabaseSnapshotService(database),
+            snapshot: DriftDatabaseSnapshotService(database),
             files: dialog,
           ),
         ),
@@ -385,7 +386,7 @@ void main() {
     final state = await registry.load();
     fileIn('db_registry.json').writeAsStringSync(
       jsonEncode({
-        'version': DatabaseRegistry.formatVersion,
+        'version': FileDatabaseRegistry.formatVersion,
         'activeId': state.activeId,
         'entries': [
           for (final entry in state.entries)

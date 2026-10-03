@@ -1,20 +1,10 @@
 import 'package:budget_tracker/domain/commands/finance_transaction_input.dart';
+import 'package:budget_tracker/domain/common/error_codes.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
 import 'package:budget_tracker/domain/models/finance_models.dart';
 import 'package:budget_tracker/domain/repositories/finance_repositories.dart';
 import 'package:budget_tracker/domain/services/account_balance_rule.dart';
 import 'package:budget_tracker/domain/services/transactions_journal_rule.dart';
-import 'package:budget_tracker/domain/usecases/account_usecases.dart';
-
-/// Код ошибки домена: для перевода между счетами разных валют обязательна сумма
-/// зачисления.
-const String transferToAmountRequiredError =
-    'toAmountMinor is required when transfer accounts use different currencies.';
-
-/// Код ошибки домена: перевод между счетами одной валюты не задает сумму
-/// зачисления отдельно.
-const String transferToAmountNotAllowedError =
-    'toAmountMinor is not allowed when transfer accounts use the same currency.';
 
 class FinanceTransactionUseCases {
   FinanceTransactionUseCases({

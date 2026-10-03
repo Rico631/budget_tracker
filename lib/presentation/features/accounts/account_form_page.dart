@@ -1,5 +1,4 @@
 import 'package:budget_tracker/core/di/app_providers.dart';
-import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/core/l10n/app_localizations.dart';
 import 'package:budget_tracker/domain/commands/finance_account_input.dart';
 import 'package:budget_tracker/domain/common/validation_result.dart';
@@ -82,7 +81,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _currencyCode ??= ref
-        .read(accountUseCasesProvider)
+        .read(accountsControllerProvider.notifier)
         .defaultCurrencyCodeFor(Localizations.localeOf(context).languageCode);
   }
 

@@ -3,7 +3,8 @@ import 'dart:typed_data';
 
 import 'package:budget_tracker/data/local/database/app_database.dart';
 import 'package:budget_tracker/data/local/database/database_candidate_migrator.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/data/local/database/file_database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
 import 'package:budget_tracker/data/local/database/drift_database_restore_validator.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/repositories/database_validation.dart';
@@ -37,7 +38,7 @@ void main() {
   late Directory directory;
   late Directory sources;
   late AppDatabase current;
-  late DatabaseRegistry registry;
+  late FileDatabaseRegistry registry;
 
   File fileIn(String name) =>
       File('${directory.path}${Platform.pathSeparator}$name');
@@ -52,7 +53,7 @@ void main() {
       '${directory.path}${Platform.pathSeparator}sources',
     ).create();
     current = AppDatabase.forTesting();
-    registry = DatabaseRegistry(supportDirectory: () async => directory);
+    registry = FileDatabaseRegistry(supportDirectory: () async => directory);
     await fileIn('budget_tracker.sqlite').writeAsString('текущая база');
     await registry.load();
   });

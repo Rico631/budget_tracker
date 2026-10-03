@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
+import 'package:budget_tracker/domain/repositories/database_snapshot_service.dart';
 import 'package:budget_tracker/domain/repositories/file_dialogs.dart';
 import 'package:budget_tracker/domain/services/export_file_name_rule.dart';
 import 'package:path_provider/path_provider.dart';

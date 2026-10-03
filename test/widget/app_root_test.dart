@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:budget_tracker/core/di/app_lifecycle_providers.dart';
 import 'package:budget_tracker/core/di/finance_providers.dart';
 import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/data/local/database/file_database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/data/repositories/first_run_bootstrap_repository.dart';
@@ -21,7 +22,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory directory;
-  late DatabaseRegistry registry;
+  late FileDatabaseRegistry registry;
 
   File fileIn(String name) =>
       File('${directory.path}${Platform.pathSeparator}$name');
@@ -55,7 +56,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('budget_tracker_');
-    registry = DatabaseRegistry(supportDirectory: () async => directory);
+    registry = FileDatabaseRegistry(supportDirectory: () async => directory);
     await seedDatabase('budget_tracker.sqlite', 'Счет первой базы');
     await seedDatabase(_importedFileName, 'Счет второй базы');
     await registry.load();
@@ -63,7 +64,7 @@ void main() {
       fileName: _importedFileName,
       source: DatabaseSource.imported,
     );
-    await registry.setActive(DatabaseRegistry.originalEntryId);
+    await registry.setActive(FileDatabaseRegistry.originalEntryId);
   });
 
   tearDown(() async {

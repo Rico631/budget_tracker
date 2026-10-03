@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:budget_tracker/data/local/database/database_registry.dart';
+import 'package:budget_tracker/domain/models/database_registry_models.dart';
+import 'package:budget_tracker/domain/repositories/database_registry.dart';
 import 'package:budget_tracker/domain/repositories/database_validation.dart';
 import 'package:budget_tracker/domain/repositories/file_dialogs.dart';
 import 'package:budget_tracker/domain/services/export_file_name_rule.dart';

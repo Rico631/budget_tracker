@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
+import 'package:budget_tracker/data/local/database/drift_database_snapshot_service.dart';
 import 'package:budget_tracker/data/local/database/drift_database_restore_validator.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/repositories/database_validation.dart';
@@ -42,7 +42,7 @@ void main() {
   test('принимает корректный снимок базы', () async {
     await DriftBooksRepository(current).create(name: 'Личная книга');
     final snapshot = fileIn('snapshot.sqlite');
-    await DatabaseSnapshotService(current).snapshotTo(snapshot.path);
+    await DriftDatabaseSnapshotService(current).snapshotTo(snapshot.path);
 
     expect(await validator.validate(snapshot.path), isA<RestoreAccepted>());
   });

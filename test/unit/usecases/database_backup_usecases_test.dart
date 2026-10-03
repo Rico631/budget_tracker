@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
+import 'package:budget_tracker/data/local/database/drift_database_snapshot_service.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:budget_tracker/domain/repositories/file_dialogs.dart';
 import 'package:budget_tracker/domain/usecases/database_backup_usecases.dart';
@@ -55,7 +55,7 @@ void main() {
 
   DatabaseBackupUseCases useCasesWith(_RecordingFileDialog dialog) =>
       DatabaseBackupUseCases(
-        snapshot: DatabaseSnapshotService(database),
+        snapshot: DriftDatabaseSnapshotService(database),
         files: dialog,
         temporaryDirectory: () async => directory,
         clock: () => DateTime(2026, 10, 3, 15, 40, 5),

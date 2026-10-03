@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:budget_tracker/data/local/database/app_database.dart';
-import 'package:budget_tracker/data/local/database/database_snapshot_service.dart';
+import 'package:budget_tracker/data/local/database/drift_database_snapshot_service.dart';
 import 'package:budget_tracker/data/repositories/accounts_repository.dart';
 import 'package:budget_tracker/data/repositories/books_repository.dart';
 import 'package:drift/native.dart';
@@ -36,7 +36,7 @@ void main() {
     );
     final target = fileIn('snapshot.sqlite');
 
-    await DatabaseSnapshotService(database).snapshotTo(target.path);
+    await DriftDatabaseSnapshotService(database).snapshotTo(target.path);
 
     expect(target.existsSync(), isTrue);
     expect(directory.listSync().map((entity) => entity.uri.pathSegments.last), [
@@ -69,7 +69,7 @@ void main() {
     final target = fileIn('snapshot.sqlite');
     await target.writeAsString('не база данных');
 
-    await DatabaseSnapshotService(database).snapshotTo(target.path);
+    await DriftDatabaseSnapshotService(database).snapshotTo(target.path);
 
     final snapshot = AppDatabase.forTesting(NativeDatabase(target));
     addTearDown(snapshot.close);
