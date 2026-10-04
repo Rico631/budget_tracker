@@ -73,6 +73,8 @@ lib/
   [docs/reference-data/](docs/reference-data/).
 - Фактическое состояние архитектуры (C4) —
   [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md).
+- Описательная часть ВКР по шаблону задания (введение, главы 1–3,
+  заключение, литература, приложения) — [docs/vkr/](docs/vkr/).
 
 ## Разработка
 
