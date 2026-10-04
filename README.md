@@ -59,11 +59,17 @@ lib/
 ## Разработка
 
 ```bash
-flutter pub get        # зависимости
-flutter gen-l10n       # генерация локализации (настройки — в l10n.yaml)
-dart analyze           # статический анализ
-flutter test           # unit- и виджет-тесты
+flutter pub get                  # зависимости
+flutter gen-l10n                 # генерация локализации (настройки — в l10n.yaml)
+dart run flutter_launcher_icons  # иконки запуска из assets/icon/app_icon.png
+dart analyze                     # статический анализ
+flutter test                     # unit- и виджет-тесты
 ```
 
 Тесты зеркалят структуру `lib/`: unit-тесты лежат в `test/unit/`, виджет-тесты —
 в `test/widget/`.
+
+Иконки запуска Android, web и Windows генерируются из изображения знака
+`assets/icon/app_icon.png`; сгенерированные ресурсы платформ зафиксированы в
+репозитории, поэтому сборка не требует запуска генератора. Исходный экспорт знака —
+`assets/icon/icon.png`, передний план адаптивной иконки — `assets/icon/app_icon_foreground.png`.
