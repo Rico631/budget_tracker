@@ -61,6 +61,12 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.13
   drift_dev: ^2.26.1
+
+  # flutter_launcher_icons: иконки запуска Android, web и Windows собираются из
+  # одного изображения знака командой `dart run flutter_launcher_icons`, вместо
+  # ручной подготовки ресурсов каждой платформы (обоснование — решение 3 в
+  # openspec/changes/add-app-launcher-icon/design.md).
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
@@ -99,6 +105,9 @@ flutter:
   assets:
     - assets/fonts/LICENSE-OpenSans.txt
 
+  # Ресурсы assets/icon в приложение не включаются: это входные данные генератора
+  # иконок запуска, а не ресурсы времени выполнения.
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -129,3 +138,24 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Иконки запуска: генератор берет знак приложения и раскладывает его по платформам
+# (решения 2-5 в openspec/changes/add-app-launcher-icon/design.md). Передний план
+# adaptive-иконки уже содержит поля до гарантированной зоны, поэтому inset не
+# добавляется. Сгенерированные ресурсы платформ зафиксированы в репозитории,
+# поэтому сборка не зависит от запуска генератора.
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  adaptive_icon_foreground_inset: 0
+  web:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#009688"
+  windows:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    icon_size: 256
