@@ -17,6 +17,24 @@
   восстановление из копии и переключение между несколькими базами.
 - Локализация интерфейса: русский и английский.
 
+## Скриншоты
+
+| «Счета» | «Долги» |
+| --- | --- |
+| ![Счета](assets/images/examples/01_accounts.png) | ![Долги](assets/images/examples/02_debts.png) |
+
+| «Операции» | «Аналитика» |
+| --- | --- |
+| ![Операции](assets/images/examples/03_transactions.png) | ![Аналитика](assets/images/examples/04_analyics.png) |
+
+| «Настройки» | Форма операции «Доход» |
+| --- | --- |
+| ![Настройки](assets/images/examples/05_settings.png) | ![Форма операции — доход](assets/images/examples/06_transaction_form_income.png) |
+
+| Форма операции «Расход» | Форма операции «Перевод» |
+| --- | --- |
+| ![Форма операции — расход](assets/images/examples/06_transaction_form_expense.png) | ![Форма операции — перевод](assets/images/examples/06_transaction_form_transfer.png) |
+
 ## Архитектура
 
 Приложение разделено на три слоя и инфраструктурное ядро. Полные правила —
